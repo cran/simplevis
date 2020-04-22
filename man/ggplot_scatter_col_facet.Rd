@@ -14,7 +14,7 @@ ggplot_scatter_col_facet(data, x_var, y_var, col_var, facet_var,
   title = "[Title]", subtitle = NULL, x_title = "[X title]",
   y_title = "[Y title]", col_title = "", caption = "",
   legend_labels = NULL, font_family = "Helvetica",
-  font_size_title = 11, font_size_body = 10, wrap_title = 75,
+  font_size_title = 11, font_size_body = 10, wrap_title = 70,
   wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
   wrap_col_title = 25, wrap_caption = 80, isMobile = FALSE)
 }
@@ -85,7 +85,7 @@ ggplot_scatter_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.}
+\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 

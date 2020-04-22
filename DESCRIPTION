@@ -1,15 +1,16 @@
 Package: simplevis
 Type: Package
 Title: Simple Visualisation with 'ggplot2' and 'leaflet' Wrappers
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: 
     c(person(given = "David", 
                family = "Hodge", 
                email = "davidhodge931@gmail.com", 
-               role = c("aut", "cre")),
+               role = c("aut", "cre"),
+               comment = c(ORCID = "0000-0002-3868-7501")),
       person("Statistics New Zealand", 
              role = c("cph")))
-Description: 'ggplot2' and 'leaflet' wrapper functions designed to simplify the creation of high quality graph and map visualisations. These functions only require inputs of data, variables and titles to provide beautiful interactive or image visualisations. However they allow for more flexibility if required. The intent is that high quality well-designed graphs and maps can be made more consistently with less effort, code and expertise than would otherwise be required.
+Description: Provides 'ggplot2' and 'leaflet' wrapper functions designed to simplify the creation of high quality graph and map visualisations. These functions only require inputs of data, variables and titles to provide beautiful interactive or image visualisations. However they allow for more flexibility if required. The intent is that high quality well-designed graphs and maps can be made more consistently with less effort, code and expertise than would otherwise be required.
 License: MIT + file LICENSE
 URL: https://StatisticsNZ.github.io/simplevis,
         https://github.com/StatisticsNZ/simplevis
@@ -27,9 +28,9 @@ Suggests: knitr
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-03-10 21:01:29 UTC; dhodge
-Author: David Hodge [aut, cre],
+Packaged: 2020-04-22 02:44:19 UTC; dhodge
+Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-03-19 13:00:02 UTC
+Date/Publication: 2020-04-22 05:30:02 UTC

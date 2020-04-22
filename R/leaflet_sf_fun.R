@@ -24,7 +24,7 @@
 #' leaflet_sf(map_data)
 leaflet_sf <- function(data,
                        pal = NULL,
-                       popup = leafpop::popupTable(sentence_colnames(data)),
+                       popup = leafpop::popupTable(sentence_spaced_colnames(data)),
                        radius = 1,
                        weight = 2,
                        opacity = 0.1,
@@ -226,7 +226,9 @@ leaflet_sf <- function(data,
 #' map_data <- example_sf_nz_river_wq %>%
 #'   dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
 #'
-#' leaflet_sf_col(map_data, trend_category, pal = pal_trend3,
+#' pal <- c("#4575B4", "#D3D3D3", "#D73027")
+#'
+#' leaflet_sf_col(map_data, trend_category, pal = pal,
 #'    title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
 leaflet_sf_col <- function(data,
                            col_var,
@@ -236,7 +238,7 @@ leaflet_sf_col <- function(data,
                            pal = NULL,
                            rev_pal = FALSE,
                            col_scale_drop = FALSE,
-                           popup = leafpop::popupTable(sentence_colnames(data)),
+                           popup = leafpop::popupTable(sentence_spaced_colnames(data)),
                            radius = 1,
                            weight = 2,
                            opacity = 0.9,
@@ -279,7 +281,7 @@ leaflet_sf_col <- function(data,
     n_col_var_values <- length(labels)
     
     if (is.null(pal))
-      pal <- pal_set1[1:n_col_var_values]
+      pal <- pal_point_set1[1:n_col_var_values]
     else if (!is.null(pal))
       pal <- pal[1:n_col_var_values]
     if (rev_pal == TRUE)

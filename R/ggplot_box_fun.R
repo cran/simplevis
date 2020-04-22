@@ -31,7 +31,6 @@ theme_box <-
           face = "plain",
           hjust = 0.5
         ),
-        plot.title.position = "plot",
         plot.caption = element_text(
           family = font_family,
           colour = "#323232",
@@ -43,7 +42,7 @@ theme_box <-
           t = 5,
           l = 5,
           b = 5,
-          r = 15
+          r = 20
         ),
         panel.border = element_blank(),
         panel.spacing = unit(2.5, "lines"),
@@ -127,7 +126,7 @@ theme_box <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -136,26 +135,26 @@ theme_box <-
 #' @return A ggplot object.
 #' @export
 #' @examples
-#' iris <- iris %>%
+#' plot_data <- iris %>%
 #' tibble::as_tibble() %>%
 #'   dplyr::mutate(Species = stringr::str_to_sentence(Species))
 #'
-#' plot <- ggplot_box(data = iris, x_var = Species, y_var = Petal.Length,
+#' plot <- ggplot_box(data = plot_data, x_var = Species, y_var = Petal.Length,
 #'                     title = "Iris petal length by species",
 #'                     x_title = "Species",
 #'                     y_title = "Petal length (cm)")
 #'
 #' plot
 #'
-#' plotly::ggplotly(plot)
+#' plotly::ggplotly(plot, tooltip = "text")
 #'
-#' df <- iris %>%
+#' plot_data <- iris %>%
 #'   dplyr::group_by(Species) %>%
 #'   dplyr::summarise(boxplot_stats = list(rlang::set_names(boxplot.stats(Petal.Length)$stats,
 #'   c('ymin','lower','middle','upper','ymax')))) %>%
 #'   tidyr::unnest_wider(boxplot_stats)
 #'
-#' ggplot_box(data = df, x_var = Species, y_var = Petal.Length, stat = "identity")
+#' ggplot_box(data = plot_data, x_var = Species, y_var = Petal.Length, stat = "identity")
 ggplot_box <- function(data,
                        x_var,
                        y_var = NULL,
@@ -171,33 +170,28 @@ ggplot_box <- function(data,
                        font_family = "Helvetica",
                        font_size_title = 11,
                        font_size_body = 10,
-                       wrap_title = 75,
+                       wrap_title = 70,
                        wrap_subtitle = 80,
                        wrap_x_title = 50,
                        wrap_y_title = 50,
                        wrap_caption = 80,
                        isMobile = FALSE){
+  
+  data <- dplyr::ungroup(data)
   x_var <- rlang::enquo(x_var) #categorical var
   y_var <- rlang::enquo(y_var) #numeric var
   
   x_var_vector <- dplyr::pull(data, !!x_var)
-  if (stat == "boxplot")
-    y_var_vector <- dplyr::pull(data, !!y_var)
-  else if (stat == "identity")
-    y_var_vector <- c(dplyr::pull(data, .data$ymin), dplyr::pull(data, .data$ymax))
+  if (stat == "boxplot") y_var_vector <- dplyr::pull(data, !!y_var)
+  else if (stat == "identity") y_var_vector <- c(dplyr::pull(data, .data$ymin), dplyr::pull(data, .data$ymax))
   
-  if (is.numeric(x_var_vector))
-    stop("Please use a categorical x variable for a vertical boxplot")
-  if (!is.numeric(y_var_vector))
-    stop("Please use a numeric y variable for a vertical boxplot")
+  if (is.numeric(x_var_vector)) stop("Please use a categorical x variable for a vertical boxplot")
+  if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a vertical boxplot")
   
-  if (is.null(pal))
-    pal <- pal_snz
+  if (is.null(pal)) pal <- pal_snz
   
   if (stat == "boxplot") {
-    plot <- ggplot(data,
-                 aes(x = !!x_var,
-                     y = !!y_var)) +
+    plot <- ggplot(data, aes(x = !!x_var, y = !!y_var)) +
       coord_cartesian(clip = "off") +
       theme_box(
         font_family = font_family,
@@ -235,29 +229,19 @@ ggplot_box <- function(data,
       )
   }
   
-  if (y_scale_zero == FALSE){
-    y_scale_min_breaks_extra <- min(y_var_vector, na.rm = TRUE)
-    if (y_scale_min_breaks_extra > 0)
-      y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 0.999999
-    if (y_scale_min_breaks_extra < 0)
-      y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 1.000001
-    y_var_vector <- c(y_var_vector, y_scale_min_breaks_extra)
-  }
-  
-  if (y_scale_zero == TRUE)
+  if (y_scale_zero == TRUE) {
     y_scale_breaks <- pretty(c(0, y_var_vector))
-  else if (y_scale_zero == FALSE)
-    y_scale_breaks <- pretty(y_var_vector)
-  y_scale_max_breaks <- max(y_scale_breaks)
-  y_scale_min_breaks <- min(y_scale_breaks)
-  if (y_scale_zero == TRUE)
-    y_scale_limits <- c(0, y_scale_max_breaks)
-  else if (y_scale_zero == FALSE)
-    y_scale_limits <- c(y_scale_min_breaks, y_scale_max_breaks)
-  if (y_scale_zero == TRUE)
-    y_scale_oob <- scales::censor
-  else if (y_scale_zero == FALSE)
-    y_scale_oob <- scales::rescale_none
+    if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+    y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+  }
+  else if (y_scale_zero == FALSE) {
+    if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+    if(y_scale_trans == "log10") {
+      y_scale_breaks <- pretty(c(0, y_var_vector)) 
+      y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+    }
+    y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+  }
   
   plot <- plot +
     scale_y_continuous(
@@ -265,7 +249,7 @@ ggplot_box <- function(data,
       breaks = y_scale_breaks,
       limits = y_scale_limits,
       trans = y_scale_trans,
-      oob = y_scale_oob
+      oob = scales::rescale_none
     )
   
   if (isMobile == FALSE){
@@ -285,16 +269,16 @@ ggplot_box <- function(data,
   else if (isMobile == TRUE){
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
         x = stringr::str_wrap(x_title, 20),
         y = stringr::str_wrap(y_title, 20),
-        caption = stringr::str_wrap(caption, 20)
+        caption = stringr::str_wrap(caption, 50)
       ) +
       coord_flip() +
       scale_x_discrete(
         labels = function(x)
-          stringr::str_wrap(x, 20)
+          stringr::str_wrap(x, 30)
       ) +
       theme(panel.grid.major.x = element_line(colour = "#D3D3D3", size = 0.2)) +
       theme(panel.grid.major.y = element_blank())
@@ -324,7 +308,7 @@ ggplot_box <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -362,37 +346,31 @@ ggplot_box_facet <-
            font_family = "Helvetica",
            font_size_title = 11,
            font_size_body = 10,
-           wrap_title = 75,
+           wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
            wrap_caption = 80,
            isMobile = FALSE){
+    
+    data <- dplyr::ungroup(data)
     x_var <- rlang::enquo(x_var) #categorical var
     y_var <- rlang::enquo(y_var) #numeric var
     facet_var <- rlang::enquo(facet_var) #categorical var
     
-    x_var_vector <- dplyr::pull(data, !!x_var)
-    if (stat == "boxplot")
-      y_var_vector <- dplyr::pull(data, !!y_var)
-    else if (stat == "identity")
-      y_var_vector <- c(dplyr::pull(data, .data$ymin), dplyr::pull(data, .data$ymax))
+    x_var_vector <- dplyr::pull(data, !!x_var) 
+    if (stat == "boxplot") y_var_vector <- dplyr::pull(data, !!y_var)
+    else if (stat == "identity") y_var_vector <- c(dplyr::pull(data, .data$ymin), dplyr::pull(data, .data$ymax))
     facet_var_vector <- dplyr::pull(data, !!facet_var)
     
-    if (is.numeric(x_var_vector))
-      stop("Please use a categorical x variable for a vertical boxplot")
-    if (!is.numeric(y_var_vector))
-      stop("Please use a numeric y variable for a vertical boxplot")
-    if (is.numeric(facet_var_vector))
-      stop("Please use a categorical facet variable for a vertical boxplot")
+    if (is.numeric(x_var_vector)) stop("Please use a categorical x variable for a vertical boxplot")
+    if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a vertical boxplot")
+    if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a vertical boxplot")
     
-    if (is.null(pal))
-      pal <- pal_snz
+    if (is.null(pal)) pal <- pal_snz
     
     if (stat == "boxplot") {
-      plot <- ggplot(data,
-                     aes(x = !!x_var,
-                         y = !!y_var)) +
+      plot <- ggplot(data, aes(x = !!x_var, y = !!y_var)) +
           coord_cartesian(clip = "off") +
           theme_box(
             font_family = font_family,
@@ -430,59 +408,33 @@ ggplot_box_facet <-
       )
     }
 
-    if (facet_scales %in% c("fixed", "free_y")) {
-      if (y_scale_zero == FALSE){
-        y_scale_min_breaks_extra <- min(y_var_vector, na.rm = TRUE)
-        if (y_scale_min_breaks_extra > 0)
-          y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 0.999999
-        if (y_scale_min_breaks_extra < 0)
-          y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 1.000001
-        y_var_vector <- c(y_var_vector, y_scale_min_breaks_extra)
-      }
-      
-      if (y_scale_zero == TRUE)
-        y_scale_breaks <- pretty(c(0, y_var_vector))
-      else if (y_scale_zero == FALSE)
-        y_scale_breaks <- pretty(y_var_vector)
+    if (facet_scales %in% c("fixed", "free_x")) {
+      if (y_scale_zero == TRUE) y_scale_breaks <- pretty(c(0, y_var_vector))
+      else if (y_scale_zero == FALSE) y_scale_breaks <- pretty(y_var_vector)
       y_scale_max_breaks <- max(y_scale_breaks)
       y_scale_min_breaks <- min(y_scale_breaks)
-      if (y_scale_zero == TRUE)
-        y_scale_limits <- c(0, y_scale_max_breaks)
-      else if (y_scale_zero == FALSE)
-        y_scale_limits <- c(y_scale_min_breaks, y_scale_max_breaks)
-      if (y_scale_zero == TRUE)
-        y_scale_oob <- scales::censor
-      else if (y_scale_zero == FALSE)
-        y_scale_oob <- scales::rescale_none
-      
+      if (y_scale_zero == TRUE) y_scale_limits <- c(0, y_scale_max_breaks)
+      else if (y_scale_zero == FALSE) y_scale_limits <- c(y_scale_min_breaks, y_scale_max_breaks)
+
       plot <- plot +
         scale_y_continuous(
           expand = c(0, 0),
           breaks = y_scale_breaks,
           limits = y_scale_limits,
           trans = y_scale_trans,
-          oob = y_scale_oob
+          oob = scales::rescale_none
         )
     }
-    else if (facet_scales %in% c("free", "free_x")) {
-      if (y_scale_zero == TRUE)
-        y_scale_oob <- scales::censor
-      else if (y_scale_zero == FALSE)
-        y_scale_oob <- scales::rescale_none
-      
+    else if (facet_scales %in% c("free", "free_y")) {
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
                            trans = y_scale_trans,
-                           oob = y_scale_oob)
+                           oob = scales::rescale_none)
     }
     
     if (isMobile == FALSE){
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) <= 3)
-        facet_nrow <- 1
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) > 3)
-        facet_nrow <- 2
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) <= 3) facet_nrow <- 1
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) > 3) facet_nrow <- 2
       
       plot <- plot +
         labs(
@@ -501,17 +453,17 @@ ggplot_box_facet <-
     else if (isMobile == TRUE){
       plot <- plot +
         labs(
-          title = stringr::str_wrap(title, 20),
-          subtitle = stringr::str_wrap(subtitle, 20),
+          title = stringr::str_wrap(title, 40),
+          subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
           y = stringr::str_wrap(y_title, 20),
-          caption = stringr::str_wrap(caption, 20)
+          caption = stringr::str_wrap(caption, 50)
         ) +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1) +
         coord_flip() +
         scale_x_discrete(
           labels = function(x)
-            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), 20)
+            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), 30)
         ) +
         theme(panel.grid.major.x = element_line(colour = "#D3D3D3", size = 0.2)) +
         theme(panel.grid.major.y = element_blank())

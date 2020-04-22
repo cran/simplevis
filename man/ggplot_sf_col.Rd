@@ -11,7 +11,7 @@ ggplot_sf_col(data, col_var, col_method = NULL, bin_cuts = NULL,
   coastline_pal = "#7f7f7f", legend_ncol = 3, legend_digits = 1,
   title = "[Title]", subtitle = NULL, col_title = "", caption = "",
   legend_labels = NULL, font_family = "Helvetica",
-  font_size_title = 11, font_size_body = 10, wrap_title = 75,
+  font_size_title = 11, font_size_body = 10, wrap_title = 70,
   wrap_subtitle = 80, wrap_col_title = 25, wrap_caption = 80,
   isMobile = FALSE)
 }
@@ -64,7 +64,7 @@ ggplot_sf_col(data, col_var, col_method = NULL, bin_cuts = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.}
+\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
@@ -94,7 +94,9 @@ ggplot_sf_col(data = example_sf_nz_livestock, col_var = dairydens, coastline = n
 
 map_data <- example_sf_nz_river_wq \%>\%
   dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
+  
+ pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
-ggplot_sf_col(data = map_data, col_var = trend_category, coastline = nz, pal = pal_trend3,
+ggplot_sf_col(data = map_data, col_var = trend_category, coastline = nz, pal = pal,
    title = "Monitored river nitrate-nitrogen trends, 2008\\u201317")
 }

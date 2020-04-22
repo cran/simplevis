@@ -30,7 +30,6 @@ theme_stars <-
           face = "plain",
           hjust = 0.5
         ),
-        plot.title.position = "plot",
         plot.caption = element_text(
           family = font_family,
           colour = "#323232",
@@ -42,7 +41,7 @@ theme_stars <-
           t = 5,
           l = 5,
           b = 5,
-          r = 15
+          r = 20
         ),
         panel.border = element_blank(),
         panel.spacing = unit(2.5, "lines"),
@@ -102,7 +101,7 @@ theme_stars <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile. TRUEhis enable mobile compatible apps, where apps have ui mobileDetect function defined and mobile.js file in www/js/ folder  https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
@@ -121,7 +120,7 @@ ggplot_stars <- function(data,
                          font_family = "Helvetica",
                          font_size_title = 11,
                          font_size_body = 10,
-                         wrap_title = 75,
+                         wrap_title = 70,
                          wrap_subtitle = 80,
                          wrap_caption = 80,
                          isMobile = FALSE) {
@@ -192,9 +191,9 @@ ggplot_stars <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
-        caption = stringr::str_wrap(caption, 20)
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
+        caption = stringr::str_wrap(caption, 50)
       )
   }
   
@@ -222,7 +221,7 @@ ggplot_stars <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
@@ -251,7 +250,7 @@ ggplot_stars_col <- function(data,
                              font_family = "Helvetica",
                              font_size_title = 11,
                              font_size_body = 10,
-                             wrap_title = 75,
+                             wrap_title = 70,
                              wrap_subtitle = 80,
                              wrap_col_title = 25,
                              wrap_caption = 80,
@@ -303,7 +302,7 @@ ggplot_stars_col <- function(data,
       dplyr::mutate_at(vars(-.data$x,-.data$y), ~ cut(., bin_cuts, right = FALSE, include.lowest = TRUE))
     
     if (is.null(pal))
-      pal <- pal_set1[1:(length(bin_cuts) - 1)]
+      pal <- pal_point_set1[1:(length(bin_cuts) - 1)]
     if (!is.null(pal))
       pal <- pal[1:(length(bin_cuts) - 1)]
     if (is.null(legend_labels))
@@ -423,9 +422,9 @@ ggplot_stars_col <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
-        caption = stringr::str_wrap(caption, 20)
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
+        caption = stringr::str_wrap(caption, 50)
       )  +
       guides(fill = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15)))
   }
@@ -447,7 +446,7 @@ ggplot_stars_col <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile. TRUEhis enable mobile compatible apps, where apps have ui mobileDetect function defined and mobile.js file in www/js/ folder  https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
@@ -475,7 +474,7 @@ ggplot_stars_facet <- function(data,
                                font_family = "Helvetica",
                                font_size_title = 11,
                                font_size_body = 10,
-                               wrap_title = 75,
+                               wrap_title = 70,
                                wrap_subtitle = 80,
                                wrap_caption = 80,
                                isMobile = FALSE) {
@@ -565,9 +564,9 @@ ggplot_stars_facet <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
-        caption = stringr::str_wrap(caption, 20)
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
+        caption = stringr::str_wrap(caption, 50)
       )  +
       facet_wrap(
         ~ facet_var,
@@ -606,7 +605,7 @@ ggplot_stars_facet <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
@@ -645,7 +644,7 @@ ggplot_stars_col_facet <- function(data,
                                    font_family = "Helvetica",
                                    font_size_title = 11,
                                    font_size_body = 10,
-                                   wrap_title = 75,
+                                   wrap_title = 70,
                                    wrap_subtitle = 80,
                                    wrap_col_title = 25,
                                    wrap_caption = 80,
@@ -698,7 +697,7 @@ ggplot_stars_col_facet <- function(data,
                        ~ cut(., bin_cuts, right = FALSE, include.lowest = TRUE))
     
     if (is.null(pal))
-      pal <- pal_set1[1:(length(bin_cuts) - 1)]
+      pal <- pal_point_set1[1:(length(bin_cuts) - 1)]
     if (!is.null(pal))
       pal <- pal[1:(length(bin_cuts) - 1)]
     if (is.null(legend_labels))
@@ -879,9 +878,9 @@ ggplot_stars_col_facet <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
-        caption = stringr::str_wrap(caption, 20)
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
+        caption = stringr::str_wrap(caption, 50)
       )  +
       guides(fill = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15))) +
       facet_wrap(

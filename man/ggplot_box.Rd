@@ -8,7 +8,7 @@ ggplot_box(data, x_var, y_var = NULL, stat = "boxplot",
   y_scale_zero = TRUE, y_scale_trans = "identity", pal = NULL,
   title = "[Title]", subtitle = NULL, x_title = "[X title]",
   y_title = "[Y title]", caption = "", font_family = "Helvetica",
-  font_size_title = 11, font_size_body = 10, wrap_title = 75,
+  font_size_title = 11, font_size_body = 10, wrap_title = 70,
   wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
   wrap_caption = 80, isMobile = FALSE)
 }
@@ -43,7 +43,7 @@ ggplot_box(data, x_var, y_var = NULL, stat = "boxplot",
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.}
+\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
@@ -62,24 +62,24 @@ A ggplot object.
 Vertical box ggplot that is not coloured and not facetted.
 }
 \examples{
-iris <- iris \%>\%
+plot_data <- iris \%>\%
 tibble::as_tibble() \%>\%
   dplyr::mutate(Species = stringr::str_to_sentence(Species))
 
-plot <- ggplot_box(data = iris, x_var = Species, y_var = Petal.Length,
+plot <- ggplot_box(data = plot_data, x_var = Species, y_var = Petal.Length,
                     title = "Iris petal length by species",
                     x_title = "Species",
                     y_title = "Petal length (cm)")
 
 plot
 
-plotly::ggplotly(plot)
+plotly::ggplotly(plot, tooltip = "text")
 
-df <- iris \%>\%
+plot_data <- iris \%>\%
   dplyr::group_by(Species) \%>\%
   dplyr::summarise(boxplot_stats = list(rlang::set_names(boxplot.stats(Petal.Length)$stats,
   c('ymin','lower','middle','upper','ymax')))) \%>\%
   tidyr::unnest_wider(boxplot_stats)
 
-ggplot_box(data = df, x_var = Species, y_var = Petal.Length, stat = "identity")
+ggplot_box(data = plot_data, x_var = Species, y_var = Petal.Length, stat = "identity")
 }

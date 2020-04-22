@@ -30,7 +30,6 @@ theme_line <-
           face = "plain",
           hjust = 0.5
         ),
-        plot.title.position = "plot",
         plot.caption = element_text(
           family = font_family,
           colour = "#323232",
@@ -42,7 +41,7 @@ theme_line <-
           t = 5,
           l = 5,
           b = 5,
-          r = 15
+          r = 20
         ),
         panel.border = element_blank(),
         panel.spacing = unit(2.5, "lines"),
@@ -111,13 +110,13 @@ theme_line <-
 
 #' @title Line ggplot.
 #' @description Line ggplot that is not coloured and not facetted.
-#' @param data An ungrouped summarised tibble or dataframe. Required input.
+#' @param data A tibble or dataframe. Required input.
 #' @param x_var Unquoted numeric or date variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param x_scale_date_format Date format for x axis labels.
 #' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_scale_trans A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param points TRUE or FALSE of whether to include points. Defaults to TRUE.
 #' @param point_size Size of points. Defaults to 1. Only applicable to where points equals TRUE.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
@@ -129,7 +128,7 @@ theme_line <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -140,11 +139,10 @@ theme_line <-
 #' @examples
 #' plot_data <- dplyr::storms %>%
 #'   dplyr::group_by(year) %>%
-#'   dplyr::summarise(wind = round(mean(wind), 2)) %>%
-#'   dplyr::ungroup()
+#'   dplyr::summarise(wind = round(mean(wind), 2)) 
 #'
 #'   plot <- ggplot_line(data = plot_data, x_var = year, y_var = wind,
-#'       title = "Average wind speed of Atlantic dplyr::storms, 1975\u20132015",
+#'       title = "Average wind speed of Atlantic storms, 1975\u20132015",
 #'       x_title = "Year",
 #'       y_title = "Average maximum sustained wind speed (knots)")
 #'
@@ -169,12 +167,14 @@ ggplot_line <- function(data,
                         font_family = "Helvetica",
                         font_size_title = 11,
                         font_size_body = 10,
-                        wrap_title = 75,
+                        wrap_title = 70,
                         wrap_subtitle = 80,
                         wrap_x_title = 50,
                         wrap_y_title = 50,
                         wrap_caption = 80,
                         isMobile = FALSE) {
+  
+  data <- dplyr::ungroup(data)
   x_var <- rlang::enquo(x_var) #numeric var
   y_var <- rlang::enquo(y_var) #numeric var
   hover_var <- rlang::enquo(hover_var)
@@ -182,104 +182,96 @@ ggplot_line <- function(data,
   x_var_vector <- dplyr::pull(data, !!x_var)
   y_var_vector <- dplyr::pull(data, !!y_var)
   
-  if (!(lubridate::is.Date(x_var_vector) |
-        is.numeric(x_var_vector)))
-    stop("Please use a numeric or date x variable for a line plot")
-  if (!is.numeric(y_var_vector))
-    stop("Please use a numeric y variable for a line plot")
+  if (!(lubridate::is.Date(x_var_vector) | is.numeric(x_var_vector))) stop("Please use a numeric or date x variable for a line plot")
+  if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a line plot")
   
-  if (is.null(pal))
-    pal <- pal_snz
+  if (is.null(pal)) pal <- pal_snz
   
-  if (is.null(rlang::get_expr(hover_var))) {
-    plot <- ggplot(data,
-                   aes(!!x_var, !!y_var,
-                       text = paste(
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                           ": ",
-                           !!x_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                           ": ",
-                           !!y_var
-                         ),
-                         sep = "<br>"
-                       )))
-  }
-  else if (!is.null(rlang::get_expr(hover_var))) {
-    plot <- ggplot(data,
-                   aes(
-                     !!x_var, !!y_var,
-                     text = paste(
-                       paste0(
-                         stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                         ": ",
-                         !!x_var
-                       ),
-                       paste0(
-                         stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                         ": ",
-                         !!y_var
-                       ),
-                       paste0(
-                         stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-                         ": ",
-                         !!hover_var
-                       ),
-                       sep = "<br>"
-                     )
-                   ))
-  }
-  
-  plot <- plot +
+  plot <- ggplot(data, aes(!!x_var, !!y_var)) +
     coord_cartesian(clip = "off") +
     theme_line(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
-    ) +
-    geom_line(aes(group = 1), col = pal[1])
+    )
   
-  if (points == TRUE) {
+  if (points == TRUE) alpha <- 1
+  else if (points == FALSE) alpha <- 0
+  
+  if (is.null(rlang::get_expr(hover_var))) {
     plot <- plot +
-      geom_point(col = pal[1], size = point_size)
+      geom_line(aes(group = 1), col = pal[1]) +
+      geom_point(aes(text = paste(
+        paste0(
+          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+          ": ",
+          !!x_var
+        ),
+        paste0(
+          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+          ": ",
+          !!y_var
+        ),
+        sep = "<br>"
+        )                    
+      ), 
+      col = pal[1],
+      size = point_size,
+      alpha = alpha
+      )
+  }
+  else if (!is.null(rlang::get_expr(hover_var))) {
+    plot <- plot +
+      geom_line(aes(group = 1), col = pal[1]) +
+      geom_point(aes(text = paste(
+        paste0(
+          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+          ": ",
+          !!x_var
+        ),
+        paste0(
+          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+          ": ",
+          !!y_var
+        ),
+        paste0(
+          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
+          ": ",
+          !!hover_var
+        ),
+        sep = "<br>"
+        )
+      ), 
+      col = pal[1],
+      size = point_size,
+      alpha = alpha
+      )
   }
   
-  x_scale_breaks <- pretty(x_var_vector)
-  x_scale_min <- min(x_var_vector, na.rm = TRUE)
-  x_scale_max <- max(x_var_vector, na.rm = TRUE)
-  x_scale_limits <- c(x_scale_min, x_scale_max)
+  if(isMobile == FALSE) x_scale_n <- 6
+  else if(isMobile == TRUE) x_scale_n <- 4
+
+  x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+  x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
   
-  if (y_scale_zero == FALSE) {
-    y_scale_min_breaks_extra <- min(y_var_vector, na.rm = TRUE)
-    if (y_scale_min_breaks_extra > 0)
-      y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 0.999999
-    if (y_scale_min_breaks_extra < 0)
-      y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 1.000001
-    y_var_vector <- c(y_var_vector, y_scale_min_breaks_extra)
-  }
-  
-  if (y_scale_zero == TRUE)
+  if (y_scale_zero == TRUE) {
     y_scale_breaks <- pretty(c(0, y_var_vector))
-  else if (y_scale_zero == FALSE)
-    y_scale_breaks <- pretty(y_var_vector)
-  y_scale_max_breaks <- max(y_scale_breaks)
-  y_scale_min_breaks <- min(y_scale_breaks)
-  if (y_scale_zero == TRUE)
-    y_scale_limits <- c(0, max(y_scale_breaks))
-  else if (y_scale_zero == FALSE)
+    if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
     y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
-  if (y_scale_zero == TRUE)
-    y_scale_oob <- scales::censor
-  else if (y_scale_zero == FALSE)
-    y_scale_oob <- scales::rescale_none
+  }
+  else if (y_scale_zero == FALSE) {
+    if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+    if(y_scale_trans == "log10") {
+      y_scale_breaks <- pretty(c(0, y_var_vector)) 
+      y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+    }
+    y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+  }
   
   if (lubridate::is.Date(x_var_vector)) {
     plot <- plot +
       scale_x_date(
-        expand = c(0.03, 0),
+        expand = c(0, 0),
         breaks = x_scale_breaks,
         limits = x_scale_limits,
         labels = scales::date_format(x_scale_date_format)
@@ -287,9 +279,10 @@ ggplot_line <- function(data,
   }
   else if (is.numeric(x_var_vector)) {
     plot <- plot +
-      scale_x_continuous(expand = c(0.03, 0),
+      scale_x_continuous(expand = c(0, 0),
                          breaks = x_scale_breaks,
-                         limits = x_scale_limits)
+                         limits = x_scale_limits,
+                         oob = scales::rescale_none)
   }
   
   plot <- plot +
@@ -298,7 +291,7 @@ ggplot_line <- function(data,
       breaks = y_scale_breaks,
       limits = y_scale_limits,
       trans = y_scale_trans,
-      oob = y_scale_oob
+      oob = scales::rescale_none
     )
   
   if (isMobile == FALSE) {
@@ -314,11 +307,11 @@ ggplot_line <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
         x = stringr::str_wrap(x_title, 20),
         y = stringr::str_wrap(y_title, 20),
-        caption = stringr::str_wrap(caption, 20)
+        caption = stringr::str_wrap(caption, 50)
       )
   }
   
@@ -327,13 +320,13 @@ ggplot_line <- function(data,
 
 #' @title Line ggplot that is coloured.
 #' @description Line ggplot that is coloured, but not facetted.
-#' @param data An ungrouped summarised tibble or dataframe. Required input.
+#' @param data A tibble or dataframe. Required input.
 #' @param x_var Unquoted numeric or date variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
-#' @param col_var Unquoted categorical variable for points to be coloured by. Required input.
+#' @param col_var Unquoted categorical variable for lines and points to be coloured by. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_scale_trans A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param col_scale_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
 #' @param points TRUE or FALSE of whether to include points. Defaults to TRUE.
 #' @param point_size Size of points. Defaults to 1. Only applicable to where points equals TRUE.
@@ -351,7 +344,7 @@ ggplot_line <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -364,14 +357,13 @@ ggplot_line <- function(data,
 #' plot_data <- dplyr::storms %>%
 #'   dplyr::mutate(status = stringr::str_to_sentence(status)) %>%
 #'   dplyr::group_by(year, status) %>%
-#'   dplyr::summarise(wind = round(mean(wind), 2)) %>%
-#'   dplyr::ungroup()
+#'   dplyr::summarise(wind = round(mean(wind), 2))
 #'
-#'   plot <- ggplot_line_col(data = plot_data, x_var = year, y_var = wind, col_var = status)
+#' plot <- ggplot_line_col(data = plot_data, x_var = year, y_var = wind, col_var = status)
 #'
-#'   plot
+#' plot
 #'
-#'   plotly::ggplotly(plot, tooltip = "text")
+#' plotly::ggplotly(plot, tooltip = "text")
 ggplot_line_col <-
   function(data,
            x_var,
@@ -397,13 +389,15 @@ ggplot_line_col <-
            font_family = "Helvetica",
            font_size_title = 11,
            font_size_body = 10,
-           wrap_title = 75,
+           wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
            wrap_col_title = 25,
            wrap_caption = 80,
            isMobile = FALSE) {
+    
+    data <- dplyr::ungroup(data)
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     col_var <- rlang::enquo(col_var) #categorical var
@@ -413,131 +407,111 @@ ggplot_line_col <-
     y_var_vector <- dplyr::pull(data, !!y_var)
     col_var_vector <- dplyr::pull(data, !!col_var)
     
-    if (!(lubridate::is.Date(x_var_vector) |
-          is.numeric(x_var_vector)))
-      stop("Please use a numeric or date x variable for a line plot")
-    if (!is.numeric(y_var_vector))
-      stop("Please use a numeric y variable for a line plot")
-    if (is.numeric(col_var_vector))
-      stop("Please use a categorical colour variable for a line plot")
+    if (!(lubridate::is.Date(x_var_vector) | is.numeric(x_var_vector))) stop("Please use a numeric or date x variable for a line plot")
+    if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a line plot")
+    if (is.numeric(col_var_vector)) stop("Please use a categorical colour variable for a line plot")
     
-    if (is.null(pal))
-      pal <- pal_snz
+    if (is.null(pal)) pal <- pal_snz
     
-    if (is.null(rlang::get_expr(hover_var))) {
-      plot <- ggplot(data,
-                     aes(
-                       x = !!x_var,
-                       y = !!y_var,
-                       col = !!col_var,
-                       group = !!col_var,
-                       text = paste(
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                           ": ",
-                           !!x_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-                           ": ",
-                           !!col_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                           ": ",
-                           !!y_var
-                         ),
-                         sep = "<br>"
-                       )
-                     ))
-    }
-    else if (!is.null(rlang::get_expr(hover_var))) {
-      plot <- ggplot(data,
-                     aes(
-                       x = !!x_var,
-                       y = !!y_var,
-                       col = !!col_var,
-                       group = !!col_var,
-                       text = paste(
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                           ": ",
-                           !!x_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-                           ": ",
-                           !!col_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                           ": ",
-                           !!y_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-                           ": ",
-                           !!hover_var
-                         ),
-                         sep = "<br>"
-                       )
-                     ))
-    }
-    
-    plot <- plot +
+    plot <- ggplot(data, aes(!!x_var, !!y_var, col = !!col_var, group = !!col_var)) +
       coord_cartesian(clip = "off") +
       theme_line(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
-      ) +
-      geom_line(aes(group = !!col_var))
+      )
     
-    if (points == TRUE) {
+    if (points == TRUE) alpha <- 1
+    else if (points == FALSE) alpha <- 0
+    
+    if (is.null(rlang::get_expr(hover_var))) {
       plot <- plot +
-        geom_point(size = point_size)
+        geom_line() +
+        geom_point(aes(
+          text = paste(
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+              ": ",
+              !!x_var
+            ),
+           paste0(
+             stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
+             ": ",
+             !!col_var
+           ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+              ": ",
+              !!y_var
+            ),
+            sep = "<br>"
+          )                    
+        ), 
+        size = point_size,
+        alpha = alpha
+        )
     }
-    
-    if (rev_pal == TRUE)
-      pal <- rev(pal)
-    if (!is.null(legend_labels))
-      labels <- legend_labels
-    if (is.null(legend_labels))
-      labels <- waiver()
-    
-    x_scale_breaks <- pretty(x_var_vector)
-    x_scale_min <- min(x_var_vector, na.rm = TRUE)
-    x_scale_max <- max(x_var_vector, na.rm = TRUE)
-    x_scale_limits <- c(x_scale_min, x_scale_max)
-    
-    if (y_scale_zero == FALSE) {
-      y_scale_min_breaks_extra <- min(y_var_vector, na.rm = TRUE)
-      if (y_scale_min_breaks_extra > 0)
-        y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 0.999999
-      if (y_scale_min_breaks_extra < 0)
-        y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 1.000001
-      y_var_vector <- c(y_var_vector, y_scale_min_breaks_extra)
+    else if (!is.null(rlang::get_expr(hover_var))) {
+      plot <- plot +
+        geom_line() +
+        geom_point(aes(
+          text = paste(
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+              ": ",
+              !!x_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
+              ": ",
+              !!col_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+              ": ",
+              !!y_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
+              ": ",
+              !!hover_var
+            ),
+            sep = "<br>"
+          )
+        ), 
+        size = point_size,
+        alpha = alpha
+        )
     }
+
+    if (rev_pal == TRUE) pal <- rev(pal)
+    if (!is.null(legend_labels)) labels <- legend_labels
+    if (is.null(legend_labels)) labels <- waiver()
     
-    if (y_scale_zero == TRUE)
+    if(isMobile == FALSE) x_scale_n <- 6
+    else if(isMobile == TRUE) x_scale_n <- 4
+    
+    x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+    x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+    
+    if (y_scale_zero == TRUE) {
       y_scale_breaks <- pretty(c(0, y_var_vector))
-    else if (y_scale_zero == FALSE)
-      y_scale_breaks <- pretty(y_var_vector)
-    y_scale_max_breaks <- max(y_scale_breaks)
-    y_scale_min_breaks <- min(y_scale_breaks)
-    if (y_scale_zero == TRUE)
-      y_scale_limits <- c(0, max(y_scale_breaks))
-    else if (y_scale_zero == FALSE)
+      if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
       y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
-    if (y_scale_zero == TRUE)
-      y_scale_oob <- scales::censor
-    else if (y_scale_zero == FALSE)
-      y_scale_oob <- scales::rescale_none
-    
+    }
+    else if (y_scale_zero == FALSE) {
+      if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+      if(y_scale_trans == "log10") {
+        y_scale_breaks <- pretty(c(0, y_var_vector)) 
+        y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+      }
+      y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+    }
+
     if (lubridate::is.Date(x_var_vector)) {
       plot <- plot +
         scale_x_date(
-          expand = c(0.03, 0),
+          expand = c(0, 0),
           breaks = x_scale_breaks,
           limits = x_scale_limits,
           labels = scales::date_format(x_scale_date_format)
@@ -545,7 +519,7 @@ ggplot_line_col <-
     }
     else if (is.numeric(x_var_vector)) {
       plot <- plot +
-        scale_x_continuous(expand = c(0.03, 0),
+        scale_x_continuous(expand = c(0, 0),
                            breaks = x_scale_breaks,
                            limits = x_scale_limits)
     }
@@ -562,7 +536,7 @@ ggplot_line_col <-
         breaks = y_scale_breaks,
         limits = y_scale_limits,
         trans = y_scale_trans,
-        oob = y_scale_oob
+        oob = scales::rescale_none
       )
     
     if (isMobile == FALSE) {
@@ -579,11 +553,11 @@ ggplot_line_col <-
     else if (isMobile == TRUE) {
       plot <- plot +
         labs(
-          title = stringr::str_wrap(title, 20),
-          subtitle = stringr::str_wrap(subtitle, 20),
+          title = stringr::str_wrap(title, 40),
+          subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
           y = stringr::str_wrap(y_title, 20),
-          caption = stringr::str_wrap(caption, 20)
+          caption = stringr::str_wrap(caption, 50)
         )  +
         guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15)))
     }
@@ -593,14 +567,14 @@ ggplot_line_col <-
 
 #' @title Line ggplot that is facetted.
 #' @description Line ggplot that is facetted, but not coloured.
-#' @param data An ungrouped summarised tibble or dataframe. Required input.
+#' @param data A tibble or dataframe. Required input.
 #' @param x_var Unquoted numeric or date variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param x_scale_date_format Date format for x axis labels.
 #' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_scale_trans A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param points TRUE or FALSE of whether to include points. Defaults to TRUE.
 #' @param point_size Size of points. Defaults to 1. Only applicable to where points equals TRUE.
 #' @param facet_scales Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".
@@ -614,7 +588,7 @@ ggplot_line_col <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -626,14 +600,13 @@ ggplot_line_col <-
 #' plot_data <- dplyr::storms %>%
 #'   dplyr::mutate(status = stringr::str_to_sentence(status)) %>%
 #'   dplyr::group_by(year, status) %>%
-#'   dplyr::summarise(wind = round(mean(wind), 2)) %>%
-#'   dplyr::ungroup()
+#'   dplyr::summarise(wind = round(mean(wind), 2)) 
 #'
-#'   plot <- ggplot_line_facet(data = plot_data, x_var = year, y_var = wind, facet_var = status)
+#'  plot <- ggplot_line_facet(data = plot_data, x_var = year, y_var = wind, facet_var = status)
 #'
-#'   plot
+#'  plot
 #'
-#'   plotly::ggplotly(plot, tooltip = "text")
+#'  plotly::ggplotly(plot, tooltip = "text")
 ggplot_line_facet <-
   function(data,
            x_var,
@@ -656,12 +629,14 @@ ggplot_line_facet <-
            font_family = "Helvetica",
            font_size_title = 11,
            font_size_body = 10,
-           wrap_title = 75,
+           wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
            wrap_caption = 80,
            isMobile = FALSE) {
+    
+    data <- dplyr::ungroup(data)
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     facet_var <- rlang::enquo(facet_var) #categorical var
@@ -671,95 +646,95 @@ ggplot_line_facet <-
     y_var_vector <- dplyr::pull(data, !!y_var)
     facet_var_vector <- dplyr::pull(data, !!facet_var)
     
-    if (!(lubridate::is.Date(x_var_vector) |
-          is.numeric(x_var_vector)))
-      stop("Please use a numeric or date x variable for a line plot")
-    if (!is.numeric(y_var_vector))
-      stop("Please use a numeric y variable for a line plot")
-    if (is.numeric(facet_var_vector))
-      stop("Please use a categorical facet variable for a line plot")
+    if (!(lubridate::is.Date(x_var_vector) | is.numeric(x_var_vector))) stop("Please use a numeric or date x variable for a line plot")
+    if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a line plot")
+    if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a line plot")
     
-    if (is.null(pal))
-      pal <- pal_snz
+    if (is.null(pal)) pal <- pal_snz
     
-    if (is.null(rlang::get_expr(hover_var))) {
-      plot <- ggplot(data,
-                     aes(
-                       !!x_var, !!y_var,
-                       text = paste(
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                           ": ",
-                           !!x_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-                           ": ",
-                           !!facet_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                           ": ",
-                           !!y_var
-                         ),
-                         sep = "<br>"
-                       )
-                     ))
-    }
-    else if (!is.null(rlang::get_expr(hover_var))) {
-      plot <- ggplot(data,
-                     aes(
-                       !!x_var, !!y_var,
-                       text = paste(
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                           ": ",
-                           !!x_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-                           ": ",
-                           !!facet_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                           ": ",
-                           !!y_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-                           ": ",
-                           !!hover_var
-                         ),
-                         sep = "<br>"
-                       )
-                     ))
-    }
-    
-    plot <- plot +
+    plot <- ggplot(data, aes(!!x_var, !!y_var)) +
       coord_cartesian(clip = "off") +
       theme_line(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
-      ) +
-      geom_line(aes(group = 1), col = pal[1])
+      )
     
-    if (points == TRUE) {
+    if (points == TRUE) alpha <- 1
+    else if (points == FALSE) alpha <- 0
+    
+    if (is.null(rlang::get_expr(hover_var))) {
       plot <- plot +
-        geom_point(col = pal[1], size = point_size)
+        geom_line(aes(group = 1), col = pal[1]) +
+        geom_point(aes(text = paste(
+          paste0(
+            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+            ": ",
+            !!x_var
+          ),
+          paste0(
+            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
+            ": ",
+            !!facet_var
+          ),
+          paste0(
+            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+            ": ",
+            !!y_var
+          ),
+          sep = "<br>"
+        )                    
+        ), 
+        col = pal[1],
+        size = point_size,
+        alpha = alpha
+        )
+    }
+    else if (!is.null(rlang::get_expr(hover_var))) {
+      plot <- plot +
+        geom_line(aes(group = 1), col = pal[1]) +
+        geom_point(aes(text = paste(
+          paste0(
+            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+            ": ",
+            !!x_var
+          ),
+          paste0(
+            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
+            ": ",
+            !!facet_var
+          ),
+          paste0(
+            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+            ": ",
+            !!y_var
+          ),
+          paste0(
+            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
+            ": ",
+            !!hover_var
+          ),
+          sep = "<br>"
+        )
+        ), 
+        col = pal[1],
+        size = point_size,
+        alpha = alpha
+        )
     }
     
     if (facet_scales %in% c("fixed", "free_y")) {
-      x_scale_breaks <- pretty(x_var_vector)
-      x_scale_min <- min(x_var_vector, na.rm = TRUE)
-      x_scale_max <- max(x_var_vector, na.rm = TRUE)
-      x_scale_limits <- c(x_scale_min, x_scale_max)
+      
+      if(isMobile == FALSE) x_scale_n <- 5
+      else if(isMobile == TRUE) x_scale_n <- 4
+      
+      x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+      x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
       
       if (lubridate::is.Date(x_var_vector)) {
         plot <- plot +
           scale_x_date(
-            expand = c(0.03, 0),
+            expand = c(0, 0),
             breaks = x_scale_breaks,
             limits = x_scale_limits,
             labels = scales::date_format(x_scale_date_format)
@@ -767,36 +742,26 @@ ggplot_line_facet <-
       }
       else if (is.numeric(x_var_vector)) {
         plot <- plot +
-          scale_x_continuous(expand = c(0.03, 0),
+          scale_x_continuous(expand = c(0, 0),
                              breaks = x_scale_breaks,
                              limits = x_scale_limits)
       }
     }
     
     if (facet_scales %in% c("fixed", "free_x")) {
-      if (y_scale_zero == FALSE) {
-        y_scale_min_breaks_extra <- min(y_var_vector, na.rm = TRUE)
-        if (y_scale_min_breaks_extra > 0)
-          y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 0.999999
-        if (y_scale_min_breaks_extra < 0)
-          y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 1.000001
-        y_var_vector <- c(y_var_vector, y_scale_min_breaks_extra)
-      }
-      
-      if (y_scale_zero == TRUE)
+      if (y_scale_zero == TRUE) {
         y_scale_breaks <- pretty(c(0, y_var_vector))
-      if (y_scale_zero == FALSE)
-        y_scale_breaks <- pretty(y_var_vector)
-      y_scale_max_breaks <- max(y_scale_breaks)
-      y_scale_min_breaks <- min(y_scale_breaks)
-      if (y_scale_zero == TRUE)
-        y_scale_limits <- c(0, max(y_scale_breaks))
-      if (y_scale_zero == FALSE)
+        if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
         y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
-      if (y_scale_zero == TRUE)
-        y_scale_oob <- scales::censor
-      else if (y_scale_zero == FALSE)
-        y_scale_oob <- scales::rescale_none
+      }
+      else if (y_scale_zero == FALSE) {
+        if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+        if(y_scale_trans == "log10") {
+          y_scale_breaks <- pretty(c(0, y_var_vector)) 
+          y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        }
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
       
       plot <- plot +
         scale_y_continuous(
@@ -804,28 +769,19 @@ ggplot_line_facet <-
           breaks = y_scale_breaks,
           limits = y_scale_limits,
           trans = y_scale_trans,
-          oob = y_scale_oob
+          oob = scales::rescale_none
         )
     }
     else if (facet_scales %in% c("free", "free_y")) {
-      if (y_scale_zero == TRUE)
-        y_scale_oob <- scales::censor
-      else if (y_scale_zero == FALSE)
-        y_scale_oob <- scales::rescale_none
-      
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
                            trans = y_scale_trans,
-                           oob = y_scale_oob)
+                           oob = scales::rescale_none)
     }
-    
+
     if (isMobile == FALSE) {
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) <= 3)
-        facet_nrow <- 1
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) > 3)
-        facet_nrow <- 2
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) <= 3) facet_nrow <- 1
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) > 3) facet_nrow <- 2
       
       plot <- plot +
         labs(
@@ -840,11 +796,11 @@ ggplot_line_facet <-
     else if (isMobile == TRUE) {
       plot <- plot +
         labs(
-          title = stringr::str_wrap(title, 20),
-          subtitle = stringr::str_wrap(subtitle, 20),
+          title = stringr::str_wrap(title, 40),
+          subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
           y = stringr::str_wrap(y_title, 20),
-          caption = stringr::str_wrap(caption, 20)
+          caption = stringr::str_wrap(caption, 50)
         )  +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1)
       
@@ -855,15 +811,15 @@ ggplot_line_facet <-
 
 #' @title Line ggplot that is coloured and facetted.
 #' @description Line ggplot that is coloured and facetted.
-#' @param data An ungrouped summarised tibble or dataframe. Required input.
+#' @param data A tibble or dataframe. Required input.
 #' @param x_var Unquoted numeric or date variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
-#' @param col_var Unquoted categorical variable for points to be coloured by. Required input.
+#' @param col_var Unquoted categorical variable for lines and points to be coloured by. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param x_scale_date_format Date format for x axis labels.
 #' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_scale_trans A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param col_scale_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
 #' @param points TRUE or FALSE of whether to include points. Defaults to TRUE.
 #' @param point_size Size of points. Defaults to 1. Only applicable to where points equals TRUE.
@@ -882,7 +838,7 @@ ggplot_line_facet <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -895,15 +851,14 @@ ggplot_line_facet <-
 #' plot_data <- dplyr::storms %>%
 #'   dplyr::mutate(status = stringr::str_to_sentence(status)) %>%
 #'   dplyr::group_by(year, status) %>%
-#'   dplyr::summarise(wind = round(mean(wind), 2)) %>%
-#'   dplyr::ungroup()
+#'   dplyr::summarise(wind = round(mean(wind), 2)) 
 #'
-#'   plot <- ggplot_line_col_facet(data = plot_data, x_var = year, y_var = wind, col_var = status,
+#'  plot <- ggplot_line_col_facet(data = plot_data, x_var = year, y_var = wind, col_var = status,
 #'                                 facet_var = status)
 #'
-#'   plot
+#'  plot
 #'
-#'   plotly::ggplotly(plot, tooltip = "text")
+#'  plotly::ggplotly(plot, tooltip = "text")
 ggplot_line_col_facet <-
   function(data,
            x_var,
@@ -932,13 +887,15 @@ ggplot_line_col_facet <-
            font_family = "Helvetica",
            font_size_title = 11,
            font_size_body = 10,
-           wrap_title = 75,
+           wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
            wrap_col_title = 25,
            wrap_caption = 80,
            isMobile = FALSE) {
+    
+    data <- dplyr::ungroup(data)
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     col_var <- rlang::enquo(col_var) #categorical var
@@ -950,107 +907,97 @@ ggplot_line_col_facet <-
     col_var_vector <- dplyr::pull(data, !!col_var)
     facet_var_vector <- dplyr::pull(data, !!facet_var)
     
-    if (!(lubridate::is.Date(x_var_vector) |
-          is.numeric(x_var_vector)))
-      stop("Please use a numeric or date x variable for a line plot")
-    if (!is.numeric(y_var_vector))
-      stop("Please use a numeric y variable for a line plot")
-    if (is.numeric(col_var_vector))
-      stop("Please use a categorical colour variable for a line plot")
-    if (is.numeric(facet_var_vector))
-      stop("Please use a categorical facet variable for a line plot")
+    if (!(lubridate::is.Date(x_var_vector) | is.numeric(x_var_vector))) stop("Please use a numeric or date x variable for a line plot")
+    if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a line plot")
+    if (is.numeric(col_var_vector)) stop("Please use a categorical colour variable for a line plot")
+    if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a line plot")
     
-    if (is.null(pal))
-      pal <- pal_snz
+    if (is.null(pal)) pal <- pal_snz
     
-    if (is.null(rlang::get_expr(hover_var))) {
-      plot <- ggplot(data,
-                     aes(
-                       x = !!x_var,
-                       y = !!y_var,
-                       col = !!col_var,
-                       text = paste(
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                           ": ",
-                           !!x_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-                           ": ",
-                           !!col_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-                           ": ",
-                           !!facet_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                           ": ",
-                           !!y_var
-                         ),
-                         sep = "<br>"
-                       )
-                     ))
-    }
-    else if (!is.null(rlang::get_expr(hover_var))) {
-      plot <- ggplot(data,
-                     aes(
-                       x = !!x_var,
-                       y = !!y_var,
-                       col = !!col_var,
-                       text = paste(
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-                           ": ",
-                           !!x_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-                           ": ",
-                           !!col_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-                           ": ",
-                           !!facet_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-                           ": ",
-                           !!y_var
-                         ),
-                         paste0(
-                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-                           ": ",
-                           !!hover_var
-                         ),
-                         sep = "<br>"
-                       )
-                     ))
-    }
-    
-    plot <- plot +
+    plot <- ggplot(data, aes(!!x_var, !!y_var, col = !!col_var, group = !!col_var)) +
       coord_cartesian(clip = "off") +
       theme_line(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
-      ) +
-      geom_line(aes(group = !!col_var))
+      )
     
-    if (points == TRUE) {
+    if (points == TRUE) alpha <- 1
+    else if (points == FALSE) alpha <- 0
+    
+    if (is.null(rlang::get_expr(hover_var))) {
       plot <- plot +
-        geom_point(size = point_size)
+        geom_line() +
+        geom_point(aes(
+          text = paste(
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+              ": ",
+              !!x_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
+              ": ",
+              !!col_var
+            ),
+            paste0(
+               stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
+               ": ",
+               !!facet_var
+             ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+              ": ",
+              !!y_var
+            ),
+            sep = "<br>"
+          )                    
+        ), 
+        size = point_size,
+        alpha = alpha
+        )
     }
-    
-    if (rev_pal == TRUE)
-      pal <- rev(pal)
-    if (!is.null(legend_labels))
-      labels <- legend_labels
-    if (is.null(legend_labels))
-      labels <- waiver()
+    else if (!is.null(rlang::get_expr(hover_var))) {
+      plot <- plot +
+        geom_line() +
+        geom_point(aes(
+          text = paste(
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+              ": ",
+              !!x_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
+              ": ",
+              !!col_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
+              ": ",
+              !!facet_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+              ": ",
+              !!y_var
+            ),
+            paste0(
+              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
+              ": ",
+              !!hover_var
+            ),
+            sep = "<br>"
+          )
+        ), 
+        size = point_size,
+        alpha = alpha
+        )
+    }
+
+    if (rev_pal == TRUE) pal <- rev(pal)
+    if (!is.null(legend_labels)) labels <- legend_labels
+    if (is.null(legend_labels)) labels <- waiver()
     
     plot <- plot +
       scale_color_manual(
@@ -1061,15 +1008,17 @@ ggplot_line_col_facet <-
       )
     
     if (facet_scales %in% c("fixed", "free_y")) {
-      x_scale_breaks <- pretty(x_var_vector)
-      x_scale_min <- min(x_var_vector, na.rm = TRUE)
-      x_scale_max <- max(x_var_vector, na.rm = TRUE)
-      x_scale_limits <- c(x_scale_min, x_scale_max)
+      
+      if(isMobile == FALSE) x_scale_n <- 5
+      else if(isMobile == TRUE) x_scale_n <- 4
+      
+      x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+      x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
       
       if (lubridate::is.Date(x_var_vector)) {
         plot <- plot +
           scale_x_date(
-            expand = c(0.03, 0),
+            expand = c(0, 0),
             breaks = x_scale_breaks,
             limits = x_scale_limits,
             labels = scales::date_format(x_scale_date_format)
@@ -1077,27 +1026,27 @@ ggplot_line_col_facet <-
       }
       else if (is.numeric(x_var_vector)) {
         plot <- plot +
-          scale_x_continuous(expand = c(0.03, 0),
+          scale_x_continuous(expand = c(0, 0),
                              breaks = x_scale_breaks,
                              limits = x_scale_limits)
       }
       
     }
+    
     if (facet_scales %in% c("fixed", "free_x")) {
-      if (y_scale_zero == TRUE)
+      if (y_scale_zero == TRUE) {
         y_scale_breaks <- pretty(c(0, y_var_vector))
-      else if (y_scale_zero == FALSE)
-        y_scale_breaks <- pretty(y_var_vector)
-      y_scale_max_breaks <- max(y_scale_breaks)
-      y_scale_min_breaks <- min(y_scale_breaks)
-      if (y_scale_zero == TRUE)
-        y_scale_limits <- c(0, max(y_scale_breaks))
-      else if (y_scale_zero == FALSE)
+        if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
         y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
-      if (y_scale_zero == TRUE)
-        y_scale_oob <- scales::censor
-      else if (y_scale_zero == FALSE)
-        y_scale_oob <- scales::rescale_none
+      }
+      else if (y_scale_zero == FALSE) {
+        if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+        if(y_scale_trans == "log10") {
+          y_scale_breaks <- pretty(c(0, y_var_vector)) 
+          y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        }
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
       
       plot <- plot +
         scale_y_continuous(
@@ -1105,28 +1054,27 @@ ggplot_line_col_facet <-
           breaks = y_scale_breaks,
           limits = y_scale_limits,
           trans = y_scale_trans,
-          oob = y_scale_oob
+          oob = scales::rescale_none
         )
     }
     else if (facet_scales %in% c("free", "free_y")) {
-      if (y_scale_zero == TRUE)
-        y_scale_oob <- scales::censor
-      else if (y_scale_zero == FALSE)
-        y_scale_oob <- scales::rescale_none
-      
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
                            trans = y_scale_trans,
-                           oob = y_scale_oob)
+                           oob = scales::rescale_none)
     }
     
+    plot <- plot +
+      scale_fill_manual(
+        values = pal,
+        drop = col_scale_drop,
+        labels = labels,
+        na.value = "#A8A8A8"
+      ) 
+
     if (isMobile == FALSE) {
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) <= 3)
-        facet_nrow <- 1
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) > 3)
-        facet_nrow <- 2
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) <= 3) facet_nrow <- 1 
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) > 3) facet_nrow <- 2
       
       plot <- plot +
         labs(
@@ -1142,11 +1090,11 @@ ggplot_line_col_facet <-
     else if (isMobile == TRUE) {
       plot <- plot +
         labs(
-          title = stringr::str_wrap(title, 20),
-          subtitle = stringr::str_wrap(subtitle, 20),
+          title = stringr::str_wrap(title, 40),
+          subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
           y = stringr::str_wrap(y_title, 20),
-          caption = stringr::str_wrap(caption, 20)
+          caption = stringr::str_wrap(caption, 50)
         )  +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1) +
         guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15)))

@@ -10,12 +10,12 @@ ggplot_hbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
   pal = NULL, title = "[Title]", subtitle = NULL,
   x_title = "[X title]", y_title = "[Y title]", caption = "",
   font_family = "Helvetica", font_size_title = 11,
-  font_size_body = 10, wrap_title = 75, wrap_subtitle = 80,
+  font_size_body = 10, wrap_title = 70, wrap_subtitle = 80,
   wrap_x_title = 50, wrap_y_title = 50, wrap_y_label = 50,
   wrap_caption = 80, isMobile = FALSE)
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe. Required input.}
+\item{data}{A tibble or dataframe. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x axis. Required input.}
 
@@ -53,7 +53,7 @@ ggplot_hbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.}
+\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
@@ -74,13 +74,11 @@ A ggplot object.
 Horizontal bar ggplot that is facetted, but not coloured.
 }
 \examples{
-
 plot_data <- ggplot2::diamonds \%>\%
   dplyr::mutate(cut = stringr::str_to_sentence(cut)) \%>\%
   dplyr::group_by(cut, clarity) \%>\%
   dplyr::summarise(average_price = mean(price)) \%>\%
-  dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) \%>\%
-  dplyr::ungroup()
+  dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) 
 
 plot <- ggplot_hbar_facet(data = plot_data, x_var = average_price_thousands,
                           y_var = cut, facet_var = clarity)

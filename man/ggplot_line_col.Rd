@@ -11,18 +11,18 @@ ggplot_line_col(data, x_var, y_var, col_var, hover_var = NULL,
   title = "[Title]", subtitle = NULL, x_title = "[X title]",
   y_title = "[Y title]", col_title = "", caption = "",
   legend_labels = NULL, font_family = "Helvetica",
-  font_size_title = 11, font_size_body = 10, wrap_title = 75,
+  font_size_title = 11, font_size_body = 10, wrap_title = 70,
   wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
   wrap_col_title = 25, wrap_caption = 80, isMobile = FALSE)
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe. Required input.}
+\item{data}{A tibble or dataframe. Required input.}
 
 \item{x_var}{Unquoted numeric or date variable to be on the x axis. Required input.}
 
 \item{y_var}{Unquoted numeric variable to be on the y axis. Required input.}
 
-\item{col_var}{Unquoted categorical variable for points to be coloured by. Required input.}
+\item{col_var}{Unquoted categorical variable for lines and points to be coloured by. Required input.}
 
 \item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
 
@@ -30,7 +30,7 @@ ggplot_line_col(data, x_var, y_var, col_var, hover_var = NULL,
 
 \item{y_scale_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{A string specifying a transformation for the y scale. Defaults to "identity".}
+\item{y_scale_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
 \item{col_scale_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
 
@@ -64,7 +64,7 @@ ggplot_line_col(data, x_var, y_var, col_var, hover_var = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.}
+\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
@@ -88,12 +88,11 @@ Line ggplot that is coloured, but not facetted.
 plot_data <- dplyr::storms \%>\%
   dplyr::mutate(status = stringr::str_to_sentence(status)) \%>\%
   dplyr::group_by(year, status) \%>\%
-  dplyr::summarise(wind = round(mean(wind), 2)) \%>\%
-  dplyr::ungroup()
+  dplyr::summarise(wind = round(mean(wind), 2))
 
-  plot <- ggplot_line_col(data = plot_data, x_var = year, y_var = wind, col_var = status)
+plot <- ggplot_line_col(data = plot_data, x_var = year, y_var = wind, col_var = status)
 
-  plot
+plot
 
-  plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot, tooltip = "text")
 }

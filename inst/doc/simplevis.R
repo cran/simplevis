@@ -1,14 +1,14 @@
-## ---- include = FALSE----------------------------------------------------
+## ---- include = FALSE---------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ----setup, warning = FALSE, message = FALSE-----------------------------
+## ----setup, warning = FALSE, message = FALSE----------------------------------
 library(simplevis)
 library(dplyr)
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 plot_data <- ggplot2::diamonds %>%
   mutate(cut = stringr::str_to_sentence(cut)) %>%
   group_by(cut) %>%
@@ -26,7 +26,7 @@ plot <- ggplot_hbar(data = plot_data,
 
 plot 
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 plot_data <- ggplot2::diamonds %>%
   mutate(cut = stringr::str_to_sentence(cut)) %>%
   group_by(cut, clarity) %>%
@@ -42,7 +42,7 @@ plot <- ggplot_hbar_col(data = plot_data,
 
 plot
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 plot_data <- ggplot2::diamonds %>%
   mutate(cut = stringr::str_to_sentence(cut)) %>%
   group_by(cut, clarity) %>%
@@ -57,7 +57,7 @@ plot <- ggplot_hbar_facet(data = plot_data,
 
 plot
 
-## ---- message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7---------
 plot_data <- ggplot2::diamonds %>%
   mutate(cut = stringr::str_to_sentence(cut)) %>%
   group_by(cut, clarity, color) %>%
@@ -90,7 +90,7 @@ plot <- ggplot_vbar(data = plot_data,
 plotly::ggplotly(plot, tooltip = "text") %>%
       plotly::config(displayModeBar = F)
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
   dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen") 
 
@@ -98,18 +98,20 @@ ggplot_sf(data = map_data,
           coastline = nz, 
           size = 0.25)
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
   filter(period == "1998-2017", indicator == "Nitrate-nitrogen") 
+
+pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
 ggplot_sf_col(data = map_data, 
               col_var = trend_category, 
               coastline = nz, 
               size = 0.25, 
-              pal = pal_trend3, 
+              pal = pal, 
               title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
  filter(period == "1998-2017", indicator == "Nitrate-nitrogen") 
 
@@ -119,26 +121,28 @@ ggplot_sf_facet(data = map_data,
                 size = 0.25,
                 title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
 
-## ---- message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 5, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
  filter(period == "1998-2017", indicator %in% c("Nitrate-nitrogen", "Dissolved reactive phosphorus")) 
+
+pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
 ggplot_sf_col_facet(data = map_data, 
                     col_var = trend_category, 
                     facet_var = indicator,
                     coastline = nz, 
                     size = 0.25, 
-                    pal = pal_trend3,
+                    pal = pal,
                     title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 ggplot_stars_col(data = example_stars_nz_no3n, 
                  coastline = nz,
                  col_method = "quantile", 
                  title = "River modelled median nitrate-nitrogen concentrations, 2013\u201317",
                  legend_digits = 1)
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data1 <- example_stars_nz_no3n %>%
   rlang::set_names("Nitrate nitrogen")
 
@@ -165,11 +169,11 @@ leaflet_sf_col(data = map_data,
                legend_digits = 0,
                title = "Dairy density in count per km\u00b2, 2017")
 
-## ---- echo = TRUE, results = 'hide', fig.height = 4, fig.width = 7-------
+## ---- echo = TRUE, results = 'hide', fig.height = 4, fig.width = 7------------
 leaflet_stars_col(data = example_stars_nz_no3n,
    title = "River modelled median nitrate-nitrogen concentrations in g/m\u00b3, 2013\u201317")
 
-## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 plot_data <- ggplot2::diamonds %>%
   mutate_at(vars("cut"), ~stringr::str_to_sentence(.)) %>%
   group_by_at(vars("cut")) %>%
@@ -190,7 +194,7 @@ plot <- ggplot_hbar(data = plot_data,
 
 plot 
 
-## ---- eval=F-------------------------------------------------------------
+## ---- eval=F------------------------------------------------------------------
 #  run_template("template1") # a graph and table
 #  run_template("template2") # a leaflet map, as well as graph and table
 #  run_template("template3") # a dual leaflet map, as well as graph and table

@@ -4,26 +4,29 @@
 \alias{ggplot_vbar}
 \title{Vertical bar ggplot.}
 \usage{
-ggplot_vbar(data, x_var, y_var, hover_var = NULL, y_scale_zero = TRUE,
+ggplot_vbar(data, x_var, y_var, hover_var = NULL,
+  x_scale_date_format = "\%Y", y_scale_zero = TRUE,
   y_scale_trans = "identity", pal = NULL, title = "[Title]",
   subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
   caption = "", font_family = "Helvetica", font_size_title = 11,
-  font_size_body = 10, wrap_title = 75, wrap_subtitle = 80,
+  font_size_body = 10, wrap_title = 70, wrap_subtitle = 80,
   wrap_x_title = 50, wrap_y_title = 50, wrap_caption = 80,
   isMobile = FALSE)
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe. Required input.}
+\item{data}{A tibble or dataframe. Required input.}
 
-\item{x_var}{Unquoted variable to be on the x axis. Required input.}
+\item{x_var}{Unquoted numeric or date variable to be on the x axis. Required input.}
 
 \item{y_var}{Unquoted numeric variable to be on the y axis. Required input.}
 
 \item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
 
+\item{x_scale_date_format}{Date format for x axis labels.}
+
 \item{y_scale_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{A string specifying a transformation for the y axis scale. Defaults to "identity".}
+\item{y_scale_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
 
@@ -43,7 +46,7 @@ ggplot_vbar(data, x_var, y_var, hover_var = NULL, y_scale_zero = TRUE,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.}
+\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
@@ -64,11 +67,10 @@ Vertical bar ggplot that is not coloured and not facetted.
 \examples{
 plot_data <- dplyr::storms \%>\%
   dplyr::group_by(year) \%>\%
-  dplyr::summarise(average_wind = round(mean(wind), 2)) \%>\%
-  dplyr::ungroup()
+  dplyr::summarise(average_wind = round(mean(wind), 2)) 
 
 plot <- ggplot_vbar(data = plot_data, x_var = year, y_var = average_wind,
-      title = "Average wind speed of Atlantic dplyr::storms, 1975\\u20132015",
+      title = "Average wind speed of Atlantic storms, 1975\\u20132015",
       x_title = "Year",
       y_title = "Average maximum sustained wind speed (knots)")
 

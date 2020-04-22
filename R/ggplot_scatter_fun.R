@@ -30,7 +30,6 @@ theme_scatter <-
           face = "plain",
           hjust = 0.5
         ),
-        plot.title.position = "plot",
         plot.caption = element_text(
           family = font_family,
           colour = "#323232",
@@ -42,7 +41,7 @@ theme_scatter <-
           t = 5,
           l = 5,
           b = 5,
-          r = 15
+          r = 20
         ),
         panel.border = element_blank(),
         panel.spacing = unit(2.5, "lines"),
@@ -129,7 +128,7 @@ theme_scatter <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -166,31 +165,27 @@ ggplot_scatter <- function(data,
                            font_family = "Helvetica",
                            font_size_title = 11,
                            font_size_body = 10,
-                           wrap_title = 75,
+                           wrap_title = 70,
                            wrap_subtitle = 80,
                            wrap_x_title = 50,
                            wrap_y_title = 50,
                            wrap_caption = 80,
                            isMobile = FALSE) {
+  
+  data <- dplyr::ungroup(data)
   x_var <- rlang::enquo(x_var) #numeric var
   y_var <- rlang::enquo(y_var) #numeric var
-  
   hover_var <- rlang::enquo(hover_var)
   
   x_var_vector <- dplyr::pull(data, !!x_var)
   y_var_vector <- dplyr::pull(data, !!y_var)
   
-  if (!is.numeric(x_var_vector))
-    stop("Please use a numeric x variable for a scatterplot")
-  if (!is.numeric(y_var_vector))
-    stop("Please use a numeric y variable for a scatterplot")
+  if (!is.numeric(x_var_vector)) stop("Please use a numeric x variable for a scatterplot")
+  if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a scatterplot")
   
-  if (is.null(pal)) {
-    pal <- pal_snz
-  }
+  if (is.null(pal)) pal <- pal_snz
   
-  plot <- ggplot(data,
-                 aes(!!x_var, !!y_var)) +
+  plot <- ggplot(data, aes(!!x_var, !!y_var)) +
     theme_scatter(
       font_family = font_family,
       font_size_body = font_size_body,
@@ -240,53 +235,36 @@ ggplot_scatter <- function(data,
       size = size)
   }
   
-  if (x_scale_zero == FALSE) {
-    x_scale_min_breaks_extra <- min(x_var_vector, na.rm = TRUE)
-    if (x_scale_min_breaks_extra > 0)
-      x_scale_min_breaks_extra <- x_scale_min_breaks_extra * 0.999999
-    if (x_scale_min_breaks_extra < 0)
-      x_scale_min_breaks_extra <- x_scale_min_breaks_extra * 1.000001
-    x_var_vector <- c(x_var_vector, x_scale_min_breaks_extra)
-  }
+  if(isMobile == FALSE) x_scale_n <- 6
+  else if(isMobile == TRUE) x_scale_n <- 4
   
-  if (x_scale_zero == TRUE)
-    x_scale_breaks <- pretty(c(0, x_var_vector))
-  else if (x_scale_zero == FALSE)
-    x_scale_breaks <- pretty(x_var_vector)
-  x_scale_max_breaks <- max(x_scale_breaks)
-  x_scale_min_breaks <- min(x_scale_breaks)
-  if (x_scale_zero == TRUE)
-    x_scale_limits <- c(0, max(x_scale_breaks))
-  else if (x_scale_zero == FALSE)
+  if (x_scale_zero == TRUE) {
+    x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+    if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
     x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
-  if (x_scale_zero == TRUE)
-    x_scale_oob <- scales::censor
-  else if (x_scale_zero == FALSE)
-    x_scale_oob <- scales::rescale_none
-  
-  if (y_scale_zero == FALSE) {
-    y_scale_min_breaks_extra <- min(y_var_vector, na.rm = TRUE)
-    if (y_scale_min_breaks_extra > 0)
-      y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 0.999999
-    if (y_scale_min_breaks_extra < 0)
-      y_scale_min_breaks_extra <- y_scale_min_breaks_extra * 1.000001
-    y_var_vector <- c(y_var_vector, y_scale_min_breaks_extra)
+  }
+  else if (x_scale_zero == FALSE) {
+    if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+    if(x_scale_trans == "log10") {
+      x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n) 
+      x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+    }
+    x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
   }
   
-  if (y_scale_zero == TRUE)
+  if (y_scale_zero == TRUE) {
     y_scale_breaks <- pretty(c(0, y_var_vector))
-  else if (y_scale_zero == FALSE)
-    y_scale_breaks <- pretty(y_var_vector)
-  y_scale_max_breaks <- max(y_scale_breaks)
-  y_scale_min_breaks <- min(y_scale_breaks)
-  if (y_scale_zero == TRUE)
-    y_scale_limits <- c(0, max(y_scale_breaks))
-  else if (y_scale_zero == FALSE)
+    if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
     y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
-  if (y_scale_zero == TRUE)
-    y_scale_oob <- scales::censor
-  else if (y_scale_zero == FALSE)
-    y_scale_oob <- scales::rescale_none
+  }
+  else if (y_scale_zero == FALSE) {
+    if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+    if(y_scale_trans == "log10") {
+      y_scale_breaks <- pretty(c(0, y_var_vector)) 
+      y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+    }
+    y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+  }
   
   plot <- plot +
     scale_x_continuous(
@@ -294,16 +272,14 @@ ggplot_scatter <- function(data,
       breaks = x_scale_breaks,
       limits = x_scale_limits,
       trans = x_scale_trans,
-      oob = x_scale_oob,
-      labels = scales::number_format()
-      
+      oob = scales::rescale_none
     ) +
     scale_y_continuous(
       expand = c(0, 0),
       breaks = y_scale_breaks,
       limits = y_scale_limits,
       trans = y_scale_trans,
-      oob = y_scale_oob
+      oob = scales::rescale_none
     )
   
   if (isMobile == FALSE) {
@@ -319,11 +295,11 @@ ggplot_scatter <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
         x = stringr::str_wrap(x_title, 20),
         y = stringr::str_wrap(y_title, 20),
-        caption = stringr::str_wrap(caption, 20)
+        caption = stringr::str_wrap(caption, 50)
       )
   }
   
@@ -361,7 +337,7 @@ ggplot_scatter <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -409,13 +385,15 @@ ggplot_scatter_col <-
            font_family = "Helvetica",
            font_size_title = 11,
            font_size_body = 10,
-           wrap_title = 75,
+           wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
            wrap_col_title = 25,
            wrap_caption = 80,
            isMobile = FALSE) {
+    
+    data <- dplyr::ungroup(data)
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     col_var <- rlang::enquo(col_var)
@@ -425,56 +403,37 @@ ggplot_scatter_col <-
     y_var_vector <- dplyr::pull(data, !!y_var)
     col_var_vector <- dplyr::pull(data, !!col_var)
     
-    if (!is.numeric(x_var_vector))
-      stop("Please use a numeric x variable for a scatterplot")
-    if (!is.numeric(y_var_vector))
-      stop("Please use a numeric y variable for a scatterplot")
+    if (!is.numeric(x_var_vector)) stop("Please use a numeric x variable for a scatterplot")
+    if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a scatterplot")
     
-    if (is.null(col_method))
-      if (!is.numeric(col_var_vector))
-        col_method <- "category"
-    if (is.null(col_method))
-      if (is.numeric(col_var_vector))
-        col_method <- "bin"
+    if (is.null(col_method)) {
+      if (!is.numeric(col_var_vector)) col_method <- "category"
+      else if (is.numeric(col_var_vector)) col_method <- "bin"
+    }
     
     if (col_method == "quantile") {
-      if (is.null(quantile_cuts))
-        quantile_cuts <- c(0, 0.25, 0.5, 0.75, 1)
-      bin_cuts <-
-        quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
-      if (anyDuplicated(bin_cuts) > 0)
-        stop("quantile_cuts do not provide unique breaks")
+      if (is.null(quantile_cuts)) quantile_cuts <- c(0, 0.25, 0.5, 0.75, 1)
+      bin_cuts <- quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
+      if (anyDuplicated(bin_cuts) > 0) stop("quantile_cuts do not provide unique breaks")
       data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-      if (is.null(pal))
-        pal <- viridis::viridis(length(bin_cuts) - 1)
-      if (is.null(legend_labels))
-        labels <- numeric_legend_labels(bin_cuts, legend_digits)
-      if (!is.null(legend_labels))
-        labels <- legend_labels
+      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
+      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+      if (!is.null(legend_labels)) labels <- legend_labels
     }
     else if (col_method == "bin") {
-      if (is.null(bin_cuts))
-        bin_cuts <- pretty(col_var_vector)
+      if (is.null(bin_cuts)) bin_cuts <- pretty(col_var_vector)
       data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-      if (is.null(pal))
-        pal <- viridis::viridis(length(bin_cuts) - 1)
-      if (is.null(legend_labels))
-        labels <- numeric_legend_labels(bin_cuts, legend_digits)
-      if (!is.null(legend_labels))
-        labels <- legend_labels
+      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
+      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+      if (!is.null(legend_labels)) labels <- legend_labels
     }
     else if (col_method == "category") {
-      if (is.null(pal))
-        pal <- pal_snz
-      if (!is.null(legend_labels))
-        labels <- legend_labels
-      if (is.null(legend_labels))
-        labels <- waiver()
+      if (is.null(pal)) pal <- pal_point_set1
+      if (!is.null(legend_labels)) labels <- legend_labels
+      if (is.null(legend_labels)) labels <- waiver()
     }
     
-    plot <- ggplot(data,
-                   aes(x = !!x_var,
-                       y = !!y_var)) +
+    plot <- ggplot(data, aes(x = !!x_var, y = !!y_var)) +
       theme_scatter(
         font_family = font_family,
         font_size_body = font_size_body,
@@ -538,34 +497,39 @@ ggplot_scatter_col <-
         size = size)
     }
     
-    if (rev_pal == TRUE)
-      pal <- rev(pal)
-    if (remove_na == TRUE)
-      na.translate <- FALSE
-    if (remove_na == FALSE)
-      na.translate <- TRUE
+    if (rev_pal == TRUE) pal <- rev(pal)
+    if (remove_na == TRUE) na.translate <- FALSE
+    if (remove_na == FALSE) na.translate <- TRUE
+    if(isMobile == FALSE) x_scale_n <- 6
+    else if(isMobile == TRUE) x_scale_n <- 4
     
-    if (x_scale_zero == TRUE)
-      x_scale_breaks <- pretty(c(0, x_var_vector))
-    if (x_scale_zero == FALSE)
-      x_scale_breaks <- pretty(x_var_vector)
-    x_scale_max_breaks <- max(x_scale_breaks)
-    x_scale_min_breaks <- min(x_scale_breaks)
-    if (x_scale_zero == TRUE)
-      x_scale_limits <- c(0, x_scale_max_breaks)
-    if (x_scale_zero == FALSE)
-      x_scale_limits <- c(x_scale_min_breaks, x_scale_max_breaks)
+    if (x_scale_zero == TRUE) {
+      x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+      if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+      x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+    }
+    else if (x_scale_zero == FALSE) {
+      if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+      if(x_scale_trans == "log10") {
+        x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n) 
+        x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+      }
+      x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+    }
     
-    if (y_scale_zero == TRUE)
+    if (y_scale_zero == TRUE) {
       y_scale_breaks <- pretty(c(0, y_var_vector))
-    if (y_scale_zero == FALSE)
-      y_scale_breaks <- pretty(y_var_vector)
-    y_scale_max_breaks <- max(y_scale_breaks)
-    y_var_min <- min(y_scale_breaks)
-    if (y_scale_zero == TRUE)
-      y_scale_limits <- c(0, y_scale_max_breaks)
-    if (y_scale_zero == FALSE)
-      y_scale_limits <- c(y_var_min, y_scale_max_breaks)
+      if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+      y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+    }
+    else if (y_scale_zero == FALSE) {
+      if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+      if(y_scale_trans == "log10") {
+        y_scale_breaks <- pretty(c(0, y_var_vector)) 
+        y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+      }
+      y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+    }
     
     plot <- plot +
       scale_color_manual(
@@ -579,15 +543,17 @@ ggplot_scatter_col <-
         expand = c(0, 0),
         breaks = x_scale_breaks,
         limits = x_scale_limits,
-        trans = x_scale_trans
+        trans = x_scale_trans,
+        oob = scales::rescale_none
       ) +
       scale_y_continuous(
         expand = c(0, 0),
         breaks = y_scale_breaks,
         limits = y_scale_limits,
-        trans = y_scale_trans
+        trans = y_scale_trans,
+        oob = scales::rescale_none
       )
-    
+
     if (isMobile == FALSE) {
       plot <- plot +
         labs(
@@ -602,11 +568,11 @@ ggplot_scatter_col <-
     else if (isMobile == TRUE) {
       plot <- plot +
         labs(
-          title = stringr::str_wrap(title, 20),
-          subtitle = stringr::str_wrap(subtitle, 20),
+          title = stringr::str_wrap(title, 40),
+          subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
           y = stringr::str_wrap(y_title, 20),
-          caption = stringr::str_wrap(caption, 20)
+          caption = stringr::str_wrap(caption, 50)
         )  +
         guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15)))
     }
@@ -637,7 +603,7 @@ ggplot_scatter_col <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -676,12 +642,14 @@ ggplot_scatter_facet <-
            font_family = "Helvetica",
            font_size_title = 11,
            font_size_body = 10,
-           wrap_title = 75,
+           wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
            wrap_caption = 80,
            isMobile = FALSE) {
+    
+    data <- dplyr::ungroup(data)
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     facet_var <- rlang::enquo(facet_var) #categorical var
@@ -691,19 +659,13 @@ ggplot_scatter_facet <-
     y_var_vector <- dplyr::pull(data, !!y_var)
     facet_var_vector <- dplyr::pull(data, !!facet_var)
     
-    if (!is.numeric(x_var_vector))
-      stop("Please use a numeric x variable for a scatterplot")
-    if (!is.numeric(y_var_vector))
-      stop("Please use a numeric y variable for a scatterplot")
-    if (is.numeric(facet_var_vector))
-      stop("Please use a categorical facet variable for a scatterplot")
+    if (!is.numeric(x_var_vector)) stop("Please use a numeric x variable for a scatterplot")
+    if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a scatterplot")
+    if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a scatterplot")
     
-    if (is.null(pal))
-      pal <- pal_snz
+    if (is.null(pal)) pal <- pal_snz
     
-    plot <- ggplot(data,
-                   aes(x = !!x_var,
-                       y = !!y_var)) +
+    plot <- ggplot(data, aes(x = !!x_var, y = !!y_var)) +
       theme_scatter(
         font_family = font_family,
         font_size_body = font_size_body,
@@ -762,53 +724,69 @@ ggplot_scatter_facet <-
     }
     
     if (facet_scales %in% c("fixed", "free_y")) {
-      if (x_scale_zero == TRUE)
+      if(isMobile == FALSE) x_scale_n <- 6
+      else if(isMobile == TRUE) x_scale_n <- 4
+      
+      x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+      x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+      
+      if (x_scale_zero == TRUE) {
         x_scale_breaks <- pretty(c(0, x_var_vector))
-      if (x_scale_zero == FALSE)
-        x_scale_breaks <- pretty(x_var_vector)
-      x_scale_max_breaks <- max(x_scale_breaks)
-      x_scale_min_breaks <- min(x_scale_breaks)
-      if (x_scale_zero == TRUE)
-        x_scale_limits <- c(0, x_scale_max_breaks)
-      if (x_scale_zero == FALSE)
-        x_scale_limits <- c(x_scale_min_breaks, x_scale_max_breaks)
+        if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+      }
+      else if (x_scale_zero == FALSE) {
+        if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector)
+        if(x_scale_trans == "log10") {
+          x_scale_breaks <- pretty(c(0, x_var_vector)) 
+          x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+        }
+        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+      }
       
       plot <- plot +
         scale_x_continuous(
           expand = c(0, 0),
           breaks = x_scale_breaks,
           limits = x_scale_limits,
-          trans = x_scale_trans
+          trans = x_scale_trans,
+          oob = scales::rescale_none
         )
     }
     if (facet_scales %in% c("fixed", "free_x")) {
-      if (y_scale_zero == TRUE)
+      if (y_scale_zero == TRUE) {
         y_scale_breaks <- pretty(c(0, y_var_vector))
-      if (y_scale_zero == FALSE)
-        y_scale_breaks <- pretty(y_var_vector)
-      y_scale_max_breaks <- max(y_scale_breaks)
-      y_var_min <- min(y_scale_breaks)
-      if (y_scale_zero == TRUE)
-        y_scale_limits <- c(0, y_scale_max_breaks)
-      if (y_scale_zero == FALSE)
-        y_scale_limits <- c(y_var_min, y_scale_max_breaks)
+        if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
+      else if (y_scale_zero == FALSE) {
+        if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+        if(y_scale_trans == "log10") {
+          y_scale_breaks <- pretty(c(0, y_var_vector)) 
+          y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        }
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
       
       plot <- plot +
         scale_y_continuous(
           expand = c(0, 0),
           breaks = y_scale_breaks,
           limits = y_scale_limits,
-          trans = y_scale_trans
+          trans = y_scale_trans,
+          oob = scales::rescale_none
         )
+    }
+    else if (facet_scales %in% c("free", "free_y")) {
+      plot <- plot +
+        scale_y_continuous(expand = c(0, 0),
+                           trans = y_scale_trans,
+                           oob = scales::rescale_none)
     }
     
     if (isMobile == FALSE) {
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) <= 3)
-        facet_nrow <- 1
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) > 3)
-        facet_nrow <- 2
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) <= 3) facet_nrow <- 1
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) > 3) facet_nrow <- 2
       
       plot <- plot +
         labs(
@@ -823,11 +801,11 @@ ggplot_scatter_facet <-
     else if (isMobile == TRUE) {
       plot <- plot +
         labs(
-          title = stringr::str_wrap(title, 20),
-          subtitle = stringr::str_wrap(subtitle, 20),
+          title = stringr::str_wrap(title, 40),
+          subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
           y = stringr::str_wrap(y_title, 20),
-          caption = stringr::str_wrap(caption, 20)
+          caption = stringr::str_wrap(caption, 50)
         )  +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1)
     }
@@ -870,7 +848,7 @@ ggplot_scatter_facet <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
@@ -925,13 +903,15 @@ ggplot_scatter_col_facet <-
            font_family = "Helvetica",
            font_size_title = 11,
            font_size_body = 10,
-           wrap_title = 75,
+           wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
            wrap_col_title = 25,
            wrap_caption = 80,
            isMobile = FALSE) {
+    
+    data <- dplyr::ungroup(data)
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     col_var <- rlang::enquo(col_var)
@@ -943,76 +923,50 @@ ggplot_scatter_col_facet <-
     col_var_vector <- dplyr::pull(data, !!col_var)
     facet_var_vector <- dplyr::pull(data, !!facet_var)
     
-    if (!is.numeric(x_var_vector))
-      stop("Please use a numeric x variable for a scatterplot")
-    if (!is.numeric(y_var_vector))
-      stop("Please use a numeric y variable for a scatterplot")
-    if (is.numeric(facet_var_vector))
-      stop("Please use a categorical facet variable for a scatter plot")
+    if (!is.numeric(x_var_vector)) stop("Please use a numeric x variable for a scatterplot")
+    if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a scatterplot")
+    if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a scatter plot")
     
-    if (is.null(col_method))
-      if (!is.numeric(col_var_vector))
-        col_method <- "category"
-    if (is.null(col_method))
-      if (is.numeric(col_var_vector))
-        col_method <- "bin"
-    
+    if (is.null(col_method)) {
+      if (!is.numeric(col_var_vector)) col_method <- "category"
+      if (is.numeric(col_var_vector)) col_method <- "bin"      
+    }
+
     if (col_method == "quantile") {
-      if (is.null(quantile_cuts))
-        quantile_cuts <- c(0, 0.25, 0.5, 0.75, 1)
+      if (is.null(quantile_cuts)) quantile_cuts <- c(0, 0.25, 0.5, 0.75, 1)
       if (quantile_by_facet == TRUE) {
         data <- data %>%
           dplyr::group_by(!!facet_var) %>%
           dplyr::mutate(!!col_var := percent_rank(!!col_var)) %>%
           dplyr::mutate(!!col_var := cut(!!col_var, quantile_cuts))
         
-        if (is.null(pal))
-          pal <- viridis::viridis(length(quantile_cuts) - 1)
-        if (is.null(legend_labels))
-          labels <-
-            paste0(numeric_legend_labels(quantile_cuts * 100, 0), "%")
-        if (!is.null(legend_labels))
-          labels <- legend_labels
-        
+        if (is.null(pal)) pal <- viridis::viridis(length(quantile_cuts) - 1)
+        if (is.null(legend_labels)) labels <- paste0(numeric_legend_labels(quantile_cuts * 100, 0), "%")
+        if (!is.null(legend_labels)) labels <- legend_labels
       }
       else if (quantile_by_facet == FALSE) {
-        bin_cuts <-
-          quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
-        if (anyDuplicated(bin_cuts) > 0)
-          stop("quantile_cuts do not provide unique breaks")
-        data <-
-          dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-        if (is.null(pal))
-          pal <- viridis::viridis(length(bin_cuts) - 1)
-        if (is.null(legend_labels))
-          labels <- numeric_legend_labels(bin_cuts, legend_digits)
-        if (!is.null(legend_labels))
-          labels <- legend_labels
+        bin_cuts <- quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
+        if (anyDuplicated(bin_cuts) > 0) stop("quantile_cuts do not provide unique breaks")
+        data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
+        if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
+        if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+        if (!is.null(legend_labels)) labels <- legend_labels
       }
     }
     else if (col_method == "bin") {
-      if (is.null(bin_cuts))
-        bin_cuts <- pretty(col_var_vector)
+      if (is.null(bin_cuts)) bin_cuts <- pretty(col_var_vector)
       data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-      if (is.null(pal))
-        pal <- viridis::viridis(length(bin_cuts) - 1)
-      if (is.null(legend_labels))
-        labels <- numeric_legend_labels(bin_cuts, legend_digits)
-      if (!is.null(legend_labels))
-        labels <- legend_labels
+      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
+      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+      if (!is.null(legend_labels)) labels <- legend_labels
     }
     else if (col_method == "category") {
-      if (is.null(pal))
-        pal <- pal_snz
-      if (!is.null(legend_labels))
-        labels <- legend_labels
-      if (is.null(legend_labels))
-        labels <- waiver()
+      if (is.null(pal)) pal <- pal_point_set1
+      if (!is.null(legend_labels)) labels <- legend_labels
+      if (is.null(legend_labels)) labels <- waiver()
     }
     
-    plot <- ggplot(data,
-                   aes(x = !!x_var,
-                       y = !!y_var),) +
+    plot <- ggplot(data, aes(x = !!x_var, y = !!y_var),) +
       theme_scatter(
         font_family = font_family,
         font_size_body = font_size_body,
@@ -1086,12 +1040,9 @@ ggplot_scatter_col_facet <-
         size = size)
     }
     
-    if (rev_pal == TRUE)
-      pal <- rev(pal)
-    if (remove_na == TRUE)
-      na.translate <- FALSE
-    if (remove_na == FALSE)
-      na.translate <- TRUE
+    if (rev_pal == TRUE) pal <- rev(pal)
+    if (remove_na == TRUE) na.translate <- FALSE
+    if (remove_na == FALSE) na.translate <- TRUE
     
     plot <- plot +
       scale_color_manual(
@@ -1103,53 +1054,66 @@ ggplot_scatter_col_facet <-
       )
     
     if (facet_scales %in% c("fixed", "free_y")) {
-      if (x_scale_zero == TRUE)
-        x_scale_breaks <- pretty(c(0, x_var_vector))
-      if (x_scale_zero == FALSE)
-        x_scale_breaks <- pretty(x_var_vector)
-      x_scale_max_breaks <- max(x_scale_breaks)
-      x_scale_min_breaks <- min(x_scale_breaks)
-      if (x_scale_zero == TRUE)
-        x_scale_limits <- c(0, x_scale_max_breaks)
-      if (x_scale_zero == FALSE)
-        x_scale_limits <- c(x_scale_min_breaks, x_scale_max_breaks)
+      if(isMobile == FALSE) x_scale_n <- 6
+      else if(isMobile == TRUE) x_scale_n <- 4
+      
+      if (x_scale_zero == TRUE) {
+        x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+        if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+      }
+      else if (x_scale_zero == FALSE) {
+        if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
+        if(x_scale_trans == "log10") {
+          x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n) 
+          x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+        }
+        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+      }
       
       plot <- plot +
         scale_x_continuous(
           expand = c(0, 0),
           breaks = x_scale_breaks,
           limits = x_scale_limits,
-          trans = x_scale_trans
+          trans = x_scale_trans,
+          oob = scales::rescale_none
         )
     }
     if (facet_scales %in% c("fixed", "free_x")) {
-      if (y_scale_zero == TRUE)
+      if (y_scale_zero == TRUE) {
         y_scale_breaks <- pretty(c(0, y_var_vector))
-      if (y_scale_zero == FALSE)
-        y_scale_breaks <- pretty(y_var_vector)
-      y_scale_max_breaks <- max(y_scale_breaks)
-      y_var_min <- min(y_scale_breaks)
-      if (y_scale_zero == TRUE)
-        y_scale_limits <- c(0, y_scale_max_breaks)
-      if (y_scale_zero == FALSE)
-        y_scale_limits <- c(y_var_min, y_scale_max_breaks)
+        if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
+      else if (y_scale_zero == FALSE) {
+        if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+        if(y_scale_trans == "log10") {
+          y_scale_breaks <- pretty(c(0, y_var_vector)) 
+          y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        }
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
       
       plot <- plot +
         scale_y_continuous(
           expand = c(0, 0),
           breaks = y_scale_breaks,
           limits = y_scale_limits,
-          trans = y_scale_trans
+          trans = y_scale_trans,
+          oob = scales::rescale_none
         )
+    }
+    else if (facet_scales %in% c("free", "free_y")) {
+      plot <- plot +
+        scale_y_continuous(expand = c(0, 0),
+                           trans = y_scale_trans,
+                           oob = scales::rescale_none)
     }
     
     if (isMobile == FALSE) {
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) <= 3)
-        facet_nrow <- 1
-      if (is.null(facet_nrow) &
-          length(unique(facet_var_vector)) > 3)
-        facet_nrow <- 2
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) <= 3) facet_nrow <- 1
+      if (is.null(facet_nrow) & length(unique(facet_var_vector)) > 3) facet_nrow <- 2
       
       plot <- plot +
         labs(
@@ -1165,11 +1129,11 @@ ggplot_scatter_col_facet <-
     else if (isMobile == TRUE) {
       plot <- plot +
         labs(
-          title = stringr::str_wrap(title, 20),
-          subtitle = stringr::str_wrap(subtitle, 20),
+          title = stringr::str_wrap(title, 40),
+          subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
           y = stringr::str_wrap(y_title, 20),
-          caption = stringr::str_wrap(caption, 20)
+          caption = stringr::str_wrap(caption, 50)
         )  +
         guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15))) +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1)

@@ -13,7 +13,7 @@ ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
   coastline_pal = "#7f7f7f", title = "[Title]", subtitle = NULL,
   col_title = "", caption = "", legend_labels = NULL,
   font_family = "Helvetica", font_size_title = 11,
-  font_size_body = 10, wrap_title = 75, wrap_subtitle = 80,
+  font_size_body = 10, wrap_title = 70, wrap_subtitle = 80,
   wrap_col_title = 25, wrap_caption = 80, isMobile = FALSE)
 }
 \arguments{
@@ -71,7 +71,7 @@ ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.}
+\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
@@ -91,8 +91,10 @@ Map of simple features in ggplot that is coloured and facetted.
 map_data <- example_sf_nz_river_wq \%>\%
  dplyr::filter(period == "1998-2017",
  indicator \%in\% c("Nitrate-nitrogen", "Dissolved reactive phosphorus"))
+ 
+ pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
 ggplot_sf_col_facet(data = map_data, col_var = trend_category, facet_var = indicator,
- coastline = nz, pal = pal_trend3,
+ coastline = nz, pal = pal,
  title = "Monitored river nitrate-nitrogen trends, 2008\\u201317")
 }

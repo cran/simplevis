@@ -30,7 +30,6 @@ theme_sf <-
           face = "plain",
           hjust = 0.5
         ),
-        plot.title.position = "plot",
         plot.caption = element_text(
           family = font_family,
           colour = "#323232",
@@ -42,7 +41,7 @@ theme_sf <-
           t = 5,
           l = 5,
           b = 5,
-          r = 15
+          r = 20
         ),
         panel.border = element_blank(),
         panel.spacing = unit(2.5, "lines"),
@@ -102,7 +101,7 @@ theme_sf <-
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
@@ -124,7 +123,7 @@ ggplot_sf <- function(data,
                       font_family = "Helvetica",
                       font_size_title = 11,
                       font_size_body = 10,
-                      wrap_title = 75,
+                      wrap_title = 70,
                       wrap_subtitle = 80,
                       wrap_caption = 80,
                       isMobile = FALSE) {
@@ -181,9 +180,9 @@ ggplot_sf <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
-        caption = stringr::str_wrap(caption, 20)
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
+        caption = stringr::str_wrap(caption, 50)
       )
   }
   
@@ -216,7 +215,7 @@ ggplot_sf <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
@@ -237,8 +236,10 @@ ggplot_sf <- function(data,
 #'
 #' map_data <- example_sf_nz_river_wq %>%
 #'   dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
+#'   
+#'  pal <- c("#4575B4", "#D3D3D3", "#D73027")
 #'
-#' ggplot_sf_col(data = map_data, col_var = trend_category, coastline = nz, pal = pal_trend3,
+#' ggplot_sf_col(data = map_data, col_var = trend_category, coastline = nz, pal = pal,
 #'    title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
 ggplot_sf_col <- function(data,
                           col_var,
@@ -264,7 +265,7 @@ ggplot_sf_col <- function(data,
                           font_family = "Helvetica",
                           font_size_title = 11,
                           font_size_body = 10,
-                          wrap_title = 75,
+                          wrap_title = 70,
                           wrap_subtitle = 80,
                           wrap_col_title = 25,
                           wrap_caption = 80,
@@ -310,7 +311,7 @@ ggplot_sf_col <- function(data,
   
   if (col_method == "category") {
     if (is.null(pal))
-      pal <- pal_set1
+      pal <- pal_point_set1
     if (!is.null(legend_labels))
       labels <- legend_labels
     if (is.null(legend_labels))
@@ -441,9 +442,9 @@ ggplot_sf_col <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
-        caption = stringr::str_wrap(caption, 20)
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
+        caption = stringr::str_wrap(caption, 50)
       )  +
       guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15))) +
       guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15)))
@@ -469,7 +470,7 @@ ggplot_sf_col <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
@@ -496,7 +497,7 @@ ggplot_sf_facet <- function(data,
                             font_family = "Helvetica",
                             font_size_title = 11,
                             font_size_body = 10,
-                            wrap_title = 75,
+                            wrap_title = 70,
                             wrap_subtitle = 80,
                             wrap_caption = 80,
                             isMobile = FALSE) {
@@ -581,15 +582,15 @@ ggplot_sf_facet <- function(data,
       labs(
         title = stringr::str_wrap(title, wrap_title),
         subtitle = stringr::str_wrap(subtitle, wrap_subtitle),
-        caption = stringr::str_wrap(caption, 20)
+        caption = stringr::str_wrap(caption, 50)
       ) +
       facet_wrap(vars(!!facet_var), scales = "fixed", nrow = facet_nrow)
   }
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
         caption = stringr::str_wrap(caption, wrap_caption)
       )  +
       facet_wrap(vars(!!facet_var), scales = "fixed", ncol = 1)
@@ -627,7 +628,7 @@ ggplot_sf_facet <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 75. Not applicable where isMobile equals TRUE.
+#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
@@ -638,9 +639,11 @@ ggplot_sf_facet <- function(data,
 #' map_data <- example_sf_nz_river_wq %>%
 #'  dplyr::filter(period == "1998-2017",
 #'  indicator %in% c("Nitrate-nitrogen", "Dissolved reactive phosphorus"))
+#'  
+#'  pal <- c("#4575B4", "#D3D3D3", "#D73027")
 #'
 #' ggplot_sf_col_facet(data = map_data, col_var = trend_category, facet_var = indicator,
-#'  coastline = nz, pal = pal_trend3,
+#'  coastline = nz, pal = pal,
 #'  title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
 ggplot_sf_col_facet <- function(data,
                                 col_var,
@@ -669,7 +672,7 @@ ggplot_sf_col_facet <- function(data,
                                 font_family = "Helvetica",
                                 font_size_title = 11,
                                 font_size_body = 10,
-                                wrap_title = 75,
+                                wrap_title = 70,
                                 wrap_subtitle = 80,
                                 wrap_col_title = 25,
                                 wrap_caption = 80,
@@ -719,7 +722,7 @@ ggplot_sf_col_facet <- function(data,
   
   if (col_method == "category") {
     if (is.null(pal))
-      pal <- pal_set1
+      pal <- pal_point_set1
     if (!is.null(legend_labels))
       labels <- legend_labels
     if (is.null(legend_labels))
@@ -881,9 +884,9 @@ ggplot_sf_col_facet <- function(data,
   else if (isMobile == TRUE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, 20),
-        subtitle = stringr::str_wrap(subtitle, 20),
-        caption = stringr::str_wrap(caption, 20)
+        title = stringr::str_wrap(title, 40),
+        subtitle = stringr::str_wrap(subtitle, 40),
+        caption = stringr::str_wrap(caption, 50)
       )  +
       guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15))) +
       guides(fill = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15))) +

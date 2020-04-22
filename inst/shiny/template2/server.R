@@ -11,6 +11,8 @@ shinyServer(function(input, output, session) {
   map_data <- reactive({
     ### add your map_data code here ###
     tibble() #placeholder
+    
+    # return(map_data)
   })
 
   draw_map <- function() {
@@ -70,42 +72,24 @@ shinyServer(function(input, output, session) {
     
   })
   
-  output$plot_desktop <- plotly::renderPlotly({ # render it as a html object for desktop users
+  output$plot_desktop <- plotly::renderPlotly({ ### render it as a html object for desktop users
     plotly::ggplotly(plot(), tooltip = "text") %>%
-      plotly::config(displayModeBar = F)
+      simplevis::remove_plotly_buttons()
   })
 
-  output$plot_mobile <- renderPlot({ # render it as a image for mobile users
-    plot()
+  output$plot_mobile <- renderPlot({ ### render it as a image for mobile users
+    plot() +
+      ggplot2::theme(plot.title.position = "plot") +
+      ggplot2::theme(plot.caption.position = "plot") 
   })
-
-  ### use renderCachedPlot with relevant inputs listed to improve mobile performance ###
+  
+  ### use this code if you want to speed things up for mobile users
   # output$plot_mobile <- renderCachedPlot({
   #   plot()
   # },
   # cacheKeyExpr = {
-  #   list()
+  #   list() ### list input$dependencies here
   # })
-
-  # output$plot_data <- DT::renderDT( ### use this reactive table to debug plot_data() ###
-  #   plot_data(),
-  #   filter = "top",
-  #   rownames = F,
-  #   options = list(
-  #     pageLength = 5,
-  #     scrollX = T
-  #   )
-  # )
-
-  # table
-
-  output$table <- DT::renderDT(
-    df, ### adjust if necessary to display an appropriate number of columns of loaded data ###
-    filter = "top",
-    rownames = F,
-    options = list(pageLength = 10,
-                   scrollX = T)
-  )
 
   ### table ###
 
@@ -113,24 +97,14 @@ shinyServer(function(input, output, session) {
     df, ### adjust data object name, and columns as necessary ###
     filter = "top",
     rownames = F,
-    options = list(pageLength = 10,
+    options = list(pageLength = 5,
                    scrollX = T)
   )
 
   ### download ###
 
-  # output$download <- downloadHandler(
-  #   ### applicable  if 1 dataset ###
-  #   filename = function() {
-  #     "data.csv"
-  #   },
-  #   content = function(file) {
-  #     readr::write_csv(df, file) ### adjust data object name, as necessary ###
-  #   }
-  # )
-
   output$download <- downloadHandler(
-    ### if many files, add a zip file called download.zip into the data subfolder, and use this code instead ###
+    ### add a zip file called download.zip into the data subfolder ###
     filename <- function() {
       "download.zip"
     },
@@ -139,6 +113,16 @@ shinyServer(function(input, output, session) {
     },
     contentType = "application/zip"
   )
+  
+  # output$download <- downloadHandler(
+  #   ### applicable  if 1 dataset ###
+  #   filename = function() {
+  #     "data.csv"
+  #   },
+  #   content = function(file) {
+  #     readr::write_csv(df, file, na ="") ### adjust data object name, as necessary ###
+  #   }
+  # )
 
   ### download code ###
 
