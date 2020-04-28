@@ -1,3 +1,8 @@
+# simplevis 1.1.1
+
+* Update all maps to default to quantile col_method with quartiles
+* Added scales:show_col to all colour pals
+
 # simplevis 1.1.0 
 
 * Renamed pal_trend3, pal_trend5, and pal_set1 to have pal_point prefixes

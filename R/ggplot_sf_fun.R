@@ -193,7 +193,7 @@ ggplot_sf <- function(data,
 #' @description Map of simple features in ggplot that is coloured, but not facetted. 
 #' @param data A sf object with defined coordinate reference system. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
-#' @param col_method The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or bin if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
+#' @param col_method The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or "quantile" if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
 #' @param bin_cuts A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used.
 #' @param quantile_cuts A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles. Only applicable where col_method equals "quantile".
 #' @param size Size of points. Defaults to 0.5.
@@ -224,14 +224,11 @@ ggplot_sf <- function(data,
 #' @export
 #' @examples
 #' ggplot_sf_col(data = example_sf_nz_livestock, col_var = dairydens, coastline = nz,
+#'      col_method = "bin", bin_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
 #'      title = "Dairy density in count per km\u00b2, 2017")
 #'
 #' ggplot_sf_col(data = example_sf_nz_livestock, col_var = dairydens, coastline = nz,
 #'      col_method = "quantile", quantile_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
-#'      title = "Dairy density in count per km\u00b2, 2017")
-#'
-#' ggplot_sf_col(data = example_sf_nz_livestock, col_var = dairydens, coastline = nz,
-#'      col_method = "bin", bin_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
 #'      title = "Dairy density in count per km\u00b2, 2017")
 #'
 #' map_data <- example_sf_nz_river_wq %>%
@@ -239,8 +236,9 @@ ggplot_sf <- function(data,
 #'   
 #'  pal <- c("#4575B4", "#D3D3D3", "#D73027")
 #'
-#' ggplot_sf_col(data = map_data, col_var = trend_category, coastline = nz, pal = pal,
-#'    title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
+#' ggplot_sf_col(data = map_data, col_var = trend_category, coastline = nz, 
+#'    pal = pal, col_method = "category",
+#'    title = "Monitored river nitrate-nitrogen trends, 2008-17")
 ggplot_sf_col <- function(data,
                           col_var,
                           col_method = NULL,
@@ -307,7 +305,7 @@ ggplot_sf_col <- function(data,
       col_method <- "category"
   if (is.null(col_method))
     if (is.numeric(col_var_vector))
-      col_method <- "bin"
+      col_method <- "quantile"
   
   if (col_method == "category") {
     if (is.null(pal))
@@ -481,7 +479,7 @@ ggplot_sf_col <- function(data,
 #'  dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
 #'
 #' ggplot_sf_facet(data = map_data, facet_var = trend_category, coastline = nz,
-#'   title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
+#'   title = "Monitored river nitrate-nitrogen trends, 2008-17")
 ggplot_sf_facet <- function(data,
                             facet_var,
                             size = 0.5,
@@ -604,7 +602,7 @@ ggplot_sf_facet <- function(data,
 #' @param data A sf object with defined coordinate reference system. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
-#' @param col_method The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or bin if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
+#' @param col_method The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or "quantile" if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
 #' @param bin_cuts A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used.
 #' @param quantile_cuts A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles. Only applicable where col_method equals "quantile".
 #' @param quantile_by_facet TRUE of FALSE  whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.
@@ -644,7 +642,7 @@ ggplot_sf_facet <- function(data,
 #'
 #' ggplot_sf_col_facet(data = map_data, col_var = trend_category, facet_var = indicator,
 #'  coastline = nz, pal = pal,
-#'  title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
+#'  title = "Monitored river nitrate-nitrogen trends, 2008-17")
 ggplot_sf_col_facet <- function(data,
                                 col_var,
                                 facet_var,
@@ -718,7 +716,7 @@ ggplot_sf_col_facet <- function(data,
       col_method <- "category"
   if (is.null(col_method))
     if (is.numeric(col_var_vector))
-      col_method <- "bin"
+      col_method <- "quantile"
   
   if (col_method == "category") {
     if (is.null(pal))
