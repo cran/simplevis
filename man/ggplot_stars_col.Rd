@@ -10,7 +10,7 @@ ggplot_stars_col(data, col_method = "quantile", quantile_cuts = c(0,
   coastline_pal = "#7f7f7f", legend_ncol = 3, legend_digits = 1,
   title = "[Title]", subtitle = NULL, col_title = "", caption = "",
   legend_labels = NULL, font_family = "Helvetica",
-  font_size_title = 11, font_size_body = 10, wrap_title = 70,
+  font_size_title = NULL, font_size_body = NULL, wrap_title = 70,
   wrap_subtitle = 80, wrap_col_title = 25, wrap_caption = 80,
   isMobile = FALSE)
 }
@@ -71,5 +71,6 @@ Map of an array in ggplot that is coloured, but not facetted.
 }
 \examples{
 ggplot_stars_col(data = example_stars_nz_no3n, coastline = nz,
+   col_method = "quantile", quantile_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
    title = "River modelled median nitrate-nitrogen concentrations, 2013-17")
 }

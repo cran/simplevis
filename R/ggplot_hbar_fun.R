@@ -164,8 +164,8 @@ ggplot_hbar <- function(data,
                         y_title = "[Y title]",
                         caption = "",
                         font_family = "Helvetica",
-                        font_size_title = 11,
-                        font_size_body = 10,
+                        font_size_title = NULL,
+                        font_size_body = NULL,
                         wrap_title = 70,
                         wrap_subtitle = 80,
                         wrap_x_title = 50,
@@ -185,9 +185,18 @@ ggplot_hbar <- function(data,
   if (!is.numeric(x_var_vector)) stop("Please use a numeric x variable for a horizontal bar plot")
   if (is.numeric(y_var_vector)) stop("Please use a categorical y variable for a horizontal bar plot")
   
-  if(min(x_var_vector) < 0 & x_scale_zero == TRUE) {
+  if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
     x_scale_zero <- FALSE
     message("x_scale_zero must be FALSE as data contains values less than zero")
+  }
+  
+  if(is.null(font_size_title)){
+    if (isMobile == FALSE) font_size_title <- 11
+    else if (isMobile == TRUE) font_size_title <- 15
+  }
+  if(is.null(font_size_body)){
+    if (isMobile == FALSE) font_size_body <- 10
+    else if (isMobile == TRUE) font_size_body <- 14
   }
   
   if (is.factor(y_var_vector) & y_scale_rev == FALSE){
@@ -355,11 +364,18 @@ ggplot_hbar <- function(data,
 #'   dplyr::mutate(cut = stringr::str_to_sentence(cut)) %>%
 #'   dplyr::group_by(cut, clarity) %>%
 #'   dplyr::summarise(average_price = mean(price)) %>%
-#'   dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) 
-#'
-#' plot <- ggplot_hbar_col(data = plot_data, x_var = average_price_thousands, y_var = cut,
-#'                        col_var = clarity)
-#'
+#'   dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) %>%
+#'   dplyr::ungroup()
+#' 
+#' plot <- ggplot_hbar_col(data = plot_data, 
+#'                         x_var = average_price_thousands, 
+#'                         y_var = cut, 
+#'                         col_var = clarity, 
+#'                         legend_ncol = 4,
+#'                         title = "Average diamond price by cut and clarity", 
+#'                         x_title = "Average price ($US thousands)", 
+#'                         y_title = "Cut")
+#' 
 #' plot
 #'
 #' plotly::ggplotly(plot, tooltip = "text")
@@ -385,8 +401,8 @@ ggplot_hbar_col <-
            caption = "",
            legend_labels = NULL,
            font_family = "Helvetica",
-           font_size_title = 11,
-           font_size_body = 10,
+           font_size_title = NULL,
+           font_size_body = NULL,
            wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
@@ -413,11 +429,20 @@ ggplot_hbar_col <-
     if (position == "stack" & x_scale_trans != "identity") message("simplevis may not perform correctly using an x scale other than identity where position equals stack")
     if (position == "stack" & x_scale_zero == FALSE) message("simplevis may not perform correctly with position equal to stack and x_scale_zero equal to FALSE")
     
-    if(min(x_var_vector) < 0 & x_scale_zero == TRUE) {
+    if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
       x_scale_zero <- FALSE
       message("x_scale_zero must be FALSE as data contains values less than zero")
     }
     
+    if(is.null(font_size_title)){
+      if (isMobile == FALSE) font_size_title <- 11
+      else if (isMobile == TRUE) font_size_title <- 15
+    }
+    if(is.null(font_size_body)){
+      if (isMobile == FALSE) font_size_body <- 10
+      else if (isMobile == TRUE) font_size_body <- 14
+    }
+
     if (y_scale_rev == FALSE){
       data <- data %>%
         dplyr::mutate(!!y_var := forcats::fct_rev(!!y_var))
@@ -633,7 +658,10 @@ ggplot_hbar_col <-
 #'   dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) 
 #'
 #' plot <- ggplot_hbar_facet(data = plot_data, x_var = average_price_thousands,
-#'                           y_var = cut, facet_var = clarity)
+#'                           y_var = cut, facet_var = clarity,
+#'                          title = "Average diamond price by cut and clarity", 
+#'                          x_title = "Average price ($US thousands)", 
+#'                          y_title = "Cut")
 #'
 #' plot
 #'
@@ -656,8 +684,8 @@ ggplot_hbar_facet <-
            y_title = "[Y title]",
            caption = "",
            font_family = "Helvetica",
-           font_size_title = 11,
-           font_size_body = 10,
+           font_size_title = NULL,
+           font_size_body = NULL,
            wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
@@ -680,11 +708,20 @@ ggplot_hbar_facet <-
     if (!is.numeric(x_var_vector)) stop("Please use a categorical y variable for a horizontal bar plot")
     if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a horizontal bar plot")
     
-    if(min(x_var_vector) < 0 & x_scale_zero == TRUE) {
+    if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
       x_scale_zero <- FALSE
       message("x_scale_zero must be FALSE as data contains values less than zero")
     }
     
+    if(is.null(font_size_title)){
+      if (isMobile == FALSE) font_size_title <- 11
+      else if (isMobile == TRUE) font_size_title <- 15
+    }
+    if(is.null(font_size_body)){
+      if (isMobile == FALSE) font_size_body <- 10
+      else if (isMobile == TRUE) font_size_body <- 14
+    }
+
     if (is.factor(y_var_vector) & y_scale_rev == FALSE){
       data <- data %>%
         dplyr::mutate(!!y_var := forcats::fct_rev(!!y_var))
@@ -875,7 +912,10 @@ ggplot_hbar_facet <-
 #'   dplyr::mutate(average_price_thousands = round(average_price / 1000, 1))
 #'
 #' plot <- ggplot_hbar_col_facet(data = plot_data, x_var = average_price_thousands,
-#'                               y_var = color, col_var = clarity, facet_var = cut)
+#'                               y_var = color, col_var = clarity, facet_var = cut,
+#'                               title = "Average diamond price by colour, clarity and cut", 
+#'                               x_title = "Average price ($US thousands)", 
+#'                               y_title = "Colour")
 #'
 #' plot
 #'
@@ -905,8 +945,8 @@ ggplot_hbar_col_facet <-
            caption = "",
            legend_labels = NULL,
            font_family = "Helvetica",
-           font_size_title = 11,
-           font_size_body = 10,
+           font_size_title = NULL,
+           font_size_body = NULL,
            wrap_title = 70,
            wrap_subtitle = 80,
            wrap_x_title = 50,
@@ -935,11 +975,20 @@ ggplot_hbar_col_facet <-
     if (position == "stack" & x_scale_trans != "identity") message("simplevis may not perform correctly using an x scale other than identity where position equals stack")
     if (position == "stack" & x_scale_zero == FALSE) message("simplevis may not perform correctly with position equal to stack and x_scale_zero equal to FALSE")
     
-    if(min(x_var_vector) < 0 & x_scale_zero == TRUE) {
+    if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
       x_scale_zero <- FALSE
       message("x_scale_zero must be FALSE as data contains values less than zero")
     }
     
+    if(is.null(font_size_title)){
+      if (isMobile == FALSE) font_size_title <- 11
+      else if (isMobile == TRUE) font_size_title <- 15
+    }
+    if(is.null(font_size_body)){
+      if (isMobile == FALSE) font_size_body <- 10
+      else if (isMobile == TRUE) font_size_body <- 14
+    }
+
     if (y_scale_rev == FALSE){
       data <- data %>%
         dplyr::mutate(!!y_var := forcats::fct_rev(!!y_var))

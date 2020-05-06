@@ -1,7 +1,7 @@
 Package: simplevis
 Type: Package
 Title: Simple Visualisation with 'ggplot2' and 'leaflet' Wrappers
-Version: 1.1.1
+Version: 1.1.2
 Authors@R: 
     c(person(given = "David", 
                family = "Hodge", 
@@ -12,9 +12,9 @@ Authors@R:
              role = c("cph")))
 Description: Provides 'ggplot2' and 'leaflet' wrapper functions designed to simplify the creation of high quality graph and map visualisations. These functions only require inputs of data, variables and titles to provide beautiful interactive or image visualisations. However they allow for more flexibility if required. The intent is that high quality well-designed graphs and maps can be made more consistently with less effort, code and expertise than would otherwise be required.
 License: MIT + file LICENSE
-URL: https://StatisticsNZ.github.io/simplevis,
-        https://github.com/StatisticsNZ/simplevis
-BugReports: https://github.com/StatisticsNZ/simplevis/issues
+URL: https://statisticsnz.github.io/simplevis,
+        https://github.com/statisticsnz/simplevis
+BugReports: https://github.com/statisticsNZ/simplevis/issues
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
@@ -28,9 +28,9 @@ Suggests: knitr
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-04-28 01:27:49 UTC; dhodge
+Packaged: 2020-05-06 02:11:54 UTC; dhodge
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-04-28 13:30:02 UTC
+Date/Publication: 2020-05-06 06:30:02 UTC

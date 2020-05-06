@@ -11,7 +11,7 @@ ggplot_hbar_col(data, x_var, y_var, col_var, hover_var = NULL,
   title = "[Title]", subtitle = NULL, x_title = "[X title]",
   y_title = "[Y title]", col_title = "", caption = "",
   legend_labels = NULL, font_family = "Helvetica",
-  font_size_title = 11, font_size_body = 10, wrap_title = 70,
+  font_size_title = NULL, font_size_body = NULL, wrap_title = 70,
   wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
   wrap_y_label = 50, wrap_col_title = 25, wrap_caption = 80,
   isMobile = FALSE)
@@ -90,10 +90,17 @@ plot_data <- ggplot2::diamonds \%>\%
   dplyr::mutate(cut = stringr::str_to_sentence(cut)) \%>\%
   dplyr::group_by(cut, clarity) \%>\%
   dplyr::summarise(average_price = mean(price)) \%>\%
-  dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) 
+  dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) \%>\%
+  dplyr::ungroup()
 
-plot <- ggplot_hbar_col(data = plot_data, x_var = average_price_thousands, y_var = cut,
-                       col_var = clarity)
+plot <- ggplot_hbar_col(data = plot_data, 
+                        x_var = average_price_thousands, 
+                        y_var = cut, 
+                        col_var = clarity, 
+                        legend_ncol = 4,
+                        title = "Average diamond price by cut and clarity", 
+                        x_title = "Average price ($US thousands)", 
+                        y_title = "Cut")
 
 plot
 

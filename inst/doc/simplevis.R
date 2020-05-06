@@ -38,7 +38,10 @@ plot <- ggplot_hbar_col(data = plot_data,
                         x_var = average_price_thousands, 
                         y_var = cut, 
                         col_var = clarity, 
-                        legend_ncol = 4)
+                        legend_ncol = 4,
+                        title = "Average diamond price by cut and clarity", 
+                        x_title = "Average price ($US thousands)", 
+                        y_title = "Cut")
 
 plot
 
@@ -53,7 +56,10 @@ plot_data <- ggplot2::diamonds %>%
 plot <- ggplot_hbar_facet(data = plot_data, 
                           x_var = average_price_thousands, 
                           y_var = cut, 
-                          facet_var = clarity)
+                          facet_var = clarity,
+                          title = "Average diamond price by cut and clarity", 
+                          x_title = "Average price ($US thousands)", 
+                          y_title = "Cut")
 
 plot
 
@@ -70,7 +76,10 @@ plot <- ggplot_hbar_col_facet(data = plot_data,
                               y_var = color, 
                               col_var = clarity, 
                               facet_var = cut,
-                              legend_ncol = 4)
+                              legend_ncol = 4, 
+                              title = "Average diamond price by colour, clarity and cut", 
+                              x_title = "Average price ($US thousands)", 
+                              y_title = "Colour")
 
 plot
 
@@ -96,7 +105,9 @@ map_data <- example_sf_nz_river_wq %>%
 
 ggplot_sf(data = map_data, 
           coastline = nz, 
-          size = 0.25)
+          size = 0.25,
+          title = "Monitored river nitrate-nitrogen trend sites, 2008\u201317",
+          wrap_title = 40)
 
 ## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
@@ -109,7 +120,8 @@ ggplot_sf_col(data = map_data,
               coastline = nz, 
               size = 0.25, 
               pal = pal, 
-              title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
+              title = "Monitored river nitrate-nitrogen trends, 2008\u201317",
+              wrap_title = 40)
 
 ## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
@@ -138,21 +150,23 @@ ggplot_sf_col_facet(data = map_data,
 ## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 ggplot_stars_col(data = example_stars_nz_no3n, 
                  coastline = nz,
-                 col_method = "quantile", 
+                 col_method = "quantile", quantile_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
                  title = "River modelled median nitrate-nitrogen concentrations, 2013\u201317",
+                 wrap_title = 40, 
                  legend_digits = 1)
 
 ## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data1 <- example_stars_nz_no3n %>%
-  rlang::set_names("Nitrate nitrogen")
+  rlang::set_names("NO3N")
 
 map_data2 <- example_stars_nz_drp %>%
-  rlang::set_names("Dissolved reactive phosphorus")
+  rlang::set_names("DRP")
 
 map_data <- c(map_data1, map_data2)
 
 ggplot_stars_col_facet(data = map_data, 
                        coastline = nz,
+                       col_method = "quantile", quantile_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
                        title = "River modelled nutrient concentrations, 2013\u201317")
 
 ## ---- echo = TRUE, results = 'hide', message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
@@ -171,6 +185,7 @@ leaflet_sf_col(data = map_data,
 
 ## ---- echo = TRUE, results = 'hide', fig.height = 4, fig.width = 7------------
 leaflet_stars_col(data = example_stars_nz_no3n,
+  col_method = "quantile", quantile_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
    title = "River modelled median nitrate-nitrogen concentrations in g/m\u00b3, 2013\u201317")
 
 ## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
@@ -197,9 +212,5 @@ plot
 ## ---- eval=F------------------------------------------------------------------
 #  run_template("template1") # a graph and table
 #  run_template("template2") # a leaflet map, as well as graph and table
-#  run_template("template3") # a dual leaflet map, as well as graph and table
 #  
-#  run_example("example1") # example application of template1
-#  run_example("example2") # example application of template2
-#  run_example("example3") # example application of template3
 
