@@ -1,3 +1,10 @@
+# simplevis 1.1.3
+
+* Renamed remove_plotly_buttons as plotly_remove_buttons
+* Added plotly_reverse_legend and plotly_order_legend functions
+* Added width argument to hbar and vbar functions
+* Updated css plot minimum height
+
 # simplevis 1.1.2
 
 * Added a req statement in the observe function of template2 to ensure the basemap is output before points are tried to be plotted 
@@ -9,7 +16,7 @@
 
 # simplevis 1.1.1
 
-* Update all maps to default to quantile col_method with quartiles
+* Updated all maps to default to quantile col_method with quartiles
 * Added scales:show_col to all colour pals
 
 # simplevis 1.1.0 

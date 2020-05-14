@@ -83,21 +83,21 @@ plot <- ggplot_hbar_col_facet(data = plot_data,
 
 plot
 
-## ---- echo = TRUE, results = 'hide', message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
-plot_data <- storms %>%
-  group_by(year) %>%
-  summarise(average_wind = round(mean(wind), 2)) %>%
-  ungroup()
-
-plot <- ggplot_vbar(data = plot_data, 
-                    x_var = year, 
-                    y_var = average_wind, 
-                    title = "Average wind speed of Atlantic storms, 1975\u20132015",
-                    x_title = "Year",
-                    y_title = "Average maximum sustained wind speed (knots)")
-
-plotly::ggplotly(plot, tooltip = "text") %>%
-      plotly::config(displayModeBar = F)
+## ---- echo = TRUE, eval = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7----
+#  plot_data <- storms %>%
+#    group_by(year) %>%
+#    summarise(average_wind = round(mean(wind), 2)) %>%
+#    ungroup()
+#  
+#  plot <- ggplot_vbar(data = plot_data,
+#                      x_var = year,
+#                      y_var = average_wind,
+#                      title = "Average wind speed of Atlantic storms, 1975\u20132015",
+#                      x_title = "Year",
+#                      y_title = "Average maximum sustained wind speed (knots)")
+#  
+#  plotly::ggplotly(plot, tooltip = "text") %>%
+#    plotly_remove_buttons()
 
 ## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
