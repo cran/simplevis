@@ -1,8 +1,8 @@
-ddfaefc475372fc14cee032b5fcdc3d7 *DESCRIPTION
+a3491525225d62dbbea6dda7d8995e77 *DESCRIPTION
 308e22a6e249e75ca6f7ec793604ed4c *LICENSE
 019c7a58bfde2e92e4c825dd2ae93f72 *NAMESPACE
-4b3153ce05ff7296564e344cfe37c8b1 *NEWS.md
-b4439d377f4b0b4c229b8a21f1c1cb95 *R/data.R
+5703b6f385c32447b491fc6e209a29f2 *NEWS.md
+c91d16cf475abae6976e58fa795bbddf *R/data.R
 5c8781dfd3b4f4cb3e3c6aa416e1ba6b *R/er_helpers.R
 18e16a8ba780715e2ed556dd9174c844 *R/ggplot_box_fun.R
 f81a793d7a205fc5c479dc6b3b76e4c6 *R/ggplot_hbar_fun.R
@@ -16,7 +16,7 @@ c408523bf6fa4a23e7f023d8d0c0b1db *R/leaflet_basemap_stack_fun.R
 eb3b94668849e1932802c98ca64fea0c *R/leaflet_sf_fun.R
 c0a3bbcd98d1c96a6733450aa01103f6 *R/leaflet_stars_fun.R
 0e1c8a757099286fa7d03864d1bf7998 *R/logo.R
-90975edd56135664fa05c0563bc2946f *R/other.R
+f7318b9f9677303656297db480cb2ee8 *R/other.R
 4a7fd0b7bc6c85e086b0fcc8e3749a2b *R/plotly.R
 f49ee569d336ae90cbd55f45696a1e0e *R/run_app_fun.R
 d475a005676b5f669555a6d36a19012e *README.md
@@ -27,10 +27,9 @@ c0c4c80cdd584e0c80e942127307c952 *data/datalist
 62b80179857fe862157a399eea167d93 *data/example_stars_nz_drp.rda
 76ce0336f772f709e36e67231b076e3f *data/example_stars_nz_no3n.rda
 32af2b2dda9b6467da4c483ab9244526 *data/nz.rda
-6e64fbff3efcac7962343ab160e83f9b *data/nz_region.rda
 a241fc65ba9534c9cc28752ccd0f30e9 *inst/doc/simplevis.R
 6b5f3c8d7a31f09b559063d07c2c4fc7 *inst/doc/simplevis.Rmd
-1ef73d36ef0fc0ba7a92a40ce3fc4b50 *inst/doc/simplevis.html
+4daadf5ab07f9faa786172e7e2061c58 *inst/doc/simplevis.html
 56e511e0366b47ad0189bd31cd912da2 *inst/shiny/template1/data/template1.zip
 d2c78377e56c30a26fabe0e1c15704fc *inst/shiny/template1/global.R
 a81f329a56b7dbb442ba5adb96c901d7 *inst/shiny/template1/make_app_vis.R
@@ -94,7 +93,6 @@ cd5cbb3118e3658d76cd85b3ce6e6224 *man/leaflet_stars.Rd
 292436ebf189ab7b8eecaa872a8bac27 *man/leaflet_stars_col.Rd
 445f9942ed32dd73c138dfdbb074c299 *man/numeric_legend_labels.Rd
 fd769abda49f23b4b1ae159116109234 *man/nz.Rd
-4030f01c9a70d7c1271dcfac7047dec8 *man/nz_region.Rd
 953eb2b23bd4692d1a44f5e02dac16df *man/pal_ea19.Rd
 bdcce0f923612b1eb14e2d8e4f71e821 *man/pal_ea19_nof4.Rd
 f0135c0f33a43de6e03ec29e476438f1 *man/pal_ea19_nof5.Rd
@@ -102,11 +100,11 @@ fce6ff86f1930f8a5f9eb9a47d9a4e00 *man/pal_ea19_nztcs_c.Rd
 002984ed0ee417f456068c2eeacef805 *man/pal_ea19_trend2.Rd
 65ada271fd55d276795d048dfa6677b9 *man/pal_ea19_trend3.Rd
 7f24a3dba04d210685a0f5f0c191539e *man/pal_ea19_trend5.Rd
-84295f247334e22dd23ce8fbb2cd9d7d *man/pal_point_set1.Rd
+375c470d17092f16bf7db01a43b6c6dc *man/pal_point_set1.Rd
 7990306ce9399bcb715d481166083e0d *man/pal_point_trend2.Rd
 27aa3759aac547e47b22af5dae74006d *man/pal_point_trend3.Rd
 2b77d5f6eb4c945e09431aa7fefdc01e *man/pal_point_trend5.Rd
-49c97e51a89ac9771a4e71ce7808da05 *man/pal_snz.Rd
+b7711f73e991c5613d2ceb832f86bfc7 *man/pal_snz.Rd
 18054ed8e6f7fceef80977c3fdf02939 *man/pal_snz_nof4.Rd
 51ed694fcf98afb987b15c0fd01ff654 *man/pal_snz_nof5.Rd
 db7ee304e76a65fae8ec4bd2f51d82ba *man/pal_snz_nztcs_c.Rd
