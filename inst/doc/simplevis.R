@@ -98,6 +98,9 @@ plot
 #  
 #  plotly::ggplotly(plot, tooltip = "text") %>%
 #    plotly_remove_buttons()
+#  
+#  plotly::ggplotly(plot, tooltip = c("average_wind")) %>%
+#    plotly_remove_buttons()
 
 ## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 map_data <- example_sf_nz_river_wq %>%
