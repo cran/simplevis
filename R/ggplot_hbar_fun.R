@@ -114,6 +114,7 @@ theme_hbar <-
 #' @param x_var Unquoted numeric variable to be on the x axis. Required input.
 #' @param y_var Unquoted categorical variable to be on the y axis. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
 #' @param x_scale_trans A string specifying a transformation for the x axis scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
@@ -155,6 +156,7 @@ ggplot_hbar <- function(data,
                         x_var,
                         y_var,
                         hover_var = NULL,
+                        x_scale_labels = waiver(),
                         x_scale_zero = TRUE,
                         x_scale_trans = "identity",
                         y_scale_rev = FALSE,
@@ -164,7 +166,7 @@ ggplot_hbar <- function(data,
                         subtitle = NULL,
                         x_title = "[X title]",
                         y_title = "[Y title]",
-                        caption = "",
+                        caption = NULL,
                         font_family = "Helvetica",
                         font_size_title = NULL,
                         font_size_body = NULL,
@@ -290,6 +292,7 @@ ggplot_hbar <- function(data,
       expand = c(0, 0),
       breaks = x_scale_breaks,
       limits = x_scale_limits,
+      labels = x_scale_labels,
       trans = x_scale_trans,
       oob = scales::rescale_none
     )
@@ -333,6 +336,7 @@ ggplot_hbar <- function(data,
 #' @param y_var Unquoted categorical variable to be on the y axis. Required input.
 #' @param col_var Unquoted categorical variable to colour the bars. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
 #' @param x_scale_trans A string specifying a transformation for the x axis scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
@@ -388,6 +392,7 @@ ggplot_hbar_col <-
            y_var,
            col_var,
            hover_var = NULL,
+           x_scale_labels = waiver(),
            x_scale_zero = TRUE,
            x_scale_trans = "identity",
            y_scale_rev = FALSE,
@@ -402,7 +407,7 @@ ggplot_hbar_col <-
            x_title = "[X title]",
            y_title = "[Y title]",
            col_title = "",
-           caption = "",
+           caption = NULL,
            legend_labels = NULL,
            font_family = "Helvetica",
            font_size_title = NULL,
@@ -576,6 +581,7 @@ ggplot_hbar_col <-
         expand = c(0, 0),
         breaks = x_scale_breaks,
         limits = x_scale_limits,
+        labels = x_scale_labels,
         trans = x_scale_trans,
         oob = scales::rescale_none
       )
@@ -631,6 +637,7 @@ ggplot_hbar_col <-
 #' @param y_var Unquoted categorical variable to be on the y axis. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
 #' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
@@ -677,6 +684,7 @@ ggplot_hbar_facet <-
            y_var,
            facet_var,
            hover_var = NULL,
+           x_scale_labels = waiver(),
            x_scale_zero = TRUE,
            x_scale_trans = "identity",
            y_scale_rev = FALSE,
@@ -688,7 +696,7 @@ ggplot_hbar_facet <-
            subtitle = NULL,
            x_title = "[X title]",
            y_title = "[Y title]",
-           caption = "",
+           caption = NULL,
            font_family = "Helvetica",
            font_size_title = NULL,
            font_size_body = NULL,
@@ -824,6 +832,7 @@ ggplot_hbar_facet <-
           expand = c(0, 0),
           breaks = x_scale_breaks,
           limits = x_scale_limits,
+          labels = x_scale_labels,
           trans = x_scale_trans,
           oob = scales::rescale_none
         )
@@ -831,6 +840,7 @@ ggplot_hbar_facet <-
     if (facet_scales %in% c("free", "free_x")) {
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
+                           labels = x_scale_labels,
                            trans = x_scale_trans,
                            oob = scales::rescale_none)
     }
@@ -880,6 +890,7 @@ ggplot_hbar_facet <-
 #' @param col_var Unquoted categorical variable to colour the bars. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
 #' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
@@ -934,6 +945,7 @@ ggplot_hbar_col_facet <-
            col_var,
            facet_var,
            hover_var = NULL,
+           x_scale_labels = waiver(),
            x_scale_zero = TRUE,
            x_scale_trans = "identity",
            y_scale_rev = FALSE,
@@ -950,7 +962,7 @@ ggplot_hbar_col_facet <-
            x_title = "[X title]",
            y_title = "[Y title]",
            col_title = "",
-           caption = "",
+           caption = NULL,
            legend_labels = NULL,
            font_family = "Helvetica",
            font_size_title = NULL,
@@ -1135,6 +1147,7 @@ ggplot_hbar_col_facet <-
     if (facet_scales %in% c("free", "free_x")) {
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
+                           labels = x_scale_labels,
                            trans = x_scale_trans,
                            oob = scales::rescale_none)
     }

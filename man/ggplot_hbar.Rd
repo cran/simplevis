@@ -4,10 +4,11 @@
 \alias{ggplot_hbar}
 \title{Horizontal bar ggplot.}
 \usage{
-ggplot_hbar(data, x_var, y_var, hover_var = NULL, x_scale_zero = TRUE,
+ggplot_hbar(data, x_var, y_var, hover_var = NULL,
+  x_scale_labels = waiver(), x_scale_zero = TRUE,
   x_scale_trans = "identity", y_scale_rev = FALSE, pal = NULL,
   width = 0.75, title = "[Title]", subtitle = NULL,
-  x_title = "[X title]", y_title = "[Y title]", caption = "",
+  x_title = "[X title]", y_title = "[Y title]", caption = NULL,
   font_family = "Helvetica", font_size_title = NULL,
   font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
   wrap_x_title = 50, wrap_y_title = 50, wrap_y_label = 50,
@@ -21,6 +22,8 @@ ggplot_hbar(data, x_var, y_var, hover_var = NULL, x_scale_zero = TRUE,
 \item{y_var}{Unquoted categorical variable to be on the y axis. Required input.}
 
 \item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
+
+\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
 
 \item{x_scale_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
 
