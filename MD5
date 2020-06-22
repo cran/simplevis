@@ -1,7 +1,7 @@
-9cd6eb7195a0f79d9bb7a49df1862cb6 *DESCRIPTION
+89776cee52facdcea340ac0b27cf457a *DESCRIPTION
 308e22a6e249e75ca6f7ec793604ed4c *LICENSE
-019c7a58bfde2e92e4c825dd2ae93f72 *NAMESPACE
-aa8ff973f6cd8585c4f807799745f8c1 *NEWS.md
+1d3068798fd5236a96b71a822ae86f70 *NAMESPACE
+18c7a025bf36969dcd6b8ba7aacee265 *NEWS.md
 c91d16cf475abae6976e58fa795bbddf *R/data.R
 5f2ee92d161490560b2a8184ee66a7b9 *R/er_helpers.R
 9a20cc105f0b0d53df02a0fadb3f1cbc *R/ggplot_box_fun.R
@@ -10,10 +10,10 @@ b324b0b09543a55fd35b217b5a02a979 *R/ggplot_hbar_fun.R
 0f26846872023665faa391b654d0bb10 *R/ggplot_scatter_fun.R
 d11152828f33b507ab24c98985adc0ad *R/ggplot_sf_fun.R
 ca0fac121871d1cf726f01952ed7562d *R/ggplot_stars_fun.R
-311c3c355ecf616f5c8fe5e9be467df9 *R/ggplot_vbar_fun.R
-76778691f2b85ef3e81bfb96735ab5ba *R/imports.R
+d195d07e73dc48f011d07e96f139b720 *R/ggplot_vbar_fun.R
+d6231fa067237ad7557d024eba6f0ec1 *R/imports.R
 c408523bf6fa4a23e7f023d8d0c0b1db *R/leaflet_basemap_stack_fun.R
-eb3b94668849e1932802c98ca64fea0c *R/leaflet_sf_fun.R
+5b309c9bb4a61382090306c6c94f2895 *R/leaflet_sf_fun.R
 c0a3bbcd98d1c96a6733450aa01103f6 *R/leaflet_stars_fun.R
 0e1c8a757099286fa7d03864d1bf7998 *R/logo.R
 f7318b9f9677303656297db480cb2ee8 *R/other.R
@@ -29,7 +29,7 @@ c0c4c80cdd584e0c80e942127307c952 *data/datalist
 32af2b2dda9b6467da4c483ab9244526 *data/nz.rda
 28b213c93bdfb911705610eeb876175b *inst/doc/simplevis.R
 6790d810df5598b6c4672ae15d144af3 *inst/doc/simplevis.Rmd
-fc7c30bbb4da6c8f7fc411d82510c698 *inst/doc/simplevis.html
+e4bf00160be84a1983b42a9a024e03d7 *inst/doc/simplevis.html
 d8429a67cb475df0b94fbdab01e5cc7b *inst/shiny/template1/data/template1.zip
 bf3f7d6e017ee304be9529f70ede89af *inst/shiny/template1/global.R
 a81f329a56b7dbb442ba5adb96c901d7 *inst/shiny/template1/make_app_vis.R
@@ -88,7 +88,7 @@ e837b1e947122c64954d58c8f63cd2a2 *man/ggplot_vbar.Rd
 59f3253583255b8face98df489d00635 *man/leaflet_basemap_stack.Rd
 0b4919c299f71cdaec3fa63bcf8044fb *man/leaflet_basemap_stack_nz.Rd
 00cbc04e70dc2b193ab6f53e86f3f20e *man/leaflet_sf.Rd
-5d87ffef5c9d7053b5f6efb7b2ee6e89 *man/leaflet_sf_col.Rd
+1ed359edd16032a9fe7065ebd0f6f965 *man/leaflet_sf_col.Rd
 cd5cbb3118e3658d76cd85b3ce6e6224 *man/leaflet_stars.Rd
 292436ebf189ab7b8eecaa872a8bac27 *man/leaflet_stars_col.Rd
 445f9942ed32dd73c138dfdbb074c299 *man/numeric_legend_labels.Rd

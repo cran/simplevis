@@ -1,3 +1,8 @@
+# simplevis 1.4.0
+
+* Updated vbar x scale to accomodate edge bars.
+* Added argument to select a label variable in leaflet sf.
+
 # simplevis 1.3.0
 
 * Updated colour in pal_point_trend3 and pal_point_trend5.
