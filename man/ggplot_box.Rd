@@ -5,7 +5,8 @@
 \title{Vertical box ggplot.}
 \usage{
 ggplot_box(data, x_var, y_var = NULL, stat = "boxplot",
-  y_scale_zero = TRUE, y_scale_trans = "identity",
+  x_scale_labels = waiver(), y_scale_zero = TRUE,
+  y_scale_zero_line = TRUE, y_scale_trans = "identity",
   y_scale_labels = waiver(), pal = NULL, title = "[Title]",
   subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
   caption = NULL, font_family = "Helvetica", font_size_title = NULL,
@@ -22,7 +23,11 @@ ggplot_box(data, x_var, y_var = NULL, stat = "boxplot",
 
 \item{stat}{String of "boxplot" or "identity". Defaults to "boxplot". If identity is selected, data provided must be grouped by the x_var with ymin, lower, middle, upper, ymax variables. Note "identity" does not provide outliers.}
 
+\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+
 \item{y_scale_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
+
+\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
 \item{y_scale_trans}{TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.}
 

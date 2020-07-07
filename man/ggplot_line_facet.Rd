@@ -5,10 +5,11 @@
 \title{Line ggplot that is facetted.}
 \usage{
 ggplot_line_facet(data, x_var, y_var, facet_var, hover_var = NULL,
-  x_scale_date_format = "\%Y", y_scale_zero = TRUE,
-  y_scale_trans = "identity", y_scale_labels = waiver(),
-  facet_scales = "fixed", facet_nrow = NULL, points = TRUE,
-  point_size = 1, pal = NULL, title = "[Title]", subtitle = NULL,
+  x_scale_labels = waiver(), y_scale_zero = TRUE,
+  y_scale_zero_line = TRUE, y_scale_trans = "identity",
+  y_scale_labels = waiver(), facet_scales = "fixed",
+  facet_nrow = NULL, points = TRUE, point_size = 1, lines = TRUE,
+  pal = NULL, title = "[Title]", subtitle = NULL,
   x_title = "[X title]", y_title = "[Y title]", caption = NULL,
   font_family = "Helvetica", font_size_title = NULL,
   font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
@@ -26,9 +27,11 @@ ggplot_line_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
 
-\item{x_scale_date_format}{Date format for x axis labels.}
+\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
 
 \item{y_scale_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
+
+\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
 \item{y_scale_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
@@ -41,6 +44,8 @@ ggplot_line_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 \item{points}{TRUE or FALSE of whether to include points. Defaults to TRUE.}
 
 \item{point_size}{Size of points. Defaults to 1. Only applicable to where points equals TRUE.}
+
+\item{lines}{TRUE or FALSE of whether to include lines. Defaults to TRUE.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
 

@@ -115,7 +115,9 @@ theme_box <-
 #' @param x_var Unquoted categorical variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Defaults to NULL. Required if stat equals "boxplot".
 #' @param stat String of "boxplot" or "identity". Defaults to "boxplot". If identity is selected, data provided must be grouped by the x_var with ymin, lower, middle, upper, ymax variables. Note "identity" does not provide outliers.
+#' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param y_scale_zero TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
+#' @param y_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
 #' @param y_scale_trans TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.
 #' @param y_scale_labels Argument to adjust the format of the y scale labels.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
@@ -160,7 +162,9 @@ ggplot_box <- function(data,
                        x_var,
                        y_var = NULL,
                        stat = "boxplot",
+                       x_scale_labels = waiver(),
                        y_scale_zero = TRUE,
+                       y_scale_zero_line = TRUE,
                        y_scale_trans = "identity",
                        y_scale_labels = waiver(),
                        pal = NULL,
@@ -189,6 +193,12 @@ ggplot_box <- function(data,
   
   if (is.numeric(x_var_vector)) stop("Please use a categorical x variable for a vertical boxplot")
   if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a vertical boxplot")
+  
+  min_y_var_vector <- min(y_var_vector, na.rm = TRUE)
+  max_y_var_vector <- max(y_var_vector, na.rm = TRUE)
+  if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero == TRUE) {
+    y_scale_zero <- FALSE
+  }
   
   if(is.null(font_size_title)){
     if (isMobile == FALSE) font_size_title <- 11
@@ -241,7 +251,9 @@ ggplot_box <- function(data,
   }
   
   if (y_scale_zero == TRUE) {
-    y_scale_breaks <- pretty(c(0, y_var_vector))
+    if(max(y_var_vector) > 0) y_scale_breaks <- pretty(c(0, y_var_vector))
+    if(min(y_var_vector) < 0) y_scale_breaks <- pretty(c(y_var_vector, 0))
+    
     if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
     y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
   }
@@ -253,8 +265,9 @@ ggplot_box <- function(data,
     }
     y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
   }
-  
+
   plot <- plot +
+    scale_x_discrete(labels = x_scale_labels) +
     scale_y_continuous(
       expand = c(0, 0),
       breaks = y_scale_breaks,
@@ -264,6 +277,11 @@ ggplot_box <- function(data,
       oob = scales::rescale_none
     )
   
+  if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero_line == TRUE) {
+    plot <- plot +
+      ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
+  }
+
   if (isMobile == FALSE){
     plot <- plot +
       labs(
@@ -272,11 +290,7 @@ ggplot_box <- function(data,
         x = stringr::str_wrap(x_title, wrap_x_title),
         y = stringr::str_wrap(y_title, wrap_y_title),
         caption = stringr::str_wrap(caption, wrap_caption)
-      ) +
-      scale_x_discrete(
-        labels = function(x)
-          stringr::str_wrap(x, 15)
-      )
+      ) 
   }
   else if (isMobile == TRUE){
     plot <- plot +
@@ -288,13 +302,8 @@ ggplot_box <- function(data,
         caption = stringr::str_wrap(caption, 50)
       ) +
       coord_flip() +
-      scale_x_discrete(
-        labels = function(x)
-          stringr::str_wrap(x, 30)
-      ) +
       theme(panel.grid.major.x = element_line(colour = "#D3D3D3", size = 0.2)) +
       theme(panel.grid.major.y = element_blank())
-    
   }
   
   return(plot)
@@ -307,7 +316,9 @@ ggplot_box <- function(data,
 #' @param y_var Unquoted numeric variable to be on the y axis. Defaults to NULL. Required if stat equals "boxplot".
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param stat String of "boxplot" or "identity". Defaults to "boxplot". If identity is selected, data provided must be grouped by the x_var and facet_var with ymin, lower, middle, upper, ymax variables. Note "identity" does not provide outliers.
+#' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param y_scale_zero TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
+#' @param y_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
 #' @param y_scale_trans TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.
 #' @param y_scale_labels Argument to adjust the format of the y scale labels.
 #' @param facet_scales Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".
@@ -347,7 +358,9 @@ ggplot_box_facet <-
            y_var = NULL,
            facet_var,
            stat = "boxplot",
+           x_scale_labels = waiver(),
            y_scale_zero = TRUE,
+           y_scale_zero_line = TRUE,
            y_scale_trans = "identity",
            y_scale_labels = waiver(),
            facet_scales = "fixed",
@@ -381,6 +394,12 @@ ggplot_box_facet <-
     if (is.numeric(x_var_vector)) stop("Please use a categorical x variable for a vertical boxplot")
     if (!is.numeric(y_var_vector)) stop("Please use a numeric y variable for a vertical boxplot")
     if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a vertical boxplot")
+    
+    min_y_var_vector <- min(y_var_vector, na.rm = TRUE)
+    max_y_var_vector <- max(y_var_vector, na.rm = TRUE)
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero == TRUE) {
+      y_scale_zero <- FALSE
+    }
     
     if(is.null(font_size_title)){
       if (isMobile == FALSE) font_size_title <- 11
@@ -433,13 +452,22 @@ ggplot_box_facet <-
     }
 
     if (facet_scales %in% c("fixed", "free_x")) {
-      if (y_scale_zero == TRUE) y_scale_breaks <- pretty(c(0, y_var_vector))
-      else if (y_scale_zero == FALSE) y_scale_breaks <- pretty(y_var_vector)
-      y_scale_max_breaks <- max(y_scale_breaks)
-      y_scale_min_breaks <- min(y_scale_breaks)
-      if (y_scale_zero == TRUE) y_scale_limits <- c(0, y_scale_max_breaks)
-      else if (y_scale_zero == FALSE) y_scale_limits <- c(y_scale_min_breaks, y_scale_max_breaks)
-
+      if (y_scale_zero == TRUE) {
+        if(max(y_var_vector) > 0) y_scale_breaks <- pretty(c(0, y_var_vector))
+        if(min(y_var_vector) < 0) y_scale_breaks <- pretty(c(y_var_vector, 0))
+        
+        if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
+      else if (y_scale_zero == FALSE) {
+        if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
+        if(y_scale_trans == "log10") {
+          y_scale_breaks <- pretty(c(0, y_var_vector)) 
+          y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+        }
+        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      }
+      
       plot <- plot +
         scale_y_continuous(
           expand = c(0, 0),
@@ -456,6 +484,14 @@ ggplot_box_facet <-
                            trans = y_scale_trans,
                            labels = y_scale_labels,
                            oob = scales::rescale_none)
+    }    
+    
+    plot <- plot +
+      scale_x_discrete(labels = x_scale_labels)
+    
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero_line == TRUE) {
+      plot <- plot +
+        ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
     
     if (isMobile == FALSE){
@@ -470,10 +506,6 @@ ggplot_box_facet <-
           y = stringr::str_wrap(y_title, wrap_y_title),
           caption = stringr::str_wrap(caption, wrap_caption)
         ) +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), 15)
-        ) +
         facet_wrap(vars(!!facet_var), scales = facet_scales, nrow = facet_nrow)
     }
     else if (isMobile == TRUE){
@@ -487,13 +519,8 @@ ggplot_box_facet <-
         ) +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1) +
         coord_flip() +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), 30)
-        ) +
         theme(panel.grid.major.x = element_line(colour = "#D3D3D3", size = 0.2)) +
         theme(panel.grid.major.y = element_blank())
-      
     }
     
     return(plot)

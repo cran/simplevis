@@ -116,10 +116,14 @@ theme_hbar <-
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
 #' @param x_scale_trans A string specifying a transformation for the x axis scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
+#' @param y_scale_labels Argument to adjust the format of the y scale labels.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
 #' @param width Width of bars. Defaults to 0.75.
+#' @param na_grey TRUE or FALSE of whether to provide wide grey bars for NA y_var values. Defaults to FALSE.
+#' @param na_grey_hover_value Value to provide to users in the hover for any NA grey bars. Defaults to "NA".
 #' @param title Title string. Defaults to [Title].
 #' @param subtitle Subtitle string. Defaults to [Subtitle].
 #' @param x_title X axis title string. Defaults to [X title].
@@ -132,7 +136,6 @@ theme_hbar <-
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
-#' @param wrap_y_label Number of characters to wrap the y labels to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
 #' @return A ggplot object.
@@ -158,10 +161,14 @@ ggplot_hbar <- function(data,
                         hover_var = NULL,
                         x_scale_labels = waiver(),
                         x_scale_zero = TRUE,
+                        x_scale_zero_line = TRUE,
                         x_scale_trans = "identity",
                         y_scale_rev = FALSE,
+                        y_scale_labels = waiver(),
                         pal = NULL,
                         width = 0.75, 
+                        na_grey = FALSE,
+                        na_grey_hover_value = "NA",
                         title = "[Title]",
                         subtitle = NULL,
                         x_title = "[X title]",
@@ -174,7 +181,6 @@ ggplot_hbar <- function(data,
                         wrap_subtitle = 80,
                         wrap_x_title = 50,
                         wrap_y_title = 50,
-                        wrap_y_label = 50,
                         wrap_caption = 80,
                         isMobile = FALSE){
   
@@ -189,9 +195,10 @@ ggplot_hbar <- function(data,
   if (!is.numeric(x_var_vector)) stop("Please use a numeric x variable for a horizontal bar plot")
   if (is.numeric(y_var_vector)) stop("Please use a categorical y variable for a horizontal bar plot")
   
-  if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
+  min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
+  max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
+  if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
     x_scale_zero <- FALSE
-    message("x_scale_zero must be FALSE as data contains values less than zero")
   }
   
   if(is.null(font_size_title)){
@@ -274,7 +281,9 @@ ggplot_hbar <- function(data,
   else if(isMobile == TRUE) x_scale_n <- 4
   
   if (x_scale_zero == TRUE) {
-    x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+    if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+    if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+    
     if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
     x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
   }
@@ -297,6 +306,59 @@ ggplot_hbar <- function(data,
       oob = scales::rescale_none
     )
   
+  if(na_grey == TRUE) {
+    na_data <- filter(data, is.na(!!x_var))
+    
+    if(nrow(na_data) != 0){
+      if(x_scale_limits[2] > 0){
+        plot <- plot +
+          geom_col(aes(y = x_scale_limits[2], 
+                       text = paste(
+                         paste0(
+                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+                           ": ",
+                           !!y_var
+                         ),
+                         paste0(
+                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+                           ": ",
+                           na_grey_hover_value
+                         ),
+                         sep = "<br>"
+                       )),
+                   fill = "#F0F0F0", width = (1 + (1 - width)),
+                   data = na_data)
+      }
+      if(x_scale_limits[1] < 0){
+        plot <- plot +
+          geom_col(aes(y = x_scale_limits[1], 
+                       text = paste(
+                         paste0(
+                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+                           ": ",
+                           !!y_var
+                         ),
+                         paste0(
+                           stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+                           ": ",
+                           na_grey_hover_value
+                         ),
+                         sep = "<br>"
+                       )),
+                   fill = "#F0F0F0", width = (1 + (1 - width)),
+                   data = na_data)
+      }
+      }
+  }
+  
+  plot <- plot +
+    scale_x_discrete(labels = y_scale_labels)
+  
+  if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+    plot <- plot +
+      ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
+  }
+
   if (isMobile == FALSE){
     plot <- plot +
       labs(
@@ -305,11 +367,7 @@ ggplot_hbar <- function(data,
         y = stringr::str_wrap(x_title, wrap_x_title),
         x = stringr::str_wrap(y_title, wrap_y_title),
         caption = stringr::str_wrap(caption, wrap_caption)
-      ) +
-      scale_x_discrete(
-        labels = function(x)
-          stringr::str_wrap(x, wrap_y_label)
-      )
+      ) 
   }
   else if (isMobile == TRUE){
     plot <- plot +
@@ -319,10 +377,6 @@ ggplot_hbar <- function(data,
         y = stringr::str_wrap(x_title, 20),
         x = stringr::str_wrap(y_title, 20),
         caption = stringr::str_wrap(caption, 50)
-      ) +
-      scale_x_discrete(
-        labels = function(x)
-          stringr::str_wrap(x, 30)
       ) 
   }
   
@@ -338,8 +392,10 @@ ggplot_hbar <- function(data,
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.
 #' @param x_scale_trans A string specifying a transformation for the x axis scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
+#' @param y_scale_labels Argument to adjust the format of the y scale labels.
 #' @param col_scale_rev TRUE or FALSE of whether bar fill order from left to right is reversed from default. Defaults to FALSE.
 #' @param col_scale_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
 #' @param position Whether bars are positioned by "stack" or "dodge". Defaults to "stack".
@@ -360,7 +416,6 @@ ggplot_hbar <- function(data,
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
-#' @param wrap_y_label Number of characters to wrap the y labels to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
@@ -394,8 +449,10 @@ ggplot_hbar_col <-
            hover_var = NULL,
            x_scale_labels = waiver(),
            x_scale_zero = TRUE,
+           x_scale_zero_line = TRUE,
            x_scale_trans = "identity",
            y_scale_rev = FALSE,
+           y_scale_labels = waiver(),
            col_scale_rev = FALSE,
            col_scale_drop = FALSE,
            position = "stack",
@@ -416,7 +473,6 @@ ggplot_hbar_col <-
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
-           wrap_y_label = 50,
            wrap_col_title = 25,
            wrap_caption = 80,
            isMobile = FALSE){
@@ -438,9 +494,10 @@ ggplot_hbar_col <-
     if (position == "stack" & x_scale_trans != "identity") message("simplevis may not perform correctly using an x scale other than identity where position equals stack")
     if (position == "stack" & x_scale_zero == FALSE) message("simplevis may not perform correctly with position equal to stack and x_scale_zero equal to FALSE")
     
-    if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
+    min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
+    max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
       x_scale_zero <- FALSE
-      message("x_scale_zero must be FALSE as data contains values less than zero")
     }
     
     if(is.null(font_size_title)){
@@ -555,7 +612,9 @@ ggplot_hbar_col <-
     else if(isMobile == TRUE) x_scale_n <- 4
     
     if (x_scale_zero == TRUE) {
-      x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+      if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+      if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+      
       if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
       x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
     }
@@ -577,6 +636,7 @@ ggplot_hbar_col <-
         labels = labels,
         na.value = "#A8A8A8"
       ) +
+      scale_x_discrete(labels = y_scale_labels) +
       scale_y_continuous(
         expand = c(0, 0),
         breaks = x_scale_breaks,
@@ -586,6 +646,11 @@ ggplot_hbar_col <-
         oob = scales::rescale_none
       )
     
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+      plot <- plot +
+        ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
+    }
+
     if (isMobile == FALSE){
       plot <- plot +
         labs(
@@ -594,10 +659,6 @@ ggplot_hbar_col <-
           y = stringr::str_wrap(x_title, wrap_x_title),
           x = stringr::str_wrap(y_title, wrap_y_title),
           caption = stringr::str_wrap(caption, wrap_caption)
-        ) +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(x, wrap_y_label)
         ) +
         guides(fill = guide_legend(
           ncol = legend_ncol,
@@ -614,10 +675,6 @@ ggplot_hbar_col <-
           y = stringr::str_wrap(x_title, 20),
           x = stringr::str_wrap(y_title, 20),
           caption = stringr::str_wrap(caption, 50)
-        ) +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(x, 30)
         ) +
         guides(fill = guide_legend(
           ncol = 1,
@@ -639,12 +696,16 @@ ggplot_hbar_col <-
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.
 #' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
+#' @param y_scale_labels Argument to adjust the format of the y scale labels.
 #' @param facet_scales Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".
 #' @param facet_nrow The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows. Not applicable to where isMobile is TRUE.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
 #' @param width Width of bars. Defaults to 0.75.
+#' @param na_grey TRUE or FALSE of whether to provide wide grey bars for NA y_var values. Only works where facet_scales = "fixed" or "free_y". Defaults to FALSE.
+#' @param na_grey_hover_value Value to provide to users in the hover for any NA grey bars. Defaults to "NA".
 #' @param title Title string. Defaults to [Title].
 #' @param subtitle Subtitle string. Defaults to [Subtitle].
 #' @param x_title X axis title string. Defaults to [X title].
@@ -657,7 +718,6 @@ ggplot_hbar_col <-
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
-#' @param wrap_y_label Number of characters to wrap the y labels to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
 #' @return A ggplot object.
@@ -686,13 +746,17 @@ ggplot_hbar_facet <-
            hover_var = NULL,
            x_scale_labels = waiver(),
            x_scale_zero = TRUE,
+           x_scale_zero_line = TRUE,
            x_scale_trans = "identity",
            y_scale_rev = FALSE,
+           y_scale_labels = waiver(),
            facet_scales = "fixed",
            facet_nrow = NULL,
            pal = NULL,
            width = 0.75, 
            title = "[Title]",
+           na_grey = FALSE,
+           na_grey_hover_value = "NA",
            subtitle = NULL,
            x_title = "[X title]",
            y_title = "[Y title]",
@@ -704,7 +768,6 @@ ggplot_hbar_facet <-
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
-           wrap_y_label = 50,
            wrap_caption = 80,
            isMobile = FALSE){
     
@@ -722,9 +785,10 @@ ggplot_hbar_facet <-
     if (!is.numeric(x_var_vector)) stop("Please use a categorical y variable for a horizontal bar plot")
     if (is.numeric(facet_var_vector)) stop("Please use a categorical facet variable for a horizontal bar plot")
     
-    if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
+    min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
+    max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
       x_scale_zero <- FALSE
-      message("x_scale_zero must be FALSE as data contains values less than zero")
     }
     
     if(is.null(font_size_title)){
@@ -814,7 +878,9 @@ ggplot_hbar_facet <-
       else if(isMobile == TRUE) x_scale_n <- 4
       
       if (x_scale_zero == TRUE) {
-        x_scale_breaks <- pretty(c(0, x_var_vector))
+        if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+        if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+        
         if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
         x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
       }
@@ -836,6 +902,7 @@ ggplot_hbar_facet <-
           trans = x_scale_trans,
           oob = scales::rescale_none
         )
+      
     }
     if (facet_scales %in% c("free", "free_x")) {
       plot <- plot +
@@ -843,6 +910,69 @@ ggplot_hbar_facet <-
                            labels = x_scale_labels,
                            trans = x_scale_trans,
                            oob = scales::rescale_none)
+    }
+    
+    if(na_grey == TRUE) {
+      na_data <- filter(data, is.na(!!x_var))
+      
+      if(nrow(na_data) != 0){
+        if(x_scale_limits[2] > 0){
+          plot <- plot +
+            geom_col(aes(y = x_scale_limits[2],
+                         text = paste(
+                           paste0(
+                             stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+                             ": ",
+                             !!y_var
+                           ),
+                           paste0(
+                             stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
+                             ": ",
+                             !!facet_var
+                           ),
+                           paste0(
+                             stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+                             ": ",
+                             na_grey_hover_value
+                           ),
+                           sep = "<br>"
+                         )),
+                     fill = "#F0F0F0", width = (1 + (1 - width)),
+                     data = na_data)
+        }
+        if(x_scale_limits[1] < 0){
+          plot <- plot +
+            geom_col(aes(y = x_scale_limits[1],
+                         text = paste(
+                           paste0(
+                             stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
+                             ": ",
+                             !!y_var
+                           ),
+                           paste0(
+                             stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
+                             ": ",
+                             !!facet_var
+                           ),
+                           paste0(
+                             stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
+                             ": ",
+                             na_grey_hover_value
+                           ),
+                           sep = "<br>"
+                         )),
+                     fill = "#F0F0F0", width = (1 + (1 - width)),
+                     data = na_data)
+        }
+      }
+    }
+    
+    plot <- plot +
+      scale_x_discrete(labels = y_scale_labels)
+    
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+      plot <- plot +
+        ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
     
     if (isMobile == FALSE){
@@ -857,10 +987,6 @@ ggplot_hbar_facet <-
           x = stringr::str_wrap(y_title, wrap_y_title),
           caption = stringr::str_wrap(caption, wrap_caption)
         ) +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), wrap_y_label)
-        ) +
         facet_wrap(vars(!!facet_var), scales = facet_scales, nrow = facet_nrow)
     }
     else if (isMobile == TRUE){
@@ -871,10 +997,6 @@ ggplot_hbar_facet <-
           y = stringr::str_wrap(x_title, 20),
           x = stringr::str_wrap(y_title, 20),
           caption = stringr::str_wrap(caption, 50)
-        ) +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), 30)
         ) +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1)
     }
@@ -892,8 +1014,10 @@ ggplot_hbar_facet <-
 #' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
 #' @param x_scale_labels Argument to adjust the format of the x scale labels.
 #' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.
 #' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
 #' @param y_scale_rev TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.
+#' @param y_scale_labels Argument to adjust the format of the y scale labels.
 #' @param col_scale_rev TRUE or FALSE of whether bar fill order from left to right is reversed from default. Defaults to FALSE.
 #' @param col_scale_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
 #' @param position Whether bars are positioned by "stack" or "dodge". Defaults to "stack".
@@ -916,7 +1040,6 @@ ggplot_hbar_facet <-
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
-#' @param wrap_y_label Number of characters to wrap the y labels to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
@@ -947,8 +1070,10 @@ ggplot_hbar_col_facet <-
            hover_var = NULL,
            x_scale_labels = waiver(),
            x_scale_zero = TRUE,
+           x_scale_zero_line = TRUE,
            x_scale_trans = "identity",
            y_scale_rev = FALSE,
+           y_scale_labels = waiver(),
            col_scale_rev = FALSE,
            col_scale_drop = FALSE,
            position = "stack",
@@ -971,7 +1096,6 @@ ggplot_hbar_col_facet <-
            wrap_subtitle = 80,
            wrap_x_title = 50,
            wrap_y_title = 50,
-           wrap_y_label = 50,
            wrap_col_title = 25,
            wrap_caption = 80,
            isMobile = FALSE){
@@ -995,9 +1119,10 @@ ggplot_hbar_col_facet <-
     if (position == "stack" & x_scale_trans != "identity") message("simplevis may not perform correctly using an x scale other than identity where position equals stack")
     if (position == "stack" & x_scale_zero == FALSE) message("simplevis may not perform correctly with position equal to stack and x_scale_zero equal to FALSE")
     
-    if(min(x_var_vector, na.rm = TRUE) < 0 & x_scale_zero == TRUE) {
+    min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
+    max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
       x_scale_zero <- FALSE
-      message("x_scale_zero must be FALSE as data contains values less than zero")
     }
     
     if(is.null(font_size_title)){
@@ -1122,7 +1247,9 @@ ggplot_hbar_col_facet <-
       else if(isMobile == TRUE) x_scale_n <- 4
       
       if (x_scale_zero == TRUE) {
-        x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+        if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
+        if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+        
         if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
         x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
       }
@@ -1141,14 +1268,15 @@ ggplot_hbar_col_facet <-
           breaks = x_scale_breaks,
           limits = x_scale_limits,
           trans = x_scale_trans,
+          labels = x_scale_labels,
           oob = scales::rescale_none
         )
     }
     if (facet_scales %in% c("free", "free_x")) {
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
-                           labels = x_scale_labels,
                            trans = x_scale_trans,
+                           labels = x_scale_labels,
                            oob = scales::rescale_none)
     }
     
@@ -1158,8 +1286,14 @@ ggplot_hbar_col_facet <-
         drop = col_scale_drop,
         labels = labels,
         na.value = "#A8A8A8"
-      ) 
+      ) +
+      scale_x_discrete(labels = y_scale_labels)
     
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+      plot <- plot +
+        ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
+    }
+
     if (isMobile == FALSE){
       if (is.null(facet_nrow) & length(unique(facet_var_vector)) <= 3) facet_nrow <- 1
       if (is.null(facet_nrow) & length(unique(facet_var_vector)) > 3) facet_nrow <- 2
@@ -1171,10 +1305,6 @@ ggplot_hbar_col_facet <-
           y = stringr::str_wrap(x_title, wrap_x_title),
           x = stringr::str_wrap(y_title, wrap_y_title),
           caption = stringr::str_wrap(caption, wrap_caption)
-        ) +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), wrap_y_label)
         ) +
         facet_wrap(vars(!!facet_var), scales = facet_scales, nrow = facet_nrow) +
         guides(fill = guide_legend(
@@ -1193,10 +1323,6 @@ ggplot_hbar_col_facet <-
           y = stringr::str_wrap(x_title, 20),
           x = stringr::str_wrap(y_title, 20),
           caption = stringr::str_wrap(caption, 50)
-        ) +
-        scale_x_discrete(
-          labels = function(x)
-            stringr::str_wrap(stringr::str_replace_all(x, "__.+$", ""), 30)
         ) +
         guides(fill = guide_legend(
           ncol = 1,
