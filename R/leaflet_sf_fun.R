@@ -5,7 +5,7 @@
 #' @param data An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
 #' @param popup HTML strings for use in popup. Defaults to making a leafpop::popupTable of all attribute columns in the sf object. 
-#' @param radius Radius of points. Defaults to 1.
+#' @param radius Radius of points. Defaults to 2.
 #' @param weight Stroke border size. Defaults to 2.
 #' @param opacity The opacity of the fill. Defaults to 0.1. Only applicable to polygons.
 #' @param stroke TRUE or FALSE of whether to draw a border around the features. Defaults to TRUE.
@@ -13,7 +13,6 @@
 #' @param legend_digits Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.
 #' @param legend_labels A vector of legend label values. Defaults to "Feature".
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
-#' @param shiny TRUE or FALSE for whether the map is being run within a shiny app. Defaults to FALSE.
 #' @param map_id The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".
 #' @return A leaflet object.
 #' @export
@@ -32,9 +31,10 @@ leaflet_sf <- function(data,
                        title = "[Title]",
                        legend_digits = 1,
                        legend_labels = "[Feature]",
-                       shiny = FALSE,
                        basemap = "light",
                        map_id = "map") {
+  
+  shiny <- shiny::isRunning()
   
   if (class(data)[1] != "sf") stop("Please use an sf object as data input")
   if (is.na(sf::st_crs(data))) stop("Please assign a coordinate reference system")
@@ -191,13 +191,13 @@ leaflet_sf <- function(data,
 #' @param col_var Unquoted variable to colour the features by. Required input.
 #' @param label_var Unquoted variable to label the features by. If NULL, defaults to using the colour variable.
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." if categorical colour variable, NULL results in "category". If numeric variable, defaults to "quantile". Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
-#' @param bin_cuts A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used. Only applicable where col_method equals "bin".
-#' @param quantile_cuts A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles. Only applicable where col_method equals "quantile".
+#' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
+#' @param col_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param col_na_remove TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.
-#' @param rev_pal Reverses the palette. Defaults to FALSE.
-#' @param col_scale_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param popup HTML strings for use in popup. Defaults to making a leafpop::popupTable of all attribute columns in the sf object. 
-#' @param radius Radius of points. Defaults to 1.
+#' @param radius Radius of points. Defaults to 2.
 #' @param weight Stroke border size. Defaults to 2.
 #' @param stroke TRUE or FALSE of whether to draw a border around the features. Defaults to TRUE.
 #' @param opacity The opacity of polygons. Defaults to 0.9.
@@ -205,17 +205,16 @@ leaflet_sf <- function(data,
 #' @param title A title string that will be wrapped into the legend. Defaults to "Title".
 #' @param legend_labels A vector of manual legend label values. Defaults to NULL, which results in automatic labels.
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
-#' @param shiny TRUE or FALSE for whether the map is being run within a shiny app. Defaults to FALSE.
 #' @param map_id The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".
 #' @return A leaflet object.
 #' @export
 #' @examples
 #' leaflet_sf_col(example_sf_nz_livestock, dairydens,
-#'      col_method = "quantile", quantile_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
+#'      col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
 #'      title = "Dairy density in count per km\u00b2, 2017")
 #'
 #' leaflet_sf_col(example_sf_nz_livestock, dairydens,
-#'      col_method = "bin", bin_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
+#'      col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
 #'      title = "Dairy density in count per km\u00b2, 2017")
 #'
 #' map_data <- example_sf_nz_river_wq %>%
@@ -229,11 +228,11 @@ leaflet_sf_col <- function(data,
                            col_var,
                            label_var = NULL,
                            col_method = NULL,
-                           bin_cuts = NULL,
-                           quantile_cuts = c(0, 0.25, 0.5, 0.75, 1),
+                           col_cuts = NULL,
+                           col_drop = FALSE,
+                           col_na_remove = FALSE,
                            pal = NULL,
-                           rev_pal = FALSE,
-                           col_scale_drop = FALSE,
+                           pal_rev = FALSE,
                            popup = leafpop::popupTable(sentence_spaced_colnames(data)),
                            radius = 1,
                            weight = 2,
@@ -243,28 +242,32 @@ leaflet_sf_col <- function(data,
                            legend_digits = 1,
                            legend_labels = NULL,
                            basemap = "light",
-                           shiny = FALSE,
                            map_id = "map") {
+  
+  shiny <- shiny::isRunning()
   
   if (class(data)[1] != "sf") stop("Please use an sf object as data input")
   if (is.na(sf::st_crs(data))) stop("Please assign a coordinate reference system")
   
   if (sf::st_is_longlat(data) == FALSE) data <- sf::st_transform(data, 4326)
-  
+
   col_var <- rlang::enquo(col_var)
   label_var <- rlang::enquo(label_var)
   if(is.null(rlang::get_expr(label_var))) label_var <- col_var
-
+  
+  if (col_na_remove == TRUE) data <- data %>% 
+    filter(!is.na(!!col_var))
+  
   col_var_vector <- dplyr::pull(data, !!col_var)
   label_var_vector <- dplyr::pull(data, !!label_var)
-
+  
   if (is.null(col_method) & !is.numeric(col_var_vector)) col_method <- "category"
   if (is.null(col_method) & is.numeric(col_var_vector)) col_method <- "quantile"
   
   if (col_method == "category") {
     if (is.null(legend_labels)){
-      if (is.factor(col_var_vector) &  col_scale_drop == FALSE) labels <- levels(col_var_vector)
-      else if (is.character(col_var_vector) | col_scale_drop == TRUE) labels <- sort(unique(col_var_vector))
+      if (is.factor(col_var_vector) &  col_drop == FALSE) labels <- levels(col_var_vector)
+      else if (is.character(col_var_vector) | col_drop == TRUE) labels <- sort(unique(col_var_vector))
     }
     else if (!is.null(legend_labels)) labels <- legend_labels
     
@@ -272,70 +275,59 @@ leaflet_sf_col <- function(data,
     
     if (is.null(pal)) pal <- pal_point_set1[1:n_col_var_values]
     else if (!is.null(pal)) pal <- pal[1:n_col_var_values]
-    if (rev_pal == TRUE) pal <- rev(pal)
+    if (pal_rev == TRUE) pal <- rev(pal)
     pal <- stringr::str_sub(pal, 1, 7)
     
     pal_fun <- colorFactor(palette = pal,
-                  domain = col_var_vector,
-                  na.color = "#A8A8A8")
+                           domain = col_var_vector,
+                           na.color = "#A8A8A8")
   }
   else if (col_method == "bin") {
-    if (!is.null(bin_cuts)) {
-      if (!(dplyr::first(bin_cuts) %in% c(0,-Inf))) warning("The first element of the bin_cuts vector should generally be 0 (or -Inf if there are negative values)")
-      if (dplyr::last(bin_cuts) != Inf) warning("The last element of the bin_cuts vector should generally be Inf")
-      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-      else if (!is.null(pal)) pal <- pal[1:(length(bin_cuts) - 1)]
-      if (rev_pal == TRUE) pal <- rev(pal)
-      pal <- stringr::str_sub(pal, 1, 7)
-      
-      pal_fun <- colorBin(
-          palette = pal,
-          domain = col_var_vector,
-          bins = bin_cuts,
-          right = FALSE,
-          na.color = "#A8A8A8"
-        )
-      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
-      else if (!is.null(legend_labels)) labels <- legend_labels
+    if (is.null(col_cuts)) col_cuts <- pretty(col_var_vector)
+    else if (!is.null(col_cuts)) {
+      if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+      if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
     }
-    else if (is.null(bin_cuts)) {
-      bin_cuts <- pretty(col_var_vector)
-      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-      else if (!is.null(pal)) pal <- pal[1:(length(bin_cuts) - 1)]
-      if (rev_pal == TRUE) pal <- rev(pal)
-      pal <- stringr::str_sub(pal, 1, 7)
       
-      pal_fun <- colorBin(
-          palette = pal,
-          domain = col_var_vector,
-          pretty = TRUE,
-          right = FALSE,
-          na.color = "#A8A8A8"
-        )
-      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
-      else if (!is.null(legend_labels)) labels <- legend_labels
-    }
-  }
-  else if (col_method == "quantile") {
-    if (dplyr::first(quantile_cuts) != 0) warning("The first element of the quantile_cuts vector generally always be 0")
-    if (dplyr::last(quantile_cuts) != 1) warning("The last element of the quantile_cuts vector should generally be 1")
-    if (is.null(pal)) pal <- viridis::viridis(length(quantile_cuts) - 1)
-    else if (!is.null(pal)) pal <- pal[1:(length(quantile_cuts) - 1)]
-    if (rev_pal == TRUE) pal <- rev(pal)
+    if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+    else if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
+    if (pal_rev == TRUE) pal <- rev(pal)
     pal <- stringr::str_sub(pal, 1, 7)
     
-    bin_cuts <- quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
-    if (anyDuplicated(bin_cuts) > 0) stop("quantile_cuts do not provide unique breaks")
+    pal_fun <- colorBin(
+      palette = pal,
+      domain = col_var_vector,
+      bins = col_cuts,
+      pretty = FALSE,
+      right = FALSE,
+      na.color = "#A8A8A8"
+    )
+    if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
+    else if (!is.null(legend_labels)) labels <- legend_labels
+  }
+  else if (col_method == "quantile") {
+    if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
+    else {
+      if (dplyr::first(col_cuts) != 0) warning("The first element of the col_cuts vector generally always be 0")
+      if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
+    }  
+    if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+    else if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
+    if (pal_rev == TRUE) pal <- rev(pal)
+    pal <- stringr::str_sub(pal, 1, 7)
+    
+    col_cuts <- quantile(col_var_vector, probs = col_cuts, na.rm = TRUE)
+    if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
     
     pal_fun <- colorBin(
-        palette = pal,
-        domain = col_var_vector,
-        bins = bin_cuts,
-        right = FALSE,
-        na.color = "#A8A8A8"
-      )
+      palette = pal,
+      domain = col_var_vector,
+      bins = col_cuts,
+      right = FALSE,
+      na.color = "#A8A8A8"
+    )
     
-    if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+    if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
     else if (!is.null(legend_labels)) labels <- legend_labels
   }
   
@@ -480,3 +472,4 @@ leaflet_sf_col <- function(data,
       )
   }
 }
+

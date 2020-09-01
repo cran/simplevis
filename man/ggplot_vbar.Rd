@@ -4,11 +4,10 @@
 \alias{ggplot_vbar}
 \title{Vertical bar ggplot.}
 \usage{
-ggplot_vbar(data, x_var, y_var, hover_var = NULL,
-  x_scale_labels = waiver(), y_scale_zero = TRUE,
-  y_scale_zero_line = TRUE, y_scale_trans = "identity",
-  y_scale_labels = waiver(), pal = NULL, width = 0.75,
-  na_grey = FALSE, na_grey_hover_value = "NA", title = "[Title]",
+ggplot_vbar(data, x_var, y_var, tip_var = NULL, x_labels = waiver(),
+  x_pretty_n = 6, y_zero = TRUE, y_zero_line = TRUE,
+  y_trans = "identity", y_labels = waiver(), y_pretty_n = 5,
+  pal = NULL, width = 0.75, na_grey = FALSE, title = "[Title]",
   subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
   caption = NULL, font_family = "Helvetica", font_size_title = NULL,
   font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
@@ -22,25 +21,27 @@ ggplot_vbar(data, x_var, y_var, hover_var = NULL,
 
 \item{y_var}{Unquoted numeric variable to be on the y axis. Required input.}
 
-\item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
+\item{tip_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{y_scale_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.}
 
-\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
+
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
+
+\item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
 
 \item{width}{Width of bars. Defaults to 0.75.}
 
 \item{na_grey}{TRUE or FALSE of whether to provide wide grey bars for NA y_var values. Defaults to FALSE.}
-
-\item{na_grey_hover_value}{Value to provide to users in the hover for any NA grey bars. Defaults to "NA".}
 
 \item{title}{Title string. Defaults to [Title].}
 
@@ -68,7 +69,7 @@ ggplot_vbar(data, x_var, y_var, hover_var = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
@@ -77,9 +78,11 @@ A ggplot object.
 Vertical bar ggplot that is not coloured and not facetted.
 }
 \examples{
-plot_data <- dplyr::storms \%>\%
-  dplyr::group_by(year) \%>\%
-  dplyr::summarise(average_wind = round(mean(wind), 2)) 
+library(dplyr)
+
+plot_data <- storms \%>\%
+  group_by(year) \%>\%
+  summarise(average_wind = round(mean(wind), 2)) 
 
 plot <- ggplot_vbar(data = plot_data, x_var = year, y_var = average_wind,
       title = "Average wind speed of Atlantic storms, 1975-2015",
@@ -88,5 +91,5 @@ plot <- ggplot_vbar(data = plot_data, x_var = year, y_var = average_wind,
 
 plot
 
-plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot)
 }

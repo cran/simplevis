@@ -40,7 +40,7 @@ ggplot_stars(data, pal = NULL, coastline = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile. TRUEhis enable mobile compatible apps, where apps have ui mobileDetect function defined and mobile.js file in www/js/ folder  https://g3rv4.com/2017/08/shiny-detect-mobile-browsers}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.

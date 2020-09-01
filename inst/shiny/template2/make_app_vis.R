@@ -2,29 +2,36 @@
 # these plots or maps should use character inputs that mimic the inputs that the user will select
 # they can then be copied and pasted into the server reactive data and reactive plot/map code
 # note in the server, all reactive data objects must be referred to as data()
-# note in the server, an additional isMobile = input$isMobile argument should be added for mobile users
 
 library(dplyr)
 library(simplevis)
 
-data_folder <- "inst/shiny/template2/data/"
+# data_folder <- "inst/shiny/template2/data/"
+# 
+# data1 <-  readRDS(paste0(data_folder, "data1.RDS"))
+# 
+# data2 <-  readRDS(paste0(data_folder, "data2.RDS"))
 
-data1 <-  readRDS(paste0(data_folder, "data1.RDS"))
+data1 <- ggplot2::diamonds %>% 
+  slice_sample(prop = 0.1)
 
-data2 <-  readRDS(paste0(data_folder, "data2.RDS"))
+data2 <- simplevis::example_sf_nz_river_wq %>% 
+  filter(indicator %in% c("Nitrate-nitrogen", "Total nitrogen", "Ammoniacal nitrogen")) %>% 
+  slice_sample(prop = 0.1)
 
 # make a plot filtered by a user selected colour
 color_vector <- sort(unique(data1$color))
 
 selected_color <- "E"
 
-plot_data <- data1 %>%
+plot_data <- data %>%
   filter(color == selected_color) %>% 
   mutate(cut = stringr::str_to_sentence(cut)) %>%
   group_by(cut, clarity, .drop = FALSE) %>%
-  summarise(average_price = mean(price)) %>%
+  summarise(average_price = round(mean(price), 0)) %>%
   mutate(average_price_thousands = round(average_price / 1000, 1)) %>%
-  ungroup()
+  mutate(average_price = paste0("US$", prettyNum(average_price,  big.mark = ","))) %>% 
+  add_tip(c("cut", "clarity", "average_price"))
 
 title <- paste0("Average diamond price of colour ", selected_color, " by cut and clarity")
 x_title <- "Average price ($US thousands)"
@@ -33,14 +40,15 @@ y_title <- "Cut"
 plot <- ggplot_hbar_col(data = plot_data, 
                         x_var = average_price_thousands, 
                         y_var = cut, 
-                        col_var = clarity, 
+                        col_var = clarity,
+                        tip_var = tip_text,
                         legend_ncol = 4,
                         title = title, 
                         x_title = x_title, 
                         y_title = y_title)
 
 plotly::ggplotly(plot, tooltip = "text") %>% 
-  plotly_remove_buttons() 
+  plotly_camera() 
 
 # make a trend map filtered by a user selected metric
 metric_vector <- sort(unique(data2$indicator))
@@ -59,4 +67,6 @@ leaflet_sf_col(map_data,
                trend_category, 
                pal = pal, 
                col_method = "category",
-               title = title)
+               title = title,
+               radius = 2)
+

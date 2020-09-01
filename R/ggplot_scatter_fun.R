@@ -113,17 +113,19 @@ theme_scatter <-
 #' @param data An ungrouped summarised tibble or dataframe. Required input.
 #' @param x_var Unquoted numeric variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
-#' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param tip_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.
 #' @param size Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
-#' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
-#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
-#' @param x_scale_labels Argument to adjust the format of the x scale labels.
-#' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
-#' @param y_scale_labels Argument to adjust the format of the y scale labels.
+#' @param x_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param x_trans A string specifying a transformation for the x scale. Defaults to "identity".
+#' @param x_labels Argument to adjust the format of the x scale labels.
+#' @param x_pretty_n The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.
+#' @param y_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
+#' @param y_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param y_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_labels Argument to adjust the format of the y scale labels.
+#' @param y_pretty_n The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param title  Title string. Defaults to "[Title]".
 #' @param subtitle Subtitle string. Defaults to "[Subtitle]".
 #' @param x_title X axis title string. Defaults to "[X title]".
@@ -137,11 +139,13 @@ theme_scatter <-
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
-#' plot_data <- dplyr::sample_frac(ggplot2::diamonds, 0.05)
+#' library(dplyr)
+#' 
+#' plot_data <- slice_sample(ggplot2::diamonds, prop = 0.05)
 #'
 #' plot <- ggplot_scatter(data = plot_data, x_var = carat, y_var = price,
 #'    title = "Diamond price by carat",
@@ -150,21 +154,23 @@ theme_scatter <-
 #'
 #' plot
 #'
-#' plotly::ggplotly(plot, tooltip = "text")
+#' plotly::ggplotly(plot)
 ggplot_scatter <- function(data,
                            x_var,
                            y_var,
-                           hover_var = NULL,
+                           tip_var = NULL,
                            size = 1,
                            pal = NULL,
-                           x_scale_zero = TRUE,
-                           x_scale_zero_line = TRUE,
-                           x_scale_trans = "identity",
-                           x_scale_labels = waiver(),
-                           y_scale_zero = TRUE,
-                           y_scale_zero_line = TRUE,
-                           y_scale_trans = "identity",
-                           y_scale_labels = waiver(),
+                           x_zero = TRUE,
+                           x_zero_line = TRUE,
+                           x_trans = "identity",
+                           x_labels = waiver(),
+                           x_pretty_n = 6,
+                           y_zero = TRUE,
+                           y_zero_line = TRUE,
+                           y_trans = "identity",
+                           y_labels = waiver(),
+                           y_pretty_n = 5,
                            title = "[Title]",
                            subtitle = NULL,
                            x_title = "[X title]",
@@ -183,7 +189,7 @@ ggplot_scatter <- function(data,
   data <- dplyr::ungroup(data)
   x_var <- rlang::enquo(x_var) #numeric var
   y_var <- rlang::enquo(y_var) #numeric var
-  hover_var <- rlang::enquo(hover_var)
+  tip_var <- rlang::enquo(tip_var)
   
   x_var_vector <- dplyr::pull(data, !!x_var)
   y_var_vector <- dplyr::pull(data, !!y_var)
@@ -193,14 +199,14 @@ ggplot_scatter <- function(data,
   
   min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
   max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
-  if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
-    x_scale_zero <- FALSE
+  if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero == TRUE) {
+    x_zero <- FALSE
   }
   
   min_y_var_vector <- min(y_var_vector, na.rm = TRUE)
   max_y_var_vector <- max(y_var_vector, na.rm = TRUE)
-  if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero == TRUE) {
-    y_scale_zero <- FALSE
+  if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero == TRUE) {
+    y_zero <- FALSE
   }
   
   if(is.null(font_size_title)){
@@ -214,113 +220,72 @@ ggplot_scatter <- function(data,
   
   if (is.null(pal)) pal <- pal_snz
   
-  plot <- ggplot(data, aes(!!x_var, !!y_var, key = !!hover_var)) +
+  plot <- ggplot(data) +
     theme_scatter(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
     ) +
-    coord_cartesian(clip = "off")
-  
-  if (is.null(rlang::get_expr(hover_var))) {
-    plot <- plot +
-      geom_point(aes(text = paste(
-        paste0(
-          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-          ": ",
-          !!x_var
-        ),
-        paste0(
-          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-          ": ",
-          !!y_var
-        ),
-        sep = "<br>"
-      )),
-      col = pal[1],
-      size = size)
-  }
-  else if (!is.null(rlang::get_expr(hover_var))) {
-    plot <- plot +
-      geom_point(aes(text = paste(
-        paste0(
-          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-          ": ",
-          !!x_var
-        ),
-        paste0(
-          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-          ": ",
-          !!y_var
-        ),
-        paste0(
-          stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-          ": ",
-          !!hover_var
-        ),
-        sep = "<br>"
-      )),
-      col = pal[1],
-      size = size)
-  }
-  
-  if(isMobile == FALSE) x_scale_n <- 6
-  else if(isMobile == TRUE) x_scale_n <- 4
-  
-  if (x_scale_zero == TRUE) {
-    if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
-    if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+    coord_cartesian(clip = "off") +
+    geom_point(aes(!!x_var, !!y_var, text = !!tip_var), col = pal[1], size = size)
 
-    if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
-    x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+  if(isMobile == FALSE) x_n <- x_pretty_n
+  else if(isMobile == TRUE) x_n <- 4
+  
+  if (x_zero == TRUE) {
+    if(max(x_var_vector) > 0) x_breaks <- pretty(c(0, x_var_vector), n = x_n)
+    if(min(x_var_vector) < 0) x_breaks <- pretty(c(x_var_vector, 0), n = x_n)
+
+    if(x_trans == "log10") x_breaks <- c(1, x_breaks[x_breaks > 1])
+    x_limits <- c(min(x_breaks), max(x_breaks))
   }
-  else if (x_scale_zero == FALSE) {
-    if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
-    if(x_scale_trans == "log10") {
-      x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n) 
-      x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+  else if (x_zero == FALSE) {
+    if(x_trans != "log10") x_breaks <- pretty(x_var_vector, n = x_n)
+    if(x_trans == "log10") {
+      x_breaks <- pretty(c(0, x_var_vector), n = x_n) 
+      x_breaks <- c(1, x_breaks[x_breaks > 1])
     }
-    x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+    x_limits <- c(min(x_breaks), max(x_breaks))
   }
   
-  if (y_scale_zero == TRUE) {
-    y_scale_breaks <- pretty(c(0, y_var_vector))
-    if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
-    y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+  if (y_zero == TRUE) {
+    y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n)
+    if(y_trans == "log10") y_breaks <- c(1, y_breaks[y_breaks > 1])
+    y_limits <- c(min(y_breaks), max(y_breaks))
   }
-  else if (y_scale_zero == FALSE) {
-    if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
-    if(y_scale_trans == "log10") {
-      y_scale_breaks <- pretty(c(0, y_var_vector)) 
-      y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+  else if (y_zero == FALSE) {
+    if(y_trans != "log10") y_breaks <- pretty(y_var_vector, n = y_pretty_n)
+    if(y_trans == "log10") {
+      y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n) 
+      y_breaks <- c(1, y_breaks[y_breaks > 1])
     }
-    y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+    y_limits <- c(min(y_breaks), max(y_breaks))
   }
   
   plot <- plot +
     scale_x_continuous(
       expand = c(0, 0),
-      breaks = x_scale_breaks,
-      limits = x_scale_limits,
-      trans = x_scale_trans,
-      labels = x_scale_labels,
+      breaks = x_breaks,
+      limits = x_limits,
+      trans = x_trans,
+      labels = x_labels,
       oob = scales::rescale_none
     ) +
     scale_y_continuous(
       expand = c(0, 0),
-      breaks = y_scale_breaks,
-      limits = y_scale_limits,
-      trans = y_scale_trans,
-      labels = y_scale_labels,
+      breaks = y_breaks,
+      limits = y_limits,
+      trans = y_trans,
+      labels = y_labels,
       oob = scales::rescale_none
     )
   
-  if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+  if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero_line == TRUE) {
     plot <- plot +
       ggplot2::geom_vline(xintercept = 0, colour = "#323232", size = 0.3)
   }
   
-  if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero_line == TRUE) {
+  if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero_line == TRUE) {
     plot <- plot +
       ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
@@ -341,7 +306,7 @@ ggplot_scatter <- function(data,
         title = stringr::str_wrap(title, 40),
         subtitle = stringr::str_wrap(subtitle, 40),
         x = stringr::str_wrap(x_title, 20),
-        y = stringr::str_wrap(y_title, 20),
+        y = stringr::str_wrap(y_title, 30),
         caption = stringr::str_wrap(caption, 50)
       )
   }
@@ -355,23 +320,24 @@ ggplot_scatter <- function(data,
 #' @param x_var Unquoted numeric variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
-#' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param tip_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "quantile".
-#' @param quantile_cuts A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles.
-#' @param bin_cuts A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used.
+#' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
+#' @param col_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param col_na_remove TRUE or FALSE of whether to remove NAs of the colour variable. Defaults to FALSE.
 #' @param size Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette or viridis.
-#' @param rev_pal Reverses the palette. Defaults to FALSE.
-#' @param remove_na TRUE or FALSE of whether to remove NAs of the colour variable. Defaults to FALSE.
-#' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
-#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
-#' @param x_scale_labels Argument to adjust the format of the x scale labels.
-#' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
-#' @param y_scale_labels Argument to adjust the format of the y scale labels.
-#' @param col_scale_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param pal_rev Reverses the palette. Defaults to FALSE.
+#' @param x_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param x_trans A string specifying a transformation for the x scale. Defaults to "identity".
+#' @param x_labels Argument to adjust the format of the x scale labels.
+#' @param x_pretty_n The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.
+#' @param y_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
+#' @param y_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param y_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_labels Argument to adjust the format of the y scale labels.
+#' @param y_pretty_n The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param legend_ncol The number of columns in the legend.
 #' @param legend_digits Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.
 #' @param title  Title string. Defaults to "[Title]".
@@ -390,47 +356,49 @@ ggplot_scatter <- function(data,
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
+#' library(dplyr)
 #' 
-#' plot_data <- dplyr::sample_frac(ggplot2::diamonds, 0.05)
+#' plot_data <- slice_sample(ggplot2::diamonds, prop = 0.05)
 #'
 #' plot <- ggplot_scatter_col(data = plot_data, x_var = carat, y_var = price, col_var = color)
 #'
 #' plot
 #'
-#' plotly::ggplotly(plot, tooltip = "text")
+#' plotly::ggplotly(plot)
 ggplot_scatter_col <-
   function(data,
            x_var,
            y_var,
            col_var,
-           hover_var = NULL,
+           tip_var = NULL,
            col_method = NULL,
-           col_title = "",
-           quantile_cuts = NULL,
-           bin_cuts = NULL,
+           col_cuts = NULL,
+           col_drop = FALSE,
+           col_na_remove = FALSE,
            size = 1,
            pal = NULL,
-           rev_pal = FALSE,
-           remove_na = FALSE,
-           x_scale_zero = TRUE,
-           x_scale_zero_line = TRUE,
-           x_scale_trans = "identity",
-           x_scale_labels = waiver(),
-           y_scale_zero = TRUE,
-           y_scale_zero_line = TRUE,
-           y_scale_trans = "identity",
-           y_scale_labels = waiver(),
-           col_scale_drop = FALSE,
+           pal_rev = FALSE,
+           x_zero = TRUE,
+           x_zero_line = TRUE,
+           x_trans = "identity",
+           x_labels = waiver(),
+           x_pretty_n = 6,
+           y_zero = TRUE,
+           y_zero_line = TRUE,
+           y_trans = "identity",
+           y_labels = waiver(),
+           y_pretty_n = 5,
            legend_ncol = 3,
            legend_digits = 1,
            title = "[Title]",
            subtitle = NULL,
            x_title = "[X title]",
            y_title = "[Y title]",
+           col_title = "",
            caption = NULL,
            legend_labels = NULL,
            font_family = "Helvetica",
@@ -448,7 +416,7 @@ ggplot_scatter_col <-
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     col_var <- rlang::enquo(col_var)
-    hover_var <- rlang::enquo(hover_var)
+    tip_var <- rlang::enquo(tip_var)
     
     x_var_vector <- dplyr::pull(data, !!x_var)
     y_var_vector <- dplyr::pull(data, !!y_var)
@@ -459,14 +427,14 @@ ggplot_scatter_col <-
     
     min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
     max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
-    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
-      x_scale_zero <- FALSE
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero == TRUE) {
+      x_zero <- FALSE
     }
     
     min_y_var_vector <- min(y_var_vector, na.rm = TRUE)
     max_y_var_vector <- max(y_var_vector, na.rm = TRUE)
-    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero == TRUE) {
-      y_scale_zero <- FALSE
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero == TRUE) {
+      y_zero <- FALSE
     }
     
     if(is.null(font_size_title)){
@@ -484,19 +452,19 @@ ggplot_scatter_col <-
     }
     
     if (col_method == "quantile") {
-      if (is.null(quantile_cuts)) quantile_cuts <- c(0, 0.25, 0.5, 0.75, 1)
-      bin_cuts <- quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
-      if (anyDuplicated(bin_cuts) > 0) stop("quantile_cuts do not provide unique breaks")
-      data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+      if (is.null(col_cuts)) col_cuts <- c(0, 0.25, 0.5, 0.75, 1)
+      col_cuts <- quantile(col_var_vector, probs = col_cuts, na.rm = TRUE)
+      if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
+      data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, col_cuts))
+      if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+      if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
       if (!is.null(legend_labels)) labels <- legend_labels
     }
     else if (col_method == "bin") {
-      if (is.null(bin_cuts)) bin_cuts <- pretty(col_var_vector)
-      data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+      if (is.null(col_cuts)) col_cuts <- pretty(col_var_vector)
+      data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, col_cuts))
+      if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+      if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
       if (!is.null(legend_labels)) labels <- legend_labels
     }
     else if (col_method == "category") {
@@ -505,7 +473,7 @@ ggplot_scatter_col <-
       if (is.null(legend_labels)) labels <- waiver()
     }
     
-    plot <- ggplot(data, aes(x = !!x_var, y = !!y_var, key = !!hover_var)) +
+    plot <- ggplot(data) +
       theme_scatter(
         font_family = font_family,
         font_size_body = font_size_body,
@@ -513,131 +481,78 @@ ggplot_scatter_col <-
       ) +
       coord_cartesian(clip = "off")
     
-    if (is.null(rlang::get_expr(hover_var))) {
-      plot <- plot +
-        geom_point(aes(
-          col = !!col_var,
-          text = paste(
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-              ": ",
-              !!x_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-              ": ",
-              !!col_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-              ": ",
-              !!y_var
-            ),
-            sep = "<br>"
-          )
-        ),
-        size = size)
-    }
-    else if (!is.null(rlang::get_expr(hover_var))) {
-      plot <- plot +
-        geom_point(aes(
-          col = !!col_var,
-          text = paste(
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-              ": ",
-              !!x_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-              ": ",
-              !!col_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-              ": ",
-              !!y_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-              ": ",
-              !!hover_var
-            ),
-            sep = "<br>"
-          )
-        ),
-        size = size)
-    }
-    
-    if (rev_pal == TRUE) pal <- rev(pal)
-    if (remove_na == TRUE) na.translate <- FALSE
-    if (remove_na == FALSE) na.translate <- TRUE
-    if(isMobile == FALSE) x_scale_n <- 6
-    else if(isMobile == TRUE) x_scale_n <- 4
-    
-    if (x_scale_zero == TRUE) {
-      if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
-      if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+    plot <- plot +
+      geom_point(aes(x = !!x_var, y = !!y_var, col = !!col_var, text = !!tip_var), size = size)
 
-      if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
-      x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+    if (pal_rev == TRUE) pal <- rev(pal)
+    if (col_na_remove == TRUE) na.translate <- FALSE
+    if (col_na_remove == FALSE) na.translate <- TRUE
+    if(isMobile == FALSE) x_n <- x_pretty_n
+    else if(isMobile == TRUE) x_n <- 4
+    
+    if (x_zero == TRUE) {
+      if(max(x_var_vector) > 0) x_breaks <- pretty(c(0, x_var_vector), n = x_n)
+      if(min(x_var_vector) < 0) x_breaks <- pretty(c(x_var_vector, 0), n = x_n)
+
+      if(x_trans == "log10") x_breaks <- c(1, x_breaks[x_breaks > 1])
+      x_limits <- c(min(x_breaks), max(x_breaks))
     }
-    else if (x_scale_zero == FALSE) {
-      if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
-      if(x_scale_trans == "log10") {
-        x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n) 
-        x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+    else if (x_zero == FALSE) {
+      if(x_trans != "log10") x_breaks <- pretty(x_var_vector, n = x_n)
+      if(x_trans == "log10") {
+        x_breaks <- pretty(c(0, x_var_vector), n = x_n) 
+        x_breaks <- c(1, x_breaks[x_breaks > 1])
       }
-      x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+      x_limits <- c(min(x_breaks), max(x_breaks))
     }
     
-    if (y_scale_zero == TRUE) {
-      if(max(y_var_vector) > 0) y_scale_breaks <- pretty(c(0, y_var_vector))
-      if(min(y_var_vector) < 0) y_scale_breaks <- pretty(c(y_var_vector, 0))
+    if (y_zero == TRUE) {
+      if(max_y_var_vector > 0) y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n)
+      if(min_y_var_vector < 0) y_breaks <- pretty(c(y_var_vector, 0), n = y_pretty_n)
 
-      if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
-      y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      if(y_trans == "log10") y_breaks <- c(1, y_breaks[y_breaks > 1])
+      y_limits <- c(min(y_breaks), max(y_breaks))
     }
-    else if (y_scale_zero == FALSE) {
-      if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
-      if(y_scale_trans == "log10") {
-        y_scale_breaks <- pretty(c(0, y_var_vector)) 
-        y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+    else if (y_zero == FALSE) {
+      if(y_trans != "log10") y_breaks <- pretty(y_var_vector, n = y_pretty_n)
+      if(y_trans == "log10") {
+        y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n) 
+        y_breaks <- c(1, y_breaks[y_breaks > 1])
       }
-      y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+      y_limits <- c(min(y_breaks), max(y_breaks))
     }
     
     plot <- plot +
       scale_color_manual(
         values = pal,
-        drop = col_scale_drop,
+        drop = col_drop,
         labels = labels,
         na.translate = na.translate,
         na.value = "#A8A8A8"
       ) +
       scale_x_continuous(
         expand = c(0, 0),
-        breaks = x_scale_breaks,
-        limits = x_scale_limits,
-        trans = x_scale_trans,
-        labels = x_scale_labels,
+        breaks = x_breaks,
+        limits = x_limits,
+        trans = x_trans,
+        labels = x_labels,
         oob = scales::rescale_none
       ) +
       scale_y_continuous(
         expand = c(0, 0),
-        breaks = y_scale_breaks,
-        limits = y_scale_limits,
-        trans = y_scale_trans,
-        labels = y_scale_labels,
+        breaks = y_breaks,
+        limits = y_limits,
+        trans = y_trans,
+        labels = y_labels,
         oob = scales::rescale_none
       )
     
-    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero_line == TRUE) {
       plot <- plot +
         ggplot2::geom_vline(xintercept = 0, colour = "#323232", size = 0.3)
     }
     
-    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero_line == TRUE) {
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero_line == TRUE) {
       plot <- plot +
         ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
@@ -659,7 +574,7 @@ ggplot_scatter_col <-
           title = stringr::str_wrap(title, 40),
           subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
-          y = stringr::str_wrap(y_title, 20),
+          y = stringr::str_wrap(y_title, 30),
           caption = stringr::str_wrap(caption, 50)
         )  +
         guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15)))
@@ -673,18 +588,20 @@ ggplot_scatter_col <-
 #' @param data An ungrouped summarised tibble or dataframe. Required input.
 #' @param x_var Unquoted numeric variable to be on the x axis. Required input.
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
-#' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param tip_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param size Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
-#' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
-#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
-#' @param x_scale_labels Argument to adjust the format of the x scale labels.
-#' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
-#' @param y_scale_labels Argument to adjust the format of the y scale labels.
+#' @param x_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param x_trans A string specifying a transformation for the x scale. Defaults to "identity".
+#' @param x_labels Argument to adjust the format of the x scale labels.
+#' @param x_pretty_n The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Not applicable where isMobile equals TRUE.
+#' @param y_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
+#' @param y_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param y_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_labels Argument to adjust the format of the y scale labels.
+#' @param y_pretty_n The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param facet_scales Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".
 #' @param facet_nrow The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows. Not applicable to where isMobile is TRUE.
 #' @param title  Title string. Defaults to "[Title]".
@@ -700,34 +617,37 @@ ggplot_scatter_col <-
 #' @param wrap_x_title Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
+#' library(dplyr)
 #' 
-#' plot_data <- dplyr::sample_frac(ggplot2::diamonds, 0.05)
+#' plot_data <- slice_sample(ggplot2::diamonds, prop = 0.05)
 #'
 #' plot <- ggplot_scatter_facet(data = plot_data, x_var = carat, y_var = price, facet_var = color)
 #'
 #' plot
 #'
-#' plotly::ggplotly(plot, tooltip = "text")
+#' plotly::ggplotly(plot)
 ggplot_scatter_facet <-
   function(data,
            x_var,
            y_var,
            facet_var,
-           hover_var = NULL,
+           tip_var = NULL,
            size = 1,
            pal = NULL,
-           x_scale_zero = TRUE,
-           x_scale_zero_line = TRUE,
-           x_scale_trans = "identity",
-           x_scale_labels = waiver(),
-           y_scale_zero = TRUE,
-           y_scale_zero_line = TRUE,
-           y_scale_trans = "identity",
-           y_scale_labels = waiver(),
+           x_zero = TRUE,
+           x_zero_line = TRUE,
+           x_trans = "identity",
+           x_labels = waiver(),
+           x_pretty_n = 5,
+           y_zero = TRUE,
+           y_zero_line = TRUE,
+           y_trans = "identity",
+           y_labels = waiver(),
+           y_pretty_n = 5,
            facet_scales = "fixed",
            facet_nrow = NULL,
            title = "[Title]",
@@ -749,7 +669,7 @@ ggplot_scatter_facet <-
     x_var <- rlang::enquo(x_var) #numeric var
     y_var <- rlang::enquo(y_var) #numeric var
     facet_var <- rlang::enquo(facet_var) #categorical var
-    hover_var <- rlang::enquo(hover_var)
+    tip_var <- rlang::enquo(tip_var)
     
     x_var_vector <- dplyr::pull(data, !!x_var)
     y_var_vector <- dplyr::pull(data, !!y_var)
@@ -761,14 +681,14 @@ ggplot_scatter_facet <-
     
     min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
     max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
-    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
-      x_scale_zero <- FALSE
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero == TRUE) {
+      x_zero <- FALSE
     }
     
     min_y_var_vector <- min(y_var_vector, na.rm = TRUE)
     max_y_var_vector <- max(y_var_vector, na.rm = TRUE)
-    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero == TRUE) {
-      y_scale_zero <- FALSE
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero == TRUE) {
+      y_zero <- FALSE
     }
     
     if(is.null(font_size_title)){
@@ -782,135 +702,86 @@ ggplot_scatter_facet <-
     
     if (is.null(pal)) pal <- pal_snz
     
-    plot <- ggplot(data, aes(x = !!x_var, y = !!y_var, key = !!hover_var)) +
+    plot <- ggplot(data) +
       theme_scatter(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
       ) +
-      coord_cartesian(clip = "off")
-    
-    if (is.null(rlang::get_expr(hover_var))) {
-      plot <- plot +
-        geom_point(aes(text = paste(
-          paste0(
-            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-            ": ",
-            !!x_var
-          ),
-          paste0(
-            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-            ": ",
-            !!facet_var
-          ),
-          paste0(
-            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-            ": ",
-            !!y_var
-          ),
-          sep = "<br>"
-        )),
-        col = pal[1], size = size)
-    }
-    else if (!is.null(rlang::get_expr(hover_var))) {
-      plot <- plot +
-        geom_point(aes(text = paste(
-          paste0(
-            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-            ": ",
-            !!x_var
-          ),
-          paste0(
-            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-            ": ",
-            !!facet_var
-          ),
-          paste0(
-            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-            ": ",
-            !!y_var
-          ),
-          paste0(
-            stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-            ": ",
-            !!hover_var
-          ),
-          sep = "<br>"
-        )),
-        col = pal[1], size = size)
-    }
-    
-    if (facet_scales %in% c("fixed", "free_y")) {
-      if(isMobile == FALSE) x_scale_n <- 6
-      else if(isMobile == TRUE) x_scale_n <- 4
-      
-      if (x_scale_zero == TRUE) {
-        if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
-        if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+      coord_cartesian(clip = "off") +
+      geom_point(aes(x = !!x_var, y = !!y_var, text = !!tip_var), col = pal[1], size = size)
 
-        if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
-        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+    if (facet_scales %in% c("fixed", "free_y")) {
+      if(isMobile == FALSE) x_n <- x_pretty_n
+      else if(isMobile == TRUE) x_n <- 4
+      
+      if (x_zero == TRUE) {
+        if(max(x_var_vector) > 0) x_breaks <- pretty(c(0, x_var_vector), n = x_n)
+        if(min(x_var_vector) < 0) x_breaks <- pretty(c(x_var_vector, 0), n = x_n)
+
+        if(x_trans == "log10") x_breaks <- c(1, x_breaks[x_breaks > 1])
+        x_limits <- c(min(x_breaks), max(x_breaks))
       }
-      else if (x_scale_zero == FALSE) {
-        if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector)
-        if(x_scale_trans == "log10") {
-          x_scale_breaks <- pretty(c(0, x_var_vector)) 
-          x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+      else if (x_zero == FALSE) {
+        if(x_trans != "log10") x_breaks <- pretty(x_var_vector)
+        if(x_trans == "log10") {
+          x_breaks <- pretty(c(0, x_var_vector)) 
+          x_breaks <- c(1, x_breaks[x_breaks > 1])
         }
-        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+        x_limits <- c(min(x_breaks), max(x_breaks))
       }
       
       plot <- plot +
         scale_x_continuous(
           expand = c(0, 0),
-          breaks = x_scale_breaks,
-          limits = x_scale_limits,
-          trans = x_scale_trans,
-          labels = x_scale_labels,
+          breaks = x_breaks,
+          limits = x_limits,
+          trans = x_trans,
+          labels = x_labels,
           oob = scales::rescale_none
         )
     }
     if (facet_scales %in% c("fixed", "free_x")) {
-      if (y_scale_zero == TRUE) {
-        if(max(y_var_vector) > 0) y_scale_breaks <- pretty(c(0, y_var_vector))
-        if(min(y_var_vector) < 0) y_scale_breaks <- pretty(c(y_var_vector, 0))
+      if (y_zero == TRUE) {
+        if(max_y_var_vector > 0) y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n)
+        if(min_y_var_vector < 0) y_breaks <- pretty(c(y_var_vector, 0), n = y_pretty_n)
 
-        if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
-        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+        if(y_trans == "log10") y_breaks <- c(1, y_breaks[y_breaks > 1])
+        y_limits <- c(min(y_breaks), max(y_breaks))
       }
-      else if (y_scale_zero == FALSE) {
-        if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
-        if(y_scale_trans == "log10") {
-          y_scale_breaks <- pretty(c(0, y_var_vector)) 
-          y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+      else if (y_zero == FALSE) {
+        if(y_trans != "log10") y_breaks <- pretty(y_var_vector, n = y_pretty_n)
+        if(y_trans == "log10") {
+          y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n) 
+          y_breaks <- c(1, y_breaks[y_breaks > 1])
         }
-        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+        y_limits <- c(min(y_breaks), max(y_breaks))
       }
       
       plot <- plot +
         scale_y_continuous(
           expand = c(0, 0),
-          breaks = y_scale_breaks,
-          limits = y_scale_limits,
-          trans = y_scale_trans,
-          labels = y_scale_labels,
+          breaks = y_breaks,
+          limits = y_limits,
+          trans = y_trans,
+          labels = y_labels,
           oob = scales::rescale_none
         )
     }
     else if (facet_scales %in% c("free", "free_y")) {
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
-                           trans = y_scale_trans,
-                           labels = y_scale_labels,
+                           trans = y_trans,
+                           labels = y_labels,
                            oob = scales::rescale_none)
     }
     
-    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero_line == TRUE) {
       plot <- plot +
         ggplot2::geom_vline(xintercept = 0, colour = "#323232", size = 0.3)
     }
     
-    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero_line == TRUE) {
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero_line == TRUE) {
       plot <- plot +
         ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
@@ -935,7 +806,7 @@ ggplot_scatter_facet <-
           title = stringr::str_wrap(title, 40),
           subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
-          y = stringr::str_wrap(y_title, 20),
+          y = stringr::str_wrap(y_title, 30),
           caption = stringr::str_wrap(caption, 50)
         )  +
         facet_wrap(vars(!!facet_var), scales = facet_scales, ncol = 1)
@@ -951,24 +822,25 @@ ggplot_scatter_facet <-
 #' @param y_var Unquoted numeric variable to be on the y axis. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
-#' @param hover_var Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.
+#' @param tip_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "quantile".
-#' @param quantile_cuts A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles.
+#' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
+#' @param col_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param col_na_remove TRUE or FALSE of whether to remove NAs of the colour variable. Defaults to FALSE.
 #' @param quantile_by_facet TRUE of FALSE whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.
-#' @param bin_cuts A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used.
 #' @param size Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette or viridis.
-#' @param rev_pal Reverses the palette. Defaults to FALSE.
-#' @param remove_na TRUE or FALSE of whether to remove NAs of the colour variable. Defaults to FALSE.
-#' @param x_scale_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
-#' @param x_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param x_scale_trans A string specifying a transformation for the x scale. Defaults to "identity".
-#' @param x_scale_labels Argument to adjust the format of the x scale labels.
-#' @param y_scale_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
-#' @param y_scale_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
-#' @param y_scale_trans A string specifying a transformation for the y scale. Defaults to "identity".
-#' @param y_scale_labels Argument to adjust the format of the y scale labels.
-#' @param col_scale_drop TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param pal_rev Reverses the palette. Defaults to FALSE.
+#' @param x_zero TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.
+#' @param x_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param x_trans A string specifying a transformation for the x scale. Defaults to "identity".
+#' @param x_labels Argument to adjust the format of the x scale labels.
+#' @param x_pretty_n The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Not applicable where isMobile equals TRUE.
+#' @param y_zero TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.
+#' @param y_zero_line TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.  
+#' @param y_trans A string specifying a transformation for the y scale. Defaults to "identity".
+#' @param y_labels Argument to adjust the format of the y scale labels.
+#' @param y_pretty_n The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param facet_scales Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".
 #' @param facet_nrow The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows. Not applicable to where isMobile is TRUE.
 #' @param legend_ncol The number of columns in the legend.
@@ -989,47 +861,49 @@ ggplot_scatter_facet <-
 #' @param wrap_y_title Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
+#' library(dplyr)
 #' 
 #' plot_data <- ggplot2::diamonds %>%
-#'   dplyr::sample_frac(0.05) %>%
-#'   dplyr::mutate(cut = stringr::str_to_sentence(cut))
+#'   sample_frac(0.05) %>%
+#'   mutate(cut = stringr::str_to_sentence(cut))
 #'
 #' plot <- ggplot_scatter_col_facet(data = plot_data, x_var = carat, y_var = price, col_var = color,
 #'                                  facet_var = cut)
 #'
 #' plot
 #'
-#' plotly::ggplotly(plot, tooltip = "text")
+#' plotly::ggplotly(plot)
 ggplot_scatter_col_facet <-
   function(data,
            x_var,
            y_var,
            col_var,
            facet_var,
-           hover_var = NULL,
+           tip_var = NULL,
+           col_method = NULL,
+           col_cuts = NULL,
+           col_na_remove = FALSE,
+           quantile_by_facet = TRUE,
            size = 1,
            pal = NULL,
-           rev_pal = FALSE,
-           remove_na = FALSE,
-           x_scale_zero = TRUE,
-           x_scale_zero_line = TRUE,
-           x_scale_trans = "identity",
-           x_scale_labels = waiver(),
-           y_scale_zero = TRUE,
-           y_scale_zero_line = TRUE,
-           y_scale_trans = "identity",
-           y_scale_labels = waiver(),
-           col_scale_drop = FALSE,
+           pal_rev = FALSE,
+           x_zero = TRUE,
+           x_zero_line = TRUE,
+           x_trans = "identity",
+           x_labels = waiver(),
+           x_pretty_n = 5,
+           y_zero = TRUE,
+           y_zero_line = TRUE,
+           y_trans = "identity",
+           y_labels = waiver(),
+           y_pretty_n = 5,
+           col_drop = FALSE,
            facet_scales = "fixed",
            facet_nrow = NULL,
-           col_method = NULL,
-           quantile_cuts = NULL,
-           quantile_by_facet = TRUE,
-           bin_cuts = NULL,
            legend_ncol = 3,
            legend_digits = 1,
            title = "[Title]",
@@ -1055,7 +929,7 @@ ggplot_scatter_col_facet <-
     y_var <- rlang::enquo(y_var) #numeric var
     col_var <- rlang::enquo(col_var)
     facet_var <- rlang::enquo(facet_var) #categorical var
-    hover_var <- rlang::enquo(hover_var)
+    tip_var <- rlang::enquo(tip_var)
     
     x_var_vector <- dplyr::pull(data, !!x_var)
     y_var_vector <- dplyr::pull(data, !!y_var)
@@ -1068,14 +942,14 @@ ggplot_scatter_col_facet <-
     
     min_x_var_vector <- min(x_var_vector, na.rm = TRUE)
     max_x_var_vector <- max(x_var_vector, na.rm = TRUE)
-    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero == TRUE) {
-      x_scale_zero <- FALSE
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero == TRUE) {
+      x_zero <- FALSE
     }
     
     min_y_var_vector <- min(y_var_vector, na.rm = TRUE)
     max_y_var_vector <- max(y_var_vector, na.rm = TRUE)
-    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero == TRUE) {
-      y_scale_zero <- FALSE
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero == TRUE) {
+      y_zero <- FALSE
     }
     
     if(is.null(font_size_title)){
@@ -1093,31 +967,31 @@ ggplot_scatter_col_facet <-
     }
 
     if (col_method == "quantile") {
-      if (is.null(quantile_cuts)) quantile_cuts <- c(0, 0.25, 0.5, 0.75, 1)
+      if (is.null(col_cuts)) col_cuts <- c(0, 0.25, 0.5, 0.75, 1)
       if (quantile_by_facet == TRUE) {
         data <- data %>%
           dplyr::group_by(!!facet_var) %>%
           dplyr::mutate(!!col_var := percent_rank(!!col_var)) %>%
-          dplyr::mutate(!!col_var := cut(!!col_var, quantile_cuts))
+          dplyr::mutate(!!col_var := cut(!!col_var, col_cuts))
         
-        if (is.null(pal)) pal <- viridis::viridis(length(quantile_cuts) - 1)
-        if (is.null(legend_labels)) labels <- paste0(numeric_legend_labels(quantile_cuts * 100, 0), "%")
+        if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+        if (is.null(legend_labels)) labels <- paste0(numeric_legend_labels(col_cuts * 100, 0), "%")
         if (!is.null(legend_labels)) labels <- legend_labels
       }
       else if (quantile_by_facet == FALSE) {
-        bin_cuts <- quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
-        if (anyDuplicated(bin_cuts) > 0) stop("quantile_cuts do not provide unique breaks")
-        data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-        if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-        if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+        col_cuts <- quantile(col_var_vector, probs = col_cuts, na.rm = TRUE)
+        if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
+        data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, col_cuts))
+        if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+        if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
         if (!is.null(legend_labels)) labels <- legend_labels
       }
     }
     else if (col_method == "bin") {
-      if (is.null(bin_cuts)) bin_cuts <- pretty(col_var_vector)
-      data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, bin_cuts))
-      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+      if (is.null(col_cuts)) col_cuts <- pretty(col_var_vector)
+      data <- dplyr::mutate(data, !!col_var := cut(col_var_vector, col_cuts))
+      if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+      if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
       if (!is.null(legend_labels)) labels <- legend_labels
     }
     else if (col_method == "category") {
@@ -1126,164 +1000,99 @@ ggplot_scatter_col_facet <-
       if (is.null(legend_labels)) labels <- waiver()
     }
     
-    plot <- ggplot(data, aes(x = !!x_var, y = !!y_var, key = !!hover_var)) +
+    plot <- ggplot(data) +
       theme_scatter(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
       ) +
-      coord_cartesian(clip = "off")
-    
-    if (is.null(rlang::get_expr(hover_var))) {
-      plot <- plot +
-        geom_point(aes(
-          col = !!col_var,
-          text = paste(
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-              ": ",
-              !!x_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-              ": ",
-              !!col_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-              ": ",
-              !!facet_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-              ": ",
-              !!y_var
-            ),
-            sep = "<br>"
-          )
-        ),
-        size = size)
-    }
-    else if (!is.null(rlang::get_expr(hover_var))) {
-      plot <- plot +
-        geom_point(aes(
-          col = !!col_var,
-          text = paste(
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(x_var), "_", " ")),
-              ": ",
-              !!x_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(col_var), "_", " ")),
-              ": ",
-              !!col_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(facet_var), "_", " ")),
-              ": ",
-              !!facet_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(y_var), "_", " ")),
-              ": ",
-              !!y_var
-            ),
-            paste0(
-              stringr::str_to_sentence(stringr::str_replace_all(rlang::as_name(hover_var), "_", " ")),
-              ": ",
-              !!hover_var
-            ),
-            sep = "<br>"
-          )
-        ),
-        size = size)
-    }
-    
-    if (rev_pal == TRUE) pal <- rev(pal)
-    if (remove_na == TRUE) na.translate <- FALSE
-    if (remove_na == FALSE) na.translate <- TRUE
+      coord_cartesian(clip = "off") +
+      geom_point(aes(x = !!x_var, y = !!y_var, col = !!col_var, text = !!tip_var), size = size)
+
+    if (pal_rev == TRUE) pal <- rev(pal)
+    if (col_na_remove == TRUE) na.translate <- FALSE
+    if (col_na_remove == FALSE) na.translate <- TRUE
     
     plot <- plot +
       scale_color_manual(
         values = pal,
-        drop = col_scale_drop,
+        drop = col_drop,
         labels = labels,
         na.translate = na.translate,
         na.value = "#A8A8A8"
       )
     
     if (facet_scales %in% c("fixed", "free_y")) {
-      if(isMobile == FALSE) x_scale_n <- 6
-      else if(isMobile == TRUE) x_scale_n <- 4
+      if(isMobile == FALSE) x_n <- x_pretty_n
+      else if(isMobile == TRUE) x_n <- 4
       
-      if (x_scale_zero == TRUE) {
-        if(max(x_var_vector) > 0) x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n)
-        if(min(x_var_vector) < 0) x_scale_breaks <- pretty(c(x_var_vector, 0), n = x_scale_n)
+      if (x_zero == TRUE) {
+        if(max(x_var_vector) > 0) x_breaks <- pretty(c(0, x_var_vector), n = x_n)
+        if(min(x_var_vector) < 0) x_breaks <- pretty(c(x_var_vector, 0), n = x_n)
 
-        if(x_scale_trans == "log10") x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
-        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+        if(x_trans == "log10") x_breaks <- c(1, x_breaks[x_breaks > 1])
+        x_limits <- c(min(x_breaks), max(x_breaks))
       }
-      else if (x_scale_zero == FALSE) {
-        if(x_scale_trans != "log10") x_scale_breaks <- pretty(x_var_vector, n = x_scale_n)
-        if(x_scale_trans == "log10") {
-          x_scale_breaks <- pretty(c(0, x_var_vector), n = x_scale_n) 
-          x_scale_breaks <- c(1, x_scale_breaks[x_scale_breaks > 1])
+      else if (x_zero == FALSE) {
+        if(x_trans != "log10") x_breaks <- pretty(x_var_vector, n = x_n)
+        if(x_trans == "log10") {
+          x_breaks <- pretty(c(0, x_var_vector), n = x_n) 
+          x_breaks <- c(1, x_breaks[x_breaks > 1])
         }
-        x_scale_limits <- c(min(x_scale_breaks), max(x_scale_breaks))
+        x_limits <- c(min(x_breaks), max(x_breaks))
       }
       
       plot <- plot +
         scale_x_continuous(
           expand = c(0, 0),
-          breaks = x_scale_breaks,
-          limits = x_scale_limits,
-          trans = x_scale_trans,
-          labels = x_scale_labels,
+          breaks = x_breaks,
+          limits = x_limits,
+          trans = x_trans,
+          labels = x_labels,
           oob = scales::rescale_none
         )
     }
     if (facet_scales %in% c("fixed", "free_x")) {
-      if (y_scale_zero == TRUE) {
-        if(max(y_var_vector) > 0) y_scale_breaks <- pretty(c(0, y_var_vector))
-        if(min(y_var_vector) < 0) y_scale_breaks <- pretty(c(y_var_vector, 0))
+      if (y_zero == TRUE) {
+        if(max_y_var_vector > 0) y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n)
+        if(min_y_var_vector < 0) y_breaks <- pretty(c(y_var_vector, 0), n = y_pretty_n)
 
-        if(y_scale_trans == "log10") y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
-        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+        if(y_trans == "log10") y_breaks <- c(1, y_breaks[y_breaks > 1])
+        y_limits <- c(min(y_breaks), max(y_breaks))
       }
-      else if (y_scale_zero == FALSE) {
-        if(y_scale_trans != "log10") y_scale_breaks <- pretty(y_var_vector)
-        if(y_scale_trans == "log10") {
-          y_scale_breaks <- pretty(c(0, y_var_vector)) 
-          y_scale_breaks <- c(1, y_scale_breaks[y_scale_breaks > 1])
+      else if (y_zero == FALSE) {
+        if(y_trans != "log10") y_breaks <- pretty(y_var_vector, n = y_pretty_n)
+        if(y_trans == "log10") {
+          y_breaks <- pretty(c(0, y_var_vector), n = y_pretty_n) 
+          y_breaks <- c(1, y_breaks[y_breaks > 1])
         }
-        y_scale_limits <- c(min(y_scale_breaks), max(y_scale_breaks))
+        y_limits <- c(min(y_breaks), max(y_breaks))
       }
       
       plot <- plot +
         scale_y_continuous(
           expand = c(0, 0),
-          breaks = y_scale_breaks,
-          limits = y_scale_limits,
-          trans = y_scale_trans,
-          labels = y_scale_labels,
+          breaks = y_breaks,
+          limits = y_limits,
+          trans = y_trans,
+          labels = y_labels,
           oob = scales::rescale_none
         )
     }
     else if (facet_scales %in% c("free", "free_y")) {
       plot <- plot +
         scale_y_continuous(expand = c(0, 0),
-                           trans = y_scale_trans,
-                           labels = y_scale_labels,
+                           trans = y_trans,
+                           labels = y_labels,
                            oob = scales::rescale_none)
     }
     
-    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_scale_zero_line == TRUE) {
+    if(min_x_var_vector < 0 & max_x_var_vector > 0 & x_zero_line == TRUE) {
       plot <- plot +
         ggplot2::geom_vline(xintercept = 0, colour = "#323232", size = 0.3)
     }
     
-    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_scale_zero_line == TRUE) {
+    if(min_y_var_vector < 0 & max_y_var_vector > 0 & y_zero_line == TRUE) {
       plot <- plot +
         ggplot2::geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
@@ -1309,7 +1118,7 @@ ggplot_scatter_col_facet <-
           title = stringr::str_wrap(title, 40),
           subtitle = stringr::str_wrap(subtitle, 40),
           x = stringr::str_wrap(x_title, 20),
-          y = stringr::str_wrap(y_title, 20),
+          y = stringr::str_wrap(y_title, 30),
           caption = stringr::str_wrap(caption, 50)
         )  +
         guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15))) +

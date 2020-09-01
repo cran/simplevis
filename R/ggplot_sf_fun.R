@@ -91,7 +91,7 @@ theme_sf <-
 #' @title Map of simple features in ggplot.
 #' @description Map of simple features in ggplot that is not coloured and not facetted. 
 #' @param data A sf object with defined coordinate reference system. Required input.
-#' @param size Size of points. Defaults to 0.5.
+#' @param size Size of features (or shape outlines if polygon). Defaults to 0.5.
 #' @param alpha The alpha of the fill. Defaults to 0.1. Only applicable to polygons.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
 #' @param coastline Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.
@@ -104,7 +104,7 @@ theme_sf <-
 #' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
@@ -201,14 +201,13 @@ ggplot_sf <- function(data,
 #' @param data A sf object with defined coordinate reference system. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or "quantile" if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
-#' @param bin_cuts A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used.
-#' @param quantile_cuts A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles. Only applicable where col_method equals "quantile".
-#' @param size Size of points. Defaults to 0.5.
-#' @param alpha The opacity of polygons. Defaults to 0.9.
+#' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
+#' @param col_drop TRUE or FALSE  of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param col_na_remove TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.
-#' @param rev_pal Reverses the palette. Defaults to FALSE.
-#' @param col_scale_drop TRUE or FALSE  of whether to drop unused levels from the legend. Defaults to FALSE.
-#' @param remove_na TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.
+#' @param pal_rev Reverses the palette. Defaults to FALSE.
+#' @param size Size of features (or shape outlines if polygon). Defaults to 0.5.
+#' @param alpha The opacity of polygons. Defaults to 0.9.
 #' @param coastline Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.
 #' @param coastline_behind TRUE or FALSE  as to whether the coastline is to be behind the sf object defined in the data argument. Defaults to FALSE.
 #' @param coastline_pal Colour of the coastline. Defaults to "#7F7F7F".
@@ -226,16 +225,16 @@ ggplot_sf <- function(data,
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
 #' ggplot_sf_col(data = example_sf_nz_livestock, col_var = dairydens, coastline = nz,
-#'      col_method = "bin", bin_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
+#'      col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
 #'      title = "Dairy density in count per km\u00b2, 2017")
 #'
 #' ggplot_sf_col(data = example_sf_nz_livestock, col_var = dairydens, coastline = nz,
-#'      col_method = "quantile", quantile_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
+#'      col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
 #'      title = "Dairy density in count per km\u00b2, 2017")
 #'
 #' map_data <- example_sf_nz_river_wq %>%
@@ -249,14 +248,13 @@ ggplot_sf <- function(data,
 ggplot_sf_col <- function(data,
                           col_var,
                           col_method = NULL,
-                          bin_cuts = NULL,
-                          quantile_cuts = c(0, 0.25, 0.5, 0.75, 1),
+                          col_cuts = NULL,
+                          col_drop = FALSE,
+                          col_na_remove = FALSE,
+                          pal = NULL,
+                          pal_rev = FALSE,
                           size = 0.5,
                           alpha = 0.9,
-                          pal = NULL,
-                          rev_pal = FALSE,
-                          col_scale_drop = FALSE,
-                          remove_na = FALSE,
                           coastline = NULL,
                           coastline_behind = TRUE,
                           coastline_pal = "#7f7f7f",
@@ -323,44 +321,47 @@ ggplot_sf_col <- function(data,
     if (is.null(legend_labels)) labels <- waiver()
   }
   else if (col_method == "bin") {
-    if (!is.null(bin_cuts)) {
-      if (!(dplyr::first(bin_cuts) %in% c(0,-Inf))) warning("The first element of the bin_cuts vector should generally be 0 (or -Inf if there are negative values)")
-      if (dplyr::last(bin_cuts) != Inf) warning("The last element of the bin_cuts vector should generally be Inf")
+    if (!is.null(col_cuts)) {
+      if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+      if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
     }
-    if (is.null(bin_cuts)) bin_cuts <- pretty(col_var_vector)
+    if (is.null(col_cuts)) col_cuts <- pretty(col_var_vector)
     
     data <- dplyr::mutate(data,
                     !!col_var := cut(
                       col_var_vector,
-                      bin_cuts,
+                      col_cuts,
                       right = FALSE,
                       include.lowest = TRUE
                     ))
     
-    if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-    if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+    if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+    if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
     if (!is.null(legend_labels)) labels <- legend_labels
   }
   else if (col_method == "quantile") {
-    if (dplyr::first(quantile_cuts) != 0) warning("The first element of the quantile_cuts vector generally always be 0")
-    if (dplyr::last(quantile_cuts) != 1) warning("The last element of the quantile_cuts vector should generally be 1")
-    bin_cuts <- quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
-    if (anyDuplicated(bin_cuts) > 0) stop("quantile_cuts do not provide unique breaks")
+    if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
+    else {
+      if (dplyr::first(col_cuts) != 0) warning("The first element of the col_cuts vector generally always be 0")
+      if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
+    }  
+    col_cuts <- quantile(col_var_vector, probs = col_cuts, na.rm = TRUE)
+    if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
     
     data <- dplyr::mutate(data,
                     !!col_var := cut(
                       col_var_vector,
-                      bin_cuts,
+                      col_cuts,
                       right = FALSE,
                       include.lowest = TRUE
                     ))
     
-    if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-    if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+    if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+    if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
     if (!is.null(legend_labels)) labels <- legend_labels
   }
   
-  if (rev_pal == TRUE) pal <- rev(pal)
+  if (pal_rev == TRUE) pal <- rev(pal)
   
   if (geometry_type %in% c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING")) {
     plot <- plot +
@@ -375,6 +376,7 @@ ggplot_sf_col <- function(data,
     plot <- plot +
       geom_sf(
         aes(fill = !!col_var),
+        size = size,
         col = NA,
         key_glyph = draw_key_rect,
         alpha = alpha,
@@ -382,14 +384,14 @@ ggplot_sf_col <- function(data,
       )
   }
   
-  if (remove_na == TRUE) na.translate <- FALSE
-  if (remove_na == FALSE) na.translate <- TRUE
+  if (col_na_remove == TRUE) na.translate <- FALSE
+  if (col_na_remove == FALSE) na.translate <- TRUE
   
   if (geometry_type %in% c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING")) {
     plot <- plot +
       scale_color_manual(
         values = pal,
-        drop = col_scale_drop,
+        drop = col_drop,
         labels = labels,
         na.translate = na.translate,
         na.value = "#A8A8A8"
@@ -399,7 +401,7 @@ ggplot_sf_col <- function(data,
     plot <- plot +
       scale_fill_manual(
         values = pal,
-        drop = col_scale_drop,
+        drop = col_drop,
         labels = labels,
         na.translate = na.translate,
         na.value = "#A8A8A8"
@@ -446,7 +448,7 @@ ggplot_sf_col <- function(data,
 #' @description Map of simple features in ggplot that is facetted, but not coloured. 
 #' @param data A sf object with defined coordinate reference system. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
-#' @param size Size of points. Defaults to 0.5.
+#' @param size Size of features (or shape outlines if polygon). Defaults to 0.5.
 #' @param alpha The alpha of the fill. Defaults to 0.1. Only applicable to polygons.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
 #' @param facet_nrow The number of rows of facetted plots. Not applicable to where isMobile is TRUE.
@@ -462,7 +464,7 @@ ggplot_sf_col <- function(data,
 #' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
@@ -545,6 +547,7 @@ ggplot_sf_facet <- function(data,
     plot <- plot +
       geom_sf(
         fill = pal[1],
+        size = size,
         col = NA,
         key_glyph = draw_key_rect,
         alpha = alpha,
@@ -595,15 +598,14 @@ ggplot_sf_facet <- function(data,
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or "quantile" if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
-#' @param bin_cuts A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used.
-#' @param quantile_cuts A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles. Only applicable where col_method equals "quantile".
-#' @param quantile_by_facet TRUE of FALSE  whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.
-#' @param size Size of points. Defaults to 0.5.
-#' @param alpha The opacity of polygons. Defaults to 0.9.
+#' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
+#' @param col_quantile_by_facet TRUE of FALSE  whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.
+#' @param col_drop TRUE or FALSE  of whether to drop unused levels from the legend. Defaults to FALSE.
+#' @param col_na_remove TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.
-#' @param rev_pal Reverses the palette. Defaults to FALSE.
-#' @param col_scale_drop TRUE or FALSE  of whether to drop unused levels from the legend. Defaults to FALSE.
-#' @param remove_na TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.
+#' @param pal_rev Reverses the palette. Defaults to FALSE.
+#' @param size Size of features (or shape outlines if polygon). Defaults to 0.5.
+#' @param alpha The opacity of polygons. Defaults to 0.9.
 #' @param coastline Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.
 #' @param coastline_behind TRUE or FALSE  as to whether the coastline is to be behind the sf object defined in the data argument. Defaults to FALSE.
 #' @param coastline_pal Colour of the coastline. Defaults to "#7F7F7F".
@@ -622,7 +624,7 @@ ggplot_sf_facet <- function(data,
 #' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
 #' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers
+#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.
 #' @return A ggplot object.
 #' @export
 #' @examples
@@ -639,15 +641,14 @@ ggplot_sf_col_facet <- function(data,
                                 col_var,
                                 facet_var,
                                 col_method = NULL,
-                                bin_cuts = NULL,
-                                quantile_cuts = c(0, 0.25, 0.5, 0.75, 1),
-                                quantile_by_facet = TRUE,
+                                col_cuts = NULL,
+                                col_quantile_by_facet = TRUE,
+                                col_drop = FALSE,
+                                col_na_remove = FALSE,
+                                pal = NULL,
+                                pal_rev = FALSE,
                                 size = 0.5,
                                 alpha = 0.9,
-                                pal = NULL,
-                                rev_pal = FALSE,
-                                col_scale_drop = FALSE,
-                                remove_na = FALSE,
                                 facet_nrow = NULL,
                                 legend_ncol = 3,
                                 legend_digits = 1,
@@ -718,68 +719,71 @@ ggplot_sf_col_facet <- function(data,
     if (is.null(legend_labels)) labels <- waiver()
   }
   else if (col_method == "bin") {
-    if (!is.null(bin_cuts)) {
-      if (!(dplyr::first(bin_cuts) %in% c(0,-Inf))) warning("The first element of the bin_cuts vector should generally be 0 (or -Inf if there are negative values)")
-      if (dplyr::last(bin_cuts) != Inf) warning("The last element of the bin_cuts vector should generally be Inf")
+    if (!is.null(col_cuts)) {
+      if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+      if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
     }
-    if (is.null(bin_cuts)) bin_cuts <- pretty(col_var_vector)
+    if (is.null(col_cuts)) col_cuts <- pretty(col_var_vector)
     
       data <- dplyr::mutate(data,
                             !!col_var := cut(
                               col_var_vector,
-                              bin_cuts,
+                              col_cuts,
                               right = FALSE,
                               include.lowest = TRUE
                             ))
 
-    if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-    if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, legend_digits)
+    if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+    if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
     if (!is.null(legend_labels)) labels <- legend_labels
   }
   else if (col_method == "quantile") {
-    if (dplyr::first(quantile_cuts) != 0) warning("The first element of the quantile_cuts vector generally always be 0")
-    if (dplyr::last(quantile_cuts) != 1) warning("The last element of the quantile_cuts vector should generally be 1")
-    if (quantile_by_facet == TRUE) {
+    if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
+    else {
+      if (dplyr::first(col_cuts) != 0) warning("The first element of the col_cuts vector generally always be 0")
+      if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
+    }  
+    if (col_quantile_by_facet == TRUE) {
       data <- data %>%
         dplyr::group_by(!!facet_var) %>%
         dplyr::mutate(!!col_var := percent_rank(!!col_var)) %>%
         dplyr::mutate(!!col_var := cut(
           !!col_var,
-          quantile_cuts,
+          col_cuts,
           right = FALSE,
           include.lowest = TRUE
         ))
       
       if (is.null(pal))
-        pal <- viridis::viridis(length(quantile_cuts) - 1)
+        pal <- viridis::viridis(length(col_cuts) - 1)
       if (is.null(legend_labels))
         labels <-
-          paste0(numeric_legend_labels(quantile_cuts * 100, 0),
+          paste0(numeric_legend_labels(col_cuts * 100, 0),
                  "\u1D57\u02B0 percentile")
       if (!is.null(legend_labels))
         labels <- legend_labels
       
     }
-    else if (quantile_by_facet == FALSE) {
-      bin_cuts <-
-        quantile(col_var_vector, probs = quantile_cuts, na.rm = TRUE)
-      if (anyDuplicated(bin_cuts) > 0) stop("quantile_cuts do not provide unique breaks")
+    else if (col_quantile_by_facet == FALSE) {
+      col_cuts <-
+        quantile(col_var_vector, probs = col_cuts, na.rm = TRUE)
+      if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
         data <-
           dplyr::mutate(data,
                         !!col_var := cut(
                           col_var_vector,
-                          bin_cuts,
+                          col_cuts,
                           right = FALSE,
                           include.lowest = TRUE
                         ))
       
-      if (is.null(pal)) pal <- viridis::viridis(length(bin_cuts) - 1)
-      if (is.null(legend_labels)) labels <- numeric_legend_labels(bin_cuts, 2)
+      if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
+      if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, 2)
       if (!is.null(legend_labels)) labels <- legend_labels
     }
   }
   
-  if (rev_pal == TRUE) pal <- rev(pal)
+  if (pal_rev == TRUE) pal <- rev(pal)
   
   if (geometry_type %in% c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING")) {
     plot <- plot +
@@ -794,6 +798,7 @@ ggplot_sf_col_facet <- function(data,
     plot <- plot +
       geom_sf(
         aes(fill = !!col_var),
+        size = size,
         col = NA,
         key_glyph = draw_key_rect,
         alpha = alpha,
@@ -801,16 +806,16 @@ ggplot_sf_col_facet <- function(data,
       )
   }
   
-  if (remove_na == TRUE)
+  if (col_na_remove == TRUE)
     na.translate <- FALSE
-  if (remove_na == FALSE)
+  if (col_na_remove == FALSE)
     na.translate <- TRUE
   
   if (geometry_type %in% c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING")) {
     plot <- plot +
       scale_color_manual(
         values = pal,
-        drop = col_scale_drop,
+        drop = col_drop,
         labels = labels,
         na.translate = na.translate,
         na.value = "#A8A8A8"
@@ -820,7 +825,7 @@ ggplot_sf_col_facet <- function(data,
     plot <- plot +
       scale_fill_manual(
         values = pal,
-        drop = col_scale_drop,
+        drop = col_drop,
         labels = labels,
         na.translate = na.translate,
         na.value = "#A8A8A8"

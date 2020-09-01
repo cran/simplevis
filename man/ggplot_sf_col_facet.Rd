@@ -5,11 +5,10 @@
 \title{Map of simple features in ggplot that is coloured and facetted.}
 \usage{
 ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
-  bin_cuts = NULL, quantile_cuts = c(0, 0.25, 0.5, 0.75, 1),
-  quantile_by_facet = TRUE, size = 0.5, alpha = 0.9, pal = NULL,
-  rev_pal = FALSE, col_scale_drop = FALSE, remove_na = FALSE,
-  facet_nrow = NULL, legend_ncol = 3, legend_digits = 1,
-  coastline = NULL, coastline_behind = TRUE,
+  col_cuts = NULL, col_quantile_by_facet = TRUE, col_drop = FALSE,
+  col_na_remove = FALSE, pal = NULL, pal_rev = FALSE, size = 0.5,
+  alpha = 0.9, facet_nrow = NULL, legend_ncol = 3,
+  legend_digits = 1, coastline = NULL, coastline_behind = TRUE,
   coastline_pal = "#7f7f7f", title = "[Title]", subtitle = NULL,
   col_title = "", caption = NULL, legend_labels = NULL,
   font_family = "Helvetica", font_size_title = NULL,
@@ -25,23 +24,21 @@ ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or "quantile" if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).}
 
-\item{bin_cuts}{A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used.}
+\item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{quantile_cuts}{A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles. Only applicable where col_method equals "quantile".}
+\item{col_quantile_by_facet}{TRUE of FALSE  whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.}
 
-\item{quantile_by_facet}{TRUE of FALSE  whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.}
+\item{col_drop}{TRUE or FALSE  of whether to drop unused levels from the legend. Defaults to FALSE.}
 
-\item{size}{Size of points. Defaults to 0.5.}
-
-\item{alpha}{The opacity of polygons. Defaults to 0.9.}
+\item{col_na_remove}{TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.}
 
-\item{rev_pal}{Reverses the palette. Defaults to FALSE.}
+\item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{col_scale_drop}{TRUE or FALSE  of whether to drop unused levels from the legend. Defaults to FALSE.}
+\item{size}{Size of features (or shape outlines if polygon). Defaults to 0.5.}
 
-\item{remove_na}{TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.}
+\item{alpha}{The opacity of polygons. Defaults to 0.9.}
 
 \item{facet_nrow}{The number of rows of facetted plots. Not applicable to where isMobile is TRUE.}
 
@@ -79,7 +76,7 @@ ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.

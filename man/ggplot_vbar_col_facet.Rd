@@ -5,9 +5,9 @@
 \title{Vertical bar ggplot that is coloured and facetted.}
 \usage{
 ggplot_vbar_col_facet(data, x_var, y_var, col_var, facet_var,
-  hover_var = NULL, x_scale_labels = waiver(), y_scale_zero = TRUE,
-  y_scale_zero_line = TRUE, y_scale_trans = "identity",
-  y_scale_labels = waiver(), col_scale_drop = FALSE,
+  tip_var = NULL, x_labels = waiver(), x_pretty_n = 5,
+  y_zero = TRUE, y_zero_line = TRUE, y_trans = "identity",
+  y_labels = waiver(), y_pretty_n = 5, col_drop = FALSE,
   position = "stack", facet_scales = "fixed", facet_nrow = NULL,
   pal = NULL, legend_ncol = 3, width = 0.75, title = "[Title]",
   subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
@@ -28,19 +28,23 @@ ggplot_vbar_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{facet_var}{Unquoted categorical variable to facet the data by. Required input.}
 
-\item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
+\item{tip_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{y_scale_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Not applicable where isMobile equals TRUE.}
 
-\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
-\item{col_scale_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
+
+\item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
+
+\item{col_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
 
 \item{position}{Whether bars are positioned by "stack" or "dodge". Defaults to "stack".}
 
@@ -86,7 +90,7 @@ ggplot_vbar_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
@@ -95,13 +99,15 @@ A ggplot object.
 Vertical bar ggplot that is coloured and facetted.
 }
 \examples{
-plot_data <- dplyr::storms \%>\%
-  dplyr::mutate(status = stringr::str_to_sentence(status)) \%>\%
-  dplyr::group_by(year, status, name) \%>\%
-  dplyr::summarise(average_wind = round(mean(wind), 2)) \%>\%
-  dplyr::filter(year \%in\% 1975:1980) \%>\%
-  dplyr::filter(!(status == "Tropical storm" & year == 1980)) \%>\%
-  dplyr::filter(name \%in\% c("Karl", "Juliet", "Jeanne", "Ivan", "Hermine",
+library(dplyr)
+
+plot_data <- storms \%>\%
+  mutate(status = stringr::str_to_sentence(status)) \%>\%
+  group_by(year, status, name) \%>\%
+  summarise(average_wind = round(mean(wind), 2)) \%>\%
+  filter(year \%in\% 1975:1980) \%>\%
+  filter(!(status == "Tropical storm" & year == 1980)) \%>\%
+  filter(name \%in\% c("Karl", "Juliet", "Jeanne", "Ivan", "Hermine",
   "Henri", "Gloria", "Georges", "Frederic"))
 
   plot <- ggplot_vbar_col_facet(data = plot_data, x_var = year, y_var = average_wind,
@@ -109,5 +115,5 @@ plot_data <- dplyr::storms \%>\%
 
   plot
 
-  plotly::ggplotly(plot, tooltip = "text")
+  plotly::ggplotly(plot)
 }

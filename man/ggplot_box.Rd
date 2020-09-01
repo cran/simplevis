@@ -2,38 +2,46 @@
 % Please edit documentation in R/ggplot_box_fun.R
 \name{ggplot_box}
 \alias{ggplot_box}
-\title{Vertical box ggplot.}
+\title{Boxplot ggplot.}
 \usage{
-ggplot_box(data, x_var, y_var = NULL, stat = "boxplot",
-  x_scale_labels = waiver(), y_scale_zero = TRUE,
-  y_scale_zero_line = TRUE, y_scale_trans = "identity",
-  y_scale_labels = waiver(), pal = NULL, title = "[Title]",
-  subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
-  caption = NULL, font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_x_title = 50, wrap_y_title = 50, wrap_caption = 80,
-  isMobile = FALSE)
+ggplot_box(data, x_var, y_var = NULL, group_var = NULL,
+  stat = "boxplot", x_labels = waiver(), x_pretty_n = 6,
+  y_zero = TRUE, y_zero_line = TRUE, y_trans = "identity",
+  y_labels = waiver(), y_pretty_n = 5, pal = NULL, width = 0.5,
+  title = "[Title]", subtitle = NULL, x_title = "[X title]",
+  y_title = "[Y title]", caption = NULL, font_family = "Helvetica",
+  font_size_title = NULL, font_size_body = NULL, wrap_title = 70,
+  wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
+  wrap_caption = 80, isMobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
 
-\item{x_var}{Unquoted categorical variable to be on the x axis. Required input.}
+\item{x_var}{Unquoted variable to be on the x axis. Required input.}
 
 \item{y_var}{Unquoted numeric variable to be on the y axis. Defaults to NULL. Required if stat equals "boxplot".}
 
+\item{group_var}{Unquoted variable to be the grouping variable Defaults to NULL. Only applicable if stat equals "boxplot".}
+
 \item{stat}{String of "boxplot" or "identity". Defaults to "boxplot". If identity is selected, data provided must be grouped by the x_var with ymin, lower, middle, upper, ymax variables. Note "identity" does not provide outliers.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{y_scale_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Only applicable to a x variable that is categorical or date.}
 
-\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_trans}{TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.}
+
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
+
+\item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
+
+\item{width}{Width of the box. Defaults to 0.5.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -61,18 +69,20 @@ ggplot_box(data, x_var, y_var = NULL, stat = "boxplot",
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
 }
 \description{
-Vertical box ggplot that is not coloured and not facetted.
+Boxplot ggplot that is not coloured and not facetted.
 }
 \examples{
+library(dplyr)
+
 plot_data <- iris \%>\%
 tibble::as_tibble() \%>\%
-  dplyr::mutate(Species = stringr::str_to_sentence(Species))
+  mutate(Species = stringr::str_to_sentence(Species))
 
 plot <- ggplot_box(data = plot_data, x_var = Species, y_var = Petal.Length,
                     title = "Iris petal length by species",
@@ -81,11 +91,11 @@ plot <- ggplot_box(data = plot_data, x_var = Species, y_var = Petal.Length,
 
 plot
 
-plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot)
 
 plot_data <- iris \%>\%
-  dplyr::group_by(Species) \%>\%
-  dplyr::summarise(boxplot_stats = list(rlang::set_names(boxplot.stats(Petal.Length)$stats,
+  group_by(Species) \%>\%
+  summarise(boxplot_stats = list(rlang::set_names(boxplot.stats(Petal.Length)$stats,
   c('ymin','lower','middle','upper','ymax')))) \%>\%
   tidyr::unnest_wider(boxplot_stats)
 

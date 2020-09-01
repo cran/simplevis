@@ -4,11 +4,11 @@
 \alias{ggplot_line_col}
 \title{Line ggplot that is coloured.}
 \usage{
-ggplot_line_col(data, x_var, y_var, col_var, hover_var = NULL,
-  x_scale_labels = waiver(), y_scale_zero = TRUE,
-  y_scale_zero_line = TRUE, y_scale_trans = "identity",
-  y_scale_labels = waiver(), col_scale_drop = FALSE, points = TRUE,
-  point_size = 1, lines = TRUE, pal = NULL, rev_pal = FALSE,
+ggplot_line_col(data, x_var, y_var, col_var, tip_var = NULL,
+  x_labels = waiver(), x_pretty_n = 6, y_zero = TRUE,
+  y_zero_line = TRUE, y_trans = "identity", y_labels = waiver(),
+  y_pretty_n = 5, col_drop = FALSE, points = TRUE, point_size = 1,
+  lines = TRUE, size = 0.5, pal = NULL, rev_pal = FALSE,
   legend_ncol = 3, title = "[Title]", subtitle = NULL,
   x_title = "[X title]", y_title = "[Y title]", col_title = "",
   caption = NULL, legend_labels = NULL, font_family = "Helvetica",
@@ -25,25 +25,31 @@ ggplot_line_col(data, x_var, y_var, col_var, hover_var = NULL,
 
 \item{col_var}{Unquoted categorical variable for lines and points to be coloured by. Required input.}
 
-\item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
+\item{tip_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{y_scale_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.}
 
-\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
-\item{col_scale_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
+
+\item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
+
+\item{col_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
 
 \item{points}{TRUE or FALSE of whether to include points. Defaults to TRUE.}
 
 \item{point_size}{Size of points. Defaults to 1. Only applicable to where points equals TRUE.}
 
 \item{lines}{TRUE or FALSE of whether to include lines. Defaults to TRUE.}
+
+\item{size}{Size of lines. Defaults to 0.5. Only applicable to where lines equals TRUE.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
 
@@ -83,7 +89,7 @@ ggplot_line_col(data, x_var, y_var, col_var, hover_var = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
@@ -92,14 +98,16 @@ A ggplot object.
 Line ggplot that is coloured, but not facetted.
 }
 \examples{
-plot_data <- dplyr::storms \%>\%
-  dplyr::mutate(status = stringr::str_to_sentence(status)) \%>\%
-  dplyr::group_by(year, status) \%>\%
-  dplyr::summarise(wind = round(mean(wind), 2))
+library(dplyr)
+
+plot_data <- storms \%>\%
+  mutate(status = stringr::str_to_sentence(status)) \%>\%
+  group_by(year, status) \%>\%
+  summarise(wind = round(mean(wind), 2))
 
 plot <- ggplot_line_col(data = plot_data, x_var = year, y_var = wind, col_var = status)
 
 plot
 
-plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot)
 }

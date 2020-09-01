@@ -5,12 +5,12 @@
 \title{Map of simple features in leaflet that is coloured.}
 \usage{
 leaflet_sf_col(data, col_var, label_var = NULL, col_method = NULL,
-  bin_cuts = NULL, quantile_cuts = c(0, 0.25, 0.5, 0.75, 1),
-  pal = NULL, rev_pal = FALSE, col_scale_drop = FALSE,
+  col_cuts = NULL, col_drop = FALSE, col_na_remove = FALSE,
+  pal = NULL, pal_rev = FALSE,
   popup = leafpop::popupTable(sentence_spaced_colnames(data)),
   radius = 1, weight = 2, opacity = 0.9, stroke = TRUE,
   title = "[Title]", legend_digits = 1, legend_labels = NULL,
-  basemap = "light", shiny = FALSE, map_id = "map")
+  basemap = "light", map_id = "map")
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
@@ -21,19 +21,19 @@ leaflet_sf_col(data, col_var, label_var = NULL, col_method = NULL,
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." if categorical colour variable, NULL results in "category". If numeric variable, defaults to "quantile". Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).}
 
-\item{bin_cuts}{A vector of bin cuts applicable where col_method of "bin" is selected. The first number in the vector should be either -Inf or 0, and the final number Inf. If NULL, 'pretty' breaks are used. Only applicable where col_method equals "bin".}
+\item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{quantile_cuts}{A vector of probability cuts applicable where col_method of "quantile" is selected. The first number in the vector should 0 and the final number 1. Defaults to quartiles. Only applicable where col_method equals "quantile".}
+\item{col_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
+
+\item{col_na_remove}{TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.}
 
-\item{rev_pal}{Reverses the palette. Defaults to FALSE.}
-
-\item{col_scale_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
+\item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
 \item{popup}{HTML strings for use in popup. Defaults to making a leafpop::popupTable of all attribute columns in the sf object.}
 
-\item{radius}{Radius of points. Defaults to 1.}
+\item{radius}{Radius of points. Defaults to 2.}
 
 \item{weight}{Stroke border size. Defaults to 2.}
 
@@ -49,8 +49,6 @@ leaflet_sf_col(data, col_var, label_var = NULL, col_method = NULL,
 
 \item{basemap}{The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.}
 
-\item{shiny}{TRUE or FALSE for whether the map is being run within a shiny app. Defaults to FALSE.}
-
 \item{map_id}{The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".}
 }
 \value{
@@ -61,11 +59,11 @@ Map of simple features in leaflet that is coloured.
 }
 \examples{
 leaflet_sf_col(example_sf_nz_livestock, dairydens,
-     col_method = "quantile", quantile_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
+     col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
      title = "Dairy density in count per km\\u00b2, 2017")
 
 leaflet_sf_col(example_sf_nz_livestock, dairydens,
-     col_method = "bin", bin_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
+     col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
      title = "Dairy density in count per km\\u00b2, 2017")
 
 map_data <- example_sf_nz_river_wq \%>\%

@@ -4,12 +4,11 @@
 \alias{ggplot_vbar_facet}
 \title{Vertical bar ggplot that is facetted.}
 \usage{
-ggplot_vbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
-  x_scale_labels = waiver(), y_scale_zero = TRUE,
-  y_scale_zero_line = TRUE, y_scale_trans = "identity",
-  y_scale_labels = waiver(), facet_scales = "fixed",
-  facet_nrow = NULL, pal = NULL, width = 0.75,
-  na_grey_hover_value = "NA", na_grey = FALSE, title = "[Title]",
+ggplot_vbar_facet(data, x_var, y_var, facet_var, tip_var = NULL,
+  x_labels = waiver(), x_pretty_n = 5, y_zero = TRUE,
+  y_zero_line = TRUE, y_trans = "identity", y_labels = waiver(),
+  y_pretty_n = 5, facet_scales = "fixed", facet_nrow = NULL,
+  pal = NULL, width = 0.75, na_grey = FALSE, title = "[Title]",
   subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
   caption = NULL, font_family = "Helvetica", font_size_title = NULL,
   font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
@@ -25,17 +24,21 @@ ggplot_vbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{facet_var}{Unquoted categorical variable to facet the data by. Required input.}
 
-\item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
+\item{tip_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{y_scale_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Not applicable where isMobile equals TRUE.}
 
-\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
+
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
+
+\item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{facet_scales}{Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".}
 
@@ -45,9 +48,7 @@ ggplot_vbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{width}{Width of bars. Defaults to 0.75.}
 
-\item{na_grey_hover_value}{Value to provide to users in the hover for any NA grey bars. Defaults to "NA".}
-
-\item{na_grey}{TRUE or FALSE of whether to provide wide grey bars for NA y_var values. Only works where facet_scales = "fixed" or "free_y". Defaults to FALSE.}
+\item{na_grey}{TRUE or FALSE of whether to provide wide grey bars for NA y_var values. Defaults to FALSE. Only functional where facet_scales = "fixed" or "free_x".}
 
 \item{title}{Title string. Defaults to [Title].}
 
@@ -75,7 +76,7 @@ ggplot_vbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
@@ -84,15 +85,17 @@ A ggplot object.
 Vertical bar ggplot that is facetted, but not coloured.
 }
 \examples{
-plot_data <- dplyr::storms \%>\%
-  dplyr::mutate(status = stringr::str_to_sentence(status)) \%>\%
-  dplyr::group_by(year, status) \%>\%
-  dplyr::summarise(average_wind = round(mean(wind), 2)) 
+library(dplyr)
+
+plot_data <- storms \%>\%
+  mutate(status = stringr::str_to_sentence(status)) \%>\%
+  group_by(year, status) \%>\%
+  summarise(average_wind = round(mean(wind), 2)) 
 
 plot <- ggplot_vbar_facet(data = plot_data, x_var = year, y_var = average_wind,
                           facet_var = status)
 
 plot
 
-plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot)
 }

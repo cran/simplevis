@@ -4,17 +4,16 @@
 \alias{ggplot_hbar_facet}
 \title{Horizontal bar ggplot that is facetted.}
 \usage{
-ggplot_hbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
-  x_scale_labels = waiver(), x_scale_zero = TRUE,
-  x_scale_zero_line = TRUE, x_scale_trans = "identity",
-  y_scale_rev = FALSE, y_scale_labels = waiver(),
-  facet_scales = "fixed", facet_nrow = NULL, pal = NULL,
-  width = 0.75, title = "[Title]", na_grey = FALSE,
-  na_grey_hover_value = "NA", subtitle = NULL, x_title = "[X title]",
-  y_title = "[Y title]", caption = NULL, font_family = "Helvetica",
-  font_size_title = NULL, font_size_body = NULL, wrap_title = 70,
-  wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
-  wrap_caption = 80, isMobile = FALSE)
+ggplot_hbar_facet(data, x_var, y_var, facet_var, tip_var = NULL,
+  x_labels = waiver(), x_zero = TRUE, x_zero_line = TRUE,
+  x_trans = "identity", x_pretty_n = 5, y_rev = FALSE,
+  y_labels = waiver(), facet_scales = "fixed", facet_nrow = NULL,
+  pal = NULL, width = 0.75, title = "[Title]", na_grey = FALSE,
+  subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
+  caption = NULL, font_family = "Helvetica", font_size_title = NULL,
+  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
+  wrap_x_title = 50, wrap_y_title = 50, wrap_caption = 80,
+  isMobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -25,19 +24,21 @@ ggplot_hbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{facet_var}{Unquoted categorical variable to facet the data by. Required input.}
 
-\item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
+\item{tip_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{x_scale_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
+\item{x_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
 
-\item{x_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{x_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{x_scale_trans}{A string specifying a transformation for the x scale. Defaults to "identity".}
+\item{x_trans}{A string specifying a transformation for the x scale. Defaults to "identity".}
 
-\item{y_scale_rev}{TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Not applicable where isMobile equals TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_rev}{TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.}
+
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
 
 \item{facet_scales}{Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".}
 
@@ -49,9 +50,7 @@ ggplot_hbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{title}{Title string. Defaults to [Title].}
 
-\item{na_grey}{TRUE or FALSE of whether to provide wide grey bars for NA y_var values. Only works where facet_scales = "fixed" or "free_y". Defaults to FALSE.}
-
-\item{na_grey_hover_value}{Value to provide to users in the hover for any NA grey bars. Defaults to "NA".}
+\item{na_grey}{TRUE or FALSE of whether to provide wide grey bars for NA y_var values. Defaults to FALSE. Only applicable where facet_scales = "fixed" or "free_y".}
 
 \item{subtitle}{Subtitle string. Defaults to [Subtitle].}
 
@@ -77,7 +76,7 @@ ggplot_hbar_facet(data, x_var, y_var, facet_var, hover_var = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
@@ -86,11 +85,13 @@ A ggplot object.
 Horizontal bar ggplot that is facetted, but not coloured.
 }
 \examples{
+library(dplyr)
+
 plot_data <- ggplot2::diamonds \%>\%
-  dplyr::mutate(cut = stringr::str_to_sentence(cut)) \%>\%
-  dplyr::group_by(cut, clarity) \%>\%
-  dplyr::summarise(average_price = mean(price)) \%>\%
-  dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) 
+  mutate(cut = stringr::str_to_sentence(cut)) \%>\%
+  group_by(cut, clarity) \%>\%
+  summarise(average_price = mean(price)) \%>\%
+  mutate(average_price_thousands = round(average_price / 1000, 1)) 
 
 plot <- ggplot_hbar_facet(data = plot_data, x_var = average_price_thousands,
                           y_var = cut, facet_var = clarity,
@@ -100,5 +101,5 @@ plot <- ggplot_hbar_facet(data = plot_data, x_var = average_price_thousands,
 
 plot
 
-plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot)
 }

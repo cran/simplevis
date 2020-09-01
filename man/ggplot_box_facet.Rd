@@ -2,15 +2,16 @@
 % Please edit documentation in R/ggplot_box_fun.R
 \name{ggplot_box_facet}
 \alias{ggplot_box_facet}
-\title{Vertical box ggplot that is facetted.}
+\title{Boxplot ggplot that is facetted.}
 \usage{
 ggplot_box_facet(data, x_var, y_var = NULL, facet_var,
-  stat = "boxplot", x_scale_labels = waiver(), y_scale_zero = TRUE,
-  y_scale_zero_line = TRUE, y_scale_trans = "identity",
-  y_scale_labels = waiver(), facet_scales = "fixed",
-  facet_nrow = NULL, pal = NULL, title = "[Title]",
-  subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
-  caption = NULL, font_family = "Helvetica", font_size_title = NULL,
+  group_var = NULL, stat = "boxplot", x_labels = waiver(),
+  x_pretty_n = 5, y_zero = TRUE, y_zero_line = TRUE,
+  y_trans = "identity", y_labels = waiver(), y_pretty_n = 5,
+  facet_scales = "fixed", facet_nrow = NULL, pal = NULL,
+  width = 0.5, title = "[Title]", subtitle = NULL,
+  x_title = "[X title]", y_title = "[Y title]", caption = NULL,
+  font_family = "Helvetica", font_size_title = NULL,
   font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
   wrap_x_title = 50, wrap_y_title = 50, wrap_caption = 80,
   isMobile = FALSE)
@@ -18,29 +19,37 @@ ggplot_box_facet(data, x_var, y_var = NULL, facet_var,
 \arguments{
 \item{data}{An tibble or dataframe. Required input.}
 
-\item{x_var}{Unquoted categorical variable to be on the x axis. Required input.}
+\item{x_var}{Unquoted variable to be on the x axis. Required input.}
 
 \item{y_var}{Unquoted numeric variable to be on the y axis. Defaults to NULL. Required if stat equals "boxplot".}
 
 \item{facet_var}{Unquoted categorical variable to facet the data by. Required input.}
 
+\item{group_var}{Unquoted variable to be the grouping variable Defaults to NULL. Only applicable if stat equals "boxplot".}
+
 \item{stat}{String of "boxplot" or "identity". Defaults to "boxplot". If identity is selected, data provided must be grouped by the x_var and facet_var with ymin, lower, middle, upper, ymax variables. Note "identity" does not provide outliers.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{y_scale_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Only applicable to a x variable that is categorical or date.}
 
-\item{y_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_scale_trans}{TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_trans}{TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.}
+
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
+
+\item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{facet_scales}{Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".}
 
 \item{facet_nrow}{The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows. Not applicable to where isMobile is TRUE.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
+
+\item{width}{Width of the box. Defaults to 0.5.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -68,24 +77,25 @@ ggplot_box_facet(data, x_var, y_var = NULL, facet_var,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
 }
 \description{
-Vertical box ggplot that is facetted, but not coloured.
+Boxplot ggplot that is facetted, but not coloured.
 }
 \examples{
+library(dplyr)
 
 plot_data <- ggplot2::diamonds \%>\%
-  dplyr::mutate(price_thousands = (price / 1000)) \%>\%
-  dplyr::sample_frac(0.05)
+  mutate(price_thousands = (price / 1000)) \%>\%
+  slice_sample(prop = 0.05)
 
 plot <- ggplot_box_facet(data = plot_data, x_var = cut, y_var = price_thousands, facet_var = color,
                          facet_nrow = 4)
 
 plot
 
-plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot)
 }

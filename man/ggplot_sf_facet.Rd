@@ -16,7 +16,7 @@ ggplot_sf_facet(data, facet_var, size = 0.5, alpha = 0.1, pal = NULL,
 
 \item{facet_var}{Unquoted categorical variable to facet the data by. Required input.}
 
-\item{size}{Size of points. Defaults to 0.5.}
+\item{size}{Size of features (or shape outlines if polygon). Defaults to 0.5.}
 
 \item{alpha}{The alpha of the fill. Defaults to 0.1. Only applicable to polygons.}
 
@@ -48,7 +48,7 @@ ggplot_sf_facet(data, facet_var, size = 0.5, alpha = 0.1, pal = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shiny app, use input$isMobile if your app is able to retreive this input. A method to do this is described at https://g3rv4.com/2017/08/shiny-detect-mobile-browsers}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.

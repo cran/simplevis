@@ -16,9 +16,10 @@ shinyServer(function(input, output, session) {
       filter(color == selected_color) %>% 
       mutate(cut = stringr::str_to_sentence(cut)) %>%
       group_by(cut, clarity, .drop = FALSE) %>%
-      summarise(average_price = mean(price)) %>%
+      summarise(average_price = round(mean(price), 0)) %>%
       mutate(average_price_thousands = round(average_price / 1000, 1)) %>%
-      ungroup()
+      mutate(average_price = paste0("US$", prettyNum(average_price,  big.mark = ","))) %>% 
+      add_tip(c("cut", "clarity", "average_price"))
     
     return(plot_data)
   })
@@ -28,8 +29,7 @@ shinyServer(function(input, output, session) {
     # add plot code from make_data_vis.R
     # change any placeholder character values to input widgets
     # refer to a reactive plot_data object as plot_data()
-    # add isMobile = input$isMobile to simplevis functions, so that the plot looks good on a mobile
-    
+
     selected_color <- input$plot_color
     
     title <- paste0("Average diamond price of colour ", selected_color, " by cut and clarity")
@@ -40,10 +40,11 @@ shinyServer(function(input, output, session) {
                             x_var = average_price_thousands, 
                             y_var = cut, 
                             col_var = clarity, 
+                            tip_var = tip_text,
                             legend_ncol = 4,
                             title = title, 
                             x_title = x_title, 
-                            y_title = y_title, 
+                            y_title = y_title,
                             isMobile = input$isMobile)
     
     
@@ -52,7 +53,7 @@ shinyServer(function(input, output, session) {
   
   output$plot_desktop <- plotly::renderPlotly({ 
     plotly::ggplotly(plot(), tooltip = "text") %>%
-      plotly_remove_buttons()
+      plotly_camera()
   })
   
   output$plot_mobile <- renderPlot({
@@ -82,17 +83,10 @@ shinyServer(function(input, output, session) {
     # add leaflet code from make_data_vis.R
     # change any placeholder character values to input widgets
     # refer to a reactive map_data object as map_data()
-    # add shiny = TRUE to simplevis functions
+    # use reactive radius for points that get bigger as the user zooms in, if necessary 
     
-    # use the code below if you need a reactive radius for points that get bigger as the user zooms in 
-    
-    # map_id <- "map"
-    # legend_id <- paste0(map_id, "_legend")
-    # map_id_zoom <- paste0(map_id, "_zoom") #reactive zoom for points
-    # radius <- ifelse(input[[map_id_zoom]] < 7, 1,
-    #                  ifelse(input[[map_id_zoom]] < 9, 2,
-    #                         ifelse(input[[map_id_zoom]] < 12, 3, 4)))
-    
+    # reactive_radius <-  case_when(input$map_zoom < 7, 1, ifelse(input$map_zoom < 9, 2, ifelse(input$map_zoom < 12, 3, 4)))  
+
     selected_metric <- input$map_metric
     
     pal <- c("#4575B4", "#D3D3D3", "#D73027")
@@ -104,13 +98,12 @@ shinyServer(function(input, output, session) {
                    pal = pal, 
                    col_method = "category",
                    title = title,
-                   shiny = TRUE)
+                   radius = 2)
   }
   
   observe({
     req(input$map_zoom) # wait for basemap before plotting. 
-                        # change the map id prefix, if different (e.g. input$map1_zoom)
-    
+
     withProgress(message = "Loading", {
       draw_map()
     })

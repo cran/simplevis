@@ -4,18 +4,17 @@
 \alias{ggplot_hbar_col}
 \title{Horizontal bar ggplot that is coloured.}
 \usage{
-ggplot_hbar_col(data, x_var, y_var, col_var, hover_var = NULL,
-  x_scale_labels = waiver(), x_scale_zero = TRUE,
-  x_scale_zero_line = TRUE, x_scale_trans = "identity",
-  y_scale_rev = FALSE, y_scale_labels = waiver(),
-  col_scale_rev = FALSE, col_scale_drop = FALSE, position = "stack",
-  pal = NULL, legend_ncol = 3, width = 0.75, title = "[Title]",
-  subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
-  col_title = "", caption = NULL, legend_labels = NULL,
-  font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_x_title = 50, wrap_y_title = 50, wrap_col_title = 25,
-  wrap_caption = 80, isMobile = FALSE)
+ggplot_hbar_col(data, x_var, y_var, col_var, tip_var = NULL,
+  x_labels = waiver(), x_zero = TRUE, x_zero_line = TRUE,
+  x_trans = "identity", x_pretty_n = 6, y_rev = FALSE,
+  y_labels = waiver(), col_rev = FALSE, col_drop = FALSE,
+  position = "stack", pal = NULL, legend_ncol = 3, width = 0.75,
+  title = "[Title]", subtitle = NULL, x_title = "[X title]",
+  y_title = "[Y title]", col_title = "", caption = NULL,
+  legend_labels = NULL, font_family = "Helvetica",
+  font_size_title = NULL, font_size_body = NULL, wrap_title = 70,
+  wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
+  wrap_col_title = 25, wrap_caption = 80, isMobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -26,23 +25,25 @@ ggplot_hbar_col(data, x_var, y_var, col_var, hover_var = NULL,
 
 \item{col_var}{Unquoted categorical variable to colour the bars. Required input.}
 
-\item{hover_var}{Unquoted variable to be an additional hover variable for when used inside plotly::ggplotly(). Defaults to NULL.}
+\item{tip_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot). Defaults to NULL.}
 
-\item{x_scale_labels}{Argument to adjust the format of the x scale labels.}
+\item{x_labels}{Argument to adjust the format of the x scale labels.}
 
-\item{x_scale_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
+\item{x_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
 
-\item{x_scale_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{x_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
 
-\item{x_scale_trans}{A string specifying a transformation for the x axis scale. Defaults to "identity".}
+\item{x_trans}{A string specifying a transformation for the x axis scale. Defaults to "identity".}
 
-\item{y_scale_rev}{TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.}
 
-\item{y_scale_labels}{Argument to adjust the format of the y scale labels.}
+\item{y_rev}{TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.}
 
-\item{col_scale_rev}{TRUE or FALSE of whether bar fill order from left to right is reversed from default. Defaults to FALSE.}
+\item{y_labels}{Argument to adjust the format of the y scale labels.}
 
-\item{col_scale_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
+\item{col_rev}{TRUE or FALSE of whether bar fill order from left to right is reversed from default. Defaults to FALSE.}
+
+\item{col_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
 
 \item{position}{Whether bars are positioned by "stack" or "dodge". Defaults to "stack".}
 
@@ -84,7 +85,7 @@ ggplot_hbar_col(data, x_var, y_var, col_var, hover_var = NULL,
 
 \item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. In a shinyapp, isMobile should be specified as input$isMobile.}
+\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
 \value{
 A ggplot object.
@@ -93,12 +94,14 @@ A ggplot object.
 Horizontal bar ggplot that is coloured, but not facetted.
 }
 \examples{
+library(dplyr)
+
 plot_data <- ggplot2::diamonds \%>\%
-  dplyr::mutate(cut = stringr::str_to_sentence(cut)) \%>\%
-  dplyr::group_by(cut, clarity) \%>\%
-  dplyr::summarise(average_price = mean(price)) \%>\%
-  dplyr::mutate(average_price_thousands = round(average_price / 1000, 1)) \%>\%
-  dplyr::ungroup()
+  mutate(cut = stringr::str_to_sentence(cut)) \%>\%
+  group_by(cut, clarity) \%>\%
+  summarise(average_price = mean(price)) \%>\%
+  mutate(average_price_thousands = round(average_price / 1000, 1)) \%>\%
+  ungroup()
 
 plot <- ggplot_hbar_col(data = plot_data, 
                         x_var = average_price_thousands, 
@@ -111,5 +114,5 @@ plot <- ggplot_hbar_col(data = plot_data,
 
 plot
 
-plotly::ggplotly(plot, tooltip = "text")
+plotly::ggplotly(plot)
 }

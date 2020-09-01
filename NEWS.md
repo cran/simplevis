@@ -1,3 +1,50 @@
+# simplevis 2.0.0
+
+* Update shiny templates.
+* Drop region, TA and sea-draining catchments from nz basemap stack.
+* Removed code to automate isMobile, as it was not working.
+* Removed na_tip as was not working.
+
+# simplevis 1.8.0
+
+* Renamed leaflet_basemap_stack functions to remove the word stack.
+* Removed automatic addition of tooltip text into functions.
+* Added support for the user to add a tooltip variable into plot functions.
+* Created add_tip function to easily create a tooltip text column within a dataset.
+* In scatter plots, changed quantile_cuts and bin_cuts arguments to col_cuts.
+* Renamed plotly functions.
+* Added a size argument to lines in line plots.
+* Added a group var to boxplot functions.
+* Removed requirement for categorical x var for boxplot functions.
+* Added a width argument to boxplot functions.
+* Renamed na_grey_hover_value. 
+* Fixed bug in leaflet functions with colouring by bin col_method.
+* Fixed bug in ggplot_vbar to support making a plot when all values are zero.
+
+# simplevis 1.7.0
+
+* Renamed all plot x_scale_ prefixed arguments with x_ and likewise for y_scale_ and col_scale_.
+* Renamed remove_na argument in scatter and sf plots as col_na_remove.
+* Renamed rev_pal as pal_rev in scatter, sf and stars functions.
+* Renamed bin_cuts and quantile_cuts as col_cuts.
+* Renamed quantile_by_facet as col_quantile_by_facet.
+* Added col_na_remove argument to leaflet_sf_col.
+* Fixed bug with legend key in line plots not displaying the line and point in the key.
+* Removed dplyr 1.0.0 dependency by replacing across function in stars plots with _at functions.
+* Moved all aesthetics from ggplot() function to geoms.
+
+# simplevis 1.6.0
+
+* Fixed bug with line hover_var.
+* Update template apps, and vignette.
+* Made isMobile default to NULL, which selects input$isMobile in apps and FALSE otherwise.
+* Removed shiny logical argument from leaflet functions.
+* Added argument to modify pretty n algorathim for numeric breaks.
+* Fixed bug where hbar and hbar_col were not handling all zero values appropriately.
+* Fixed bug where line and line_col were not handling all zero values appropriately.
+* Fixed bug where plot functions ability were not able to deal with NA values.
+* Fixed bug where vbar and vbar_col were not handling all zero values appropriately.
+
 # simplevis 1.5.0
 
 * Added default zero lines to plots for where there are negative values.
