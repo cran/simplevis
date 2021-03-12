@@ -5,16 +5,17 @@
 \title{Vertical bar ggplot that is coloured.}
 \usage{
 ggplot_vbar_col(data, x_var, y_var, col_var, tip_var = NULL,
-  x_labels = waiver(), x_pretty_n = 6, y_zero = TRUE,
-  y_zero_line = TRUE, y_trans = "identity", y_labels = waiver(),
-  y_pretty_n = 5, col_drop = FALSE, position = "stack", pal = NULL,
-  legend_ncol = 3, width = 0.75, title = "[Title]",
-  subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
-  col_title = "", caption = NULL, legend_labels = NULL,
-  font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_x_title = 50, wrap_y_title = 50, wrap_col_title = 25,
-  wrap_caption = 80, isMobile = FALSE)
+  x_labels = waiver(), x_pretty_n = 6, x_expand = NULL,
+  y_zero = TRUE, y_zero_line = NULL, y_trans = "identity",
+  y_labels = waiver(), y_pretty_n = 5, y_expand = NULL,
+  y_balance = FALSE, y_na_bar = FALSE, position = "stack",
+  pal = NULL, pal_rev = FALSE, legend_ncol = 3, width = 0.75,
+  title = "[Title]", subtitle = NULL, x_title = "[X title]",
+  y_title = "[Y title]", col_title = "", caption = NULL,
+  legend_labels = NULL, font_family = "Helvetica",
+  font_size_title = NULL, font_size_body = NULL, title_wrap = 70,
+  subtitle_wrap = 80, x_title_wrap = 50, y_title_wrap = 50,
+  wrap_col_title = 25, caption_wrap = 80, isMobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -31,9 +32,11 @@ ggplot_vbar_col(data, x_var, y_var, col_var, tip_var = NULL,
 
 \item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.}
 
+\item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
+
 \item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
 
 \item{y_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
@@ -41,11 +44,17 @@ ggplot_vbar_col(data, x_var, y_var, col_var, tip_var = NULL,
 
 \item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
-\item{col_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
+\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
+
+\item{y_balance}{Add balance to the y axis so that zero is in the centre of the y scale.}
+
+\item{y_na_bar}{TRUE or FALSE of whether to make NA y_var values infinity with a light grey colour to emphasise them. Defaults to FALSE.}
 
 \item{position}{Whether bars are positioned by "stack" or "dodge". Defaults to "stack".}
 
-\item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
+\item{pal}{Character vector of hex codes. Defaults to NULL, which selects a default palette.}
+
+\item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
 \item{legend_ncol}{The number of columns in the legend.}
 
@@ -71,17 +80,17 @@ ggplot_vbar_col(data, x_var, y_var, col_var, tip_var = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_x_title}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_y_title}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
 
 \item{wrap_col_title}{Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
 \item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
@@ -99,9 +108,6 @@ plot_data <- storms \%>\%
   group_by(year, status) \%>\%
   summarise(average_wind = round(mean(wind), 2)) 
 
-plot <- ggplot_vbar_col(data = plot_data, x_var = year, y_var = average_wind, col_var = status)
+ggplot_vbar_col(plot_data, year, average_wind, status)
 
-plot
-
-plotly::ggplotly(plot)
 }

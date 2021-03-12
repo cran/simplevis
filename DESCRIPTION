@@ -1,7 +1,7 @@
 Package: simplevis
 Type: Package
 Title: Simple Visualisation with 'ggplot2' and 'leaflet' Wrappers
-Version: 2.0.0
+Version: 2.4.0
 Authors@R: 
     c(person(given = "David", 
                family = "Hodge", 
@@ -18,18 +18,18 @@ BugReports: https://github.com/statisticsNZ/simplevis/issues/
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
-Imports: dplyr, DT, forcats, ggplot2, htmltools, leaflet, leafpop,
-        leaflet.extras, janitor, jsonlite, lubridate, magrittr,
-        methods, plotly, readr, rgdal, rmarkdown, rlang, scales, sf,
-        shiny, shinycssloaders, stars, stats, stringr, tibble, tidyr
-        (>= 1.0.0), viridis
-Suggests: knitr
+Imports: dplyr (>= 1.0.0), DT, forcats, ggplot2 (>= 2.0.0), htmltools,
+        leaflet (>= 2.0.0), leafpop, leaflet.extras, janitor, jsonlite,
+        lubridate, magrittr, methods, plotly, readr, rgdal, rlang (>=
+        0.4.0), rmarkdown, scales, sf, shiny, shinycssloaders, stars,
+        stats, stringr, tibble, tidyr (>= 1.0.0), viridis
+Suggests: knitr, testthat
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2020-09-01 00:23:34 UTC; dhodge
+Packaged: 2021-03-12 03:23:16 UTC; dhodge
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-09-01 08:20:03 UTC
+Date/Publication: 2021-03-12 07:40:02 UTC

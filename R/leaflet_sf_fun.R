@@ -3,8 +3,8 @@
 #' @title Map of simple features in leaflet.
 #' @description Map of simple features in leaflet that is not coloured. 
 #' @param data An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.
-#' @param pal Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.
-#' @param popup HTML strings for use in popup. Defaults to making a leafpop::popupTable of all attribute columns in the sf object. 
+#' @param pal Character vector of hex codes. Defaults to NULL, which selects a default palette.
+#' @param popup HTML strings for use in popup through a character vector. If NULL, defaults to making a leafpop::popupTable of all columns in the sf object. 
 #' @param radius Radius of points. Defaults to 2.
 #' @param weight Stroke border size. Defaults to 2.
 #' @param opacity The opacity of the fill. Defaults to 0.1. Only applicable to polygons.
@@ -17,13 +17,10 @@
 #' @return A leaflet object.
 #' @export
 #' @examples
-#' map_data <- example_sf_nz_river_wq %>%
-#'   dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
-#'
-#' leaflet_sf(map_data)
+#' leaflet_sf(example_sf_point)
 leaflet_sf <- function(data,
                        pal = NULL,
-                       popup = leafpop::popupTable(sentence_spaced_colnames(data)),
+                       popup = NULL,
                        radius = 1,
                        weight = 2,
                        opacity = 0.1,
@@ -34,6 +31,7 @@ leaflet_sf <- function(data,
                        basemap = "light",
                        map_id = "map") {
   
+  data <- dplyr::ungroup(data)
   shiny <- shiny::isRunning()
   
   if (class(data)[1] != "sf") stop("Please use an sf object as data input")
@@ -57,6 +55,17 @@ leaflet_sf <- function(data,
     else basemap_name <- "CartoDB.PositronNoLabels"
   }
   
+  if(is.null(popup)) ({
+    if(ncol(data) == 1) popup <- NULL
+    else ({
+      popup <- leafpop::popupTable(
+        sentence_spaced_colnames(
+          sf::st_drop_geometry(data)
+        ),
+        row.numbers = FALSE, feature.id = FALSE)
+    })
+  })
+
   if (geometry_type %in% c("POINT", "MULTIPOINT")) {
     
     if (shiny == FALSE) {
@@ -196,7 +205,7 @@ leaflet_sf <- function(data,
 #' @param col_na_remove TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.
 #' @param pal Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
-#' @param popup HTML strings for use in popup. Defaults to making a leafpop::popupTable of all attribute columns in the sf object. 
+#' @param popup HTML strings for use in popup through a character vector. If NULL, defaults to making a leafpop::popupTable of all columns in the sf object.  
 #' @param radius Radius of points. Defaults to 2.
 #' @param weight Stroke border size. Defaults to 2.
 #' @param stroke TRUE or FALSE of whether to draw a border around the features. Defaults to TRUE.
@@ -209,20 +218,17 @@ leaflet_sf <- function(data,
 #' @return A leaflet object.
 #' @export
 #' @examples
-#' leaflet_sf_col(example_sf_nz_livestock, dairydens,
+#' leaflet_sf_col(example_sf_polygon, density,
 #'      col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
-#'      title = "Dairy density in count per km\u00b2, 2017")
+#'      title = "Modelled density, 2017")
 #'
-#' leaflet_sf_col(example_sf_nz_livestock, dairydens,
+#' leaflet_sf_col(example_sf_polygon, density,
 #'      col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
-#'      title = "Dairy density in count per km\u00b2, 2017")
-#'
-#' map_data <- example_sf_nz_river_wq %>%
-#'   dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
+#'      title = "Modelled density, 2017")
 #'
 #' pal <- c("#4575B4", "#D3D3D3", "#D73027")
 #'
-#' leaflet_sf_col(map_data, trend_category, pal = pal, col_method = "category",
+#' leaflet_sf_col(example_sf_point, trend_category, pal = pal, col_method = "category",
 #'    title = "Monitored river nitrate-nitrogen trends, 2008\u201317")
 leaflet_sf_col <- function(data,
                            col_var,
@@ -233,7 +239,7 @@ leaflet_sf_col <- function(data,
                            col_na_remove = FALSE,
                            pal = NULL,
                            pal_rev = FALSE,
-                           popup = leafpop::popupTable(sentence_spaced_colnames(data)),
+                           popup = NULL,
                            radius = 1,
                            weight = 2,
                            opacity = 0.9,
@@ -244,6 +250,7 @@ leaflet_sf_col <- function(data,
                            basemap = "light",
                            map_id = "map") {
   
+  data <- dplyr::ungroup(data)
   shiny <- shiny::isRunning()
   
   if (class(data)[1] != "sf") stop("Please use an sf object as data input")
@@ -258,16 +265,16 @@ leaflet_sf_col <- function(data,
   if (col_na_remove == TRUE) data <- data %>% 
     filter(!is.na(!!col_var))
   
-  col_var_vector <- dplyr::pull(data, !!col_var)
-  label_var_vector <- dplyr::pull(data, !!label_var)
+  col_var_vctr <- dplyr::pull(data, !!col_var)
+  label_var_vctr <- dplyr::pull(data, !!label_var)
   
-  if (is.null(col_method) & !is.numeric(col_var_vector)) col_method <- "category"
-  if (is.null(col_method) & is.numeric(col_var_vector)) col_method <- "quantile"
+  if (is.null(col_method) & !is.numeric(col_var_vctr)) col_method <- "category"
+  if (is.null(col_method) & is.numeric(col_var_vctr)) col_method <- "quantile"
   
   if (col_method == "category") {
     if (is.null(legend_labels)){
-      if (is.factor(col_var_vector) &  col_drop == FALSE) labels <- levels(col_var_vector)
-      else if (is.character(col_var_vector) | col_drop == TRUE) labels <- sort(unique(col_var_vector))
+      if (is.factor(col_var_vctr) &  col_drop == FALSE) labels <- levels(col_var_vctr)
+      else if (is.character(col_var_vctr) | col_drop == TRUE) labels <- sort(unique(col_var_vctr))
     }
     else if (!is.null(legend_labels)) labels <- legend_labels
     
@@ -279,11 +286,11 @@ leaflet_sf_col <- function(data,
     pal <- stringr::str_sub(pal, 1, 7)
     
     pal_fun <- colorFactor(palette = pal,
-                           domain = col_var_vector,
+                           domain = col_var_vctr,
                            na.color = "#A8A8A8")
   }
   else if (col_method == "bin") {
-    if (is.null(col_cuts)) col_cuts <- pretty(col_var_vector)
+    if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr)
     else if (!is.null(col_cuts)) {
       if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
       if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
@@ -296,7 +303,7 @@ leaflet_sf_col <- function(data,
     
     pal_fun <- colorBin(
       palette = pal,
-      domain = col_var_vector,
+      domain = col_var_vctr,
       bins = col_cuts,
       pretty = FALSE,
       right = FALSE,
@@ -316,12 +323,12 @@ leaflet_sf_col <- function(data,
     if (pal_rev == TRUE) pal <- rev(pal)
     pal <- stringr::str_sub(pal, 1, 7)
     
-    col_cuts <- quantile(col_var_vector, probs = col_cuts, na.rm = TRUE)
+    col_cuts <- quantile(col_var_vctr, probs = col_cuts, na.rm = TRUE)
     if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
     
     pal_fun <- colorBin(
       palette = pal,
-      domain = col_var_vector,
+      domain = col_var_vctr,
       bins = col_cuts,
       right = FALSE,
       na.color = "#A8A8A8"
@@ -345,6 +352,17 @@ leaflet_sf_col <- function(data,
     else basemap_name <- "CartoDB.PositronNoLabels"
   }
   
+  if(is.null(popup)) ({
+    if(ncol(data) == 1) popup <- NULL
+    else ({
+      popup <- leafpop::popupTable(
+        sentence_spaced_colnames(
+          sf::st_drop_geometry(data)
+        ),
+        row.numbers = FALSE, feature.id = FALSE)
+    })
+  })
+  
   if (geometry_type %in% c("POINT", "MULTIPOINT")) {
     if (shiny == FALSE) {
       
@@ -352,8 +370,8 @@ leaflet_sf_col <- function(data,
         addProviderTiles(basemap_name) %>%
         addCircleMarkers(
           data = data,
-          color = ~ pal_fun(col_var_vector),
-          label = ~ htmltools::htmlEscape(label_var_vector),
+          color = ~ pal_fun(col_var_vctr),
+          label = ~ htmltools::htmlEscape(label_var_vctr),
           popup = popup,
           radius = radius,
           stroke = stroke,
@@ -368,8 +386,8 @@ leaflet_sf_col <- function(data,
       map <- leafletProxy(map_id) %>%
         addCircleMarkers(
           data = data,
-          color = ~ pal_fun(col_var_vector),
-          label = ~ htmltools::htmlEscape(label_var_vector),
+          color = ~ pal_fun(col_var_vctr),
+          label = ~ htmltools::htmlEscape(label_var_vctr),
           popup = popup,
           radius = radius,
           stroke = stroke,
@@ -398,9 +416,9 @@ leaflet_sf_col <- function(data,
         addProviderTiles(basemap_name) %>%
         addPolylines(
           data = data,
-          color = ~ pal_fun(col_var_vector),
+          color = ~ pal_fun(col_var_vctr),
           popup = popup,
-          label = ~ htmltools::htmlEscape(label_var_vector),
+          label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = 1,
           opacity = 1,
           weight = weight
@@ -412,9 +430,9 @@ leaflet_sf_col <- function(data,
       map <- leafletProxy(map_id) %>%
         addPolylines(
           data = data,
-          color = ~ pal_fun(col_var_vector),
+          color = ~ pal_fun(col_var_vctr),
           popup = popup,
-          label = ~ htmltools::htmlEscape(label_var_vector),
+          label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = 1,
           opacity = 1,
           weight = weight
@@ -439,9 +457,9 @@ leaflet_sf_col <- function(data,
         addProviderTiles(basemap_name) %>%
         addPolygons(
           data = data,
-          color = ~ pal_fun(col_var_vector),
+          color = ~ pal_fun(col_var_vctr),
           popup = popup,
-          label = ~ htmltools::htmlEscape(label_var_vector),
+          label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = opacity, opacity = 1,
           weight = weight
         ) 
@@ -452,9 +470,9 @@ leaflet_sf_col <- function(data,
       map <- leafletProxy(map_id) %>%
         addPolygons(
           data = data,
-          color = ~ pal_fun(col_var_vector),
+          color = ~ pal_fun(col_var_vctr),
           popup = popup,
-          label = ~ htmltools::htmlEscape(label_var_vector),
+          label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = opacity, opacity = 1,
           weight = weight
         ) 

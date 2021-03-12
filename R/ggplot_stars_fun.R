@@ -7,9 +7,11 @@
 #' @return A ggplot theme.
 #' @export
 #' @examples
-#' ggplot2::ggplot() +
+#' library(ggplot2)
+#' 
+#' ggplot() +
 #'   theme_stars("Courier", 9, 7) +
-#'   ggplot2::ggtitle("This is a title of a selected font family and size")
+#'   ggtitle("This is a title of a selected font family and size")
 theme_stars <-
   function(font_family = "Helvetica",
            font_size_title = 11,
@@ -92,37 +94,31 @@ theme_stars <-
 #' @description Map of an array in ggplot that is not coloured and not facetted. 
 #' @param data A stars object with 2 dimensions x and y. Required input.
 #' @param pal Character vector of hex codes, or provided objects with pal_ prefixes.
-#' @param coastline Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.
-#' @param coastline_behind TRUE or FALSE as to whether the coastline is to be behind the stars object defined in the data argument. Defaults to FALSE.
-#' @param coastline_pal Colour of the coastline. Defaults to "#7F7F7F".
 #' @param title Title string. Defaults to "[Title]".
 #' @param subtitle Subtitle string. Defaults to "[Subtitle]".
 #' @param caption Caption title string. Defaults to NULL.
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
-#' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile. 
 #' @return A ggplot object.
 #' @export
 #' @examples
-#' ggplot_stars(data = example_stars_nz_no3n, coastline = nz)
+#' ggplot_stars(data = example_stars)
 ggplot_stars <- function(data,
                          pal = NULL,
-                         coastline = NULL,
-                         coastline_behind = FALSE,
-                         coastline_pal = "black",
                          title = "[Title]",
                          subtitle = NULL,
                          caption = NULL,
                          font_family = "Helvetica",
                          font_size_title = NULL,
                          font_size_body = NULL,
-                         wrap_title = 70,
-                         wrap_subtitle = 80,
-                         wrap_caption = 80,
+                         title_wrap = 70,
+                         subtitle_wrap = 80,
+                         caption_wrap = 80,
                          isMobile = FALSE) {
   
   if (class(data)[1] != "stars") stop("Please use an stars object as data input")
@@ -142,25 +138,9 @@ ggplot_stars <- function(data,
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
-    )
-  
-  if (!is.null(coastline)) {
-    if (sf::st_is_longlat(data) == FALSE) coastline <- sf::st_transform(coastline, sf::st_crs(data))
-    if (coastline_behind == TRUE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
-  else if (is.null(coastline)) {
-    plot <- plot +
-      coord_equal()
-  }
-  
+    ) +
+    coord_equal() #this is applicable only when no boundary
+
   data <- data %>%
     tibble::as_tibble()
   
@@ -174,28 +154,18 @@ ggplot_stars <- function(data,
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0))
   
-  if (!is.null(coastline)) {
-    if (coastline_behind == FALSE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
-  
   if (isMobile == FALSE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, wrap_title),
-        subtitle = stringr::str_wrap(subtitle, wrap_subtitle),
-        caption = stringr::str_wrap(caption, wrap_caption)
+        title = stringr::str_wrap(title, title_wrap),
+        subtitle = stringr::str_wrap(subtitle, subtitle_wrap),
+        caption = stringr::str_wrap(caption, caption_wrap)
       )
   }
   else if (isMobile == TRUE) {
     plot <- plot +
+      theme(plot.title.position = "plot") +
+      theme(plot.caption.position = "plot") +
       labs(
         title = stringr::str_wrap(title, 40),
         subtitle = stringr::str_wrap(subtitle, 40),
@@ -213,9 +183,6 @@ ggplot_stars <- function(data,
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
 #' @param pal Character vector of hex codes, or provided objects with pal_ prefixes. Defaults to viridis.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
-#' @param coastline Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.
-#' @param coastline_behind TRUE or FALSE as to whether the coastline is to be behind the stars object defined in the data argument. Defaults to FALSE.
-#' @param coastline_pal Colour of the coastline. Defaults to "#7F7F7F".
 #' @param legend_ncol The number of columns in the legend.
 #' @param legend_digits Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.
 #' @param title Title string. Defaults to "[Title]".
@@ -226,25 +193,22 @@ ggplot_stars <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
-#' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
-#' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
 #' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile. 
 #' @return A ggplot object.
 #' @export
 #' @examples
-#' ggplot_stars_col(data = example_stars_nz_no3n, coastline = nz,
+#' ggplot_stars_col(data = example_stars, 
 #'    col_method = "quantile", col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
-#'    title = "River modelled median nitrate-nitrogen concentrations, 2013-17")
+#'    title = "Site medians, 2013-17")
 ggplot_stars_col <- function(data,
                              col_method = "quantile",
                              col_cuts = NULL,
                              pal = NULL,
                              pal_rev = FALSE,
-                             coastline = NULL,
-                             coastline_behind = TRUE,
-                             coastline_pal = "#7f7f7f",
                              legend_ncol = 3,
                              legend_digits = 1,
                              title = "[Title]",
@@ -255,10 +219,10 @@ ggplot_stars_col <- function(data,
                              font_family = "Helvetica",
                              font_size_title = NULL,
                              font_size_body = NULL,
-                             wrap_title = 70,
-                             wrap_subtitle = 80,
+                             title_wrap = 70,
+                             subtitle_wrap = 80,
                              wrap_col_title = 25,
-                             wrap_caption = 80,
+                             caption_wrap = 80,
                              isMobile = FALSE) {
   
   if (class(data)[1] != "stars") stop("Please use an stars object as data input")
@@ -283,41 +247,21 @@ ggplot_stars_col <- function(data,
   data <- data %>% 
     dplyr::select(col_var = 1)
   
-  col_var_vector <- dplyr::pull(data, .data$col_var)
-  
-  if (!is.null(coastline)) {
-    if (sf::st_is_longlat(data) == FALSE) coastline <- sf::st_transform(coastline, sf::st_crs(data))
-    if (coastline_behind == TRUE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
-  else if (is.null(coastline)) {
-    plot <- plot +
-      coord_equal()
-  }
+  col_var_vctr <- dplyr::pull(data, .data$col_var)
   
   if (col_method == "category") {
     data <- data %>%
       tibble::as_tibble()
     
-    col_cuts <- unique(col_var_vector)
+    col_cuts <- unique(col_var_vctr)
     max_bin_cut <- max(col_cuts, na.rm = TRUE)
     min_bin_cut <- min(col_cuts, na.rm = TRUE)
     col_cuts <- seq(min_bin_cut, max_bin_cut + 1, 1)
     no_bins <- length(col_cuts)
     
-    # data <- data %>%
-    #   dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-    
     data <- data %>%
-      dplyr::mutate_at(dplyr::vars(c(-.data$x, -.data$y)), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+      dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+    
     if (is.null(pal)) pal <- pal_point_set1[1:(length(col_cuts) - 1)]
     if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
     if (is.null(legend_labels)) labels <- LETTERS[1:length(col_cuts) - 1]
@@ -328,14 +272,10 @@ ggplot_stars_col <- function(data,
       data <- data %>%
         tibble::as_tibble()
       
-      col_cuts <- pretty(col_var_vector)
-      
-      # data <- data %>%
-      #   dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+      col_cuts <- pretty(col_var_vctr)
       
       data <- data %>%
-        dplyr::mutate_at(dplyr::vars(c(-.data$x, -.data$y)), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-      
+        dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
       
       if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
       if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
@@ -346,14 +286,10 @@ ggplot_stars_col <- function(data,
       if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
       if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
       
-      # data <- data %>%
-      #   tibble::as_tibble() %>%
-      #   dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-      
       data <- data %>%
         tibble::as_tibble() %>%
-        dplyr::mutate_at(dplyr::vars(c(-.data$x, -.data$y)), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+        dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+      
       if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
       if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
       if (!is.null(legend_labels)) labels <- legend_labels
@@ -369,15 +305,12 @@ ggplot_stars_col <- function(data,
     data <- data %>% 
       tibble::as_tibble()
     
-    col_cuts <- quantile(col_var_vector, probs = col_cuts, na.rm = TRUE)
+    col_cuts <- quantile(col_var_vctr, probs = col_cuts, na.rm = TRUE)
     if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
     
-    # data <- data %>%
-    #   dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-    
     data <- data %>%
-      dplyr::mutate_at(dplyr::vars(c(-.data$x, -.data$y)), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+      dplyr::mutate(dplyr::across(c(-.data$x, -.data$y), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+    
     if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
     if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
     if (!is.null(legend_labels)) labels <- legend_labels
@@ -395,31 +328,23 @@ ggplot_stars_col <- function(data,
       na.translate = FALSE
     ) +
     scale_x_continuous(expand = c(0, 0)) +
-    scale_y_continuous(expand = c(0, 0))
-  
-  if (!is.null(coastline)) {
-    if (coastline_behind == FALSE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
+    scale_y_continuous(expand = c(0, 0)) +
+    coord_equal() #this is applicable only when no boundary
   
   if (isMobile == FALSE) {
     plot <- plot +
       labs(
-        title = stringr::str_wrap(title, wrap_title),
-        subtitle = stringr::str_wrap(subtitle, wrap_subtitle),
-        caption = stringr::str_wrap(caption, wrap_caption)
+        title = stringr::str_wrap(title, title_wrap),
+        subtitle = stringr::str_wrap(subtitle, subtitle_wrap),
+        caption = stringr::str_wrap(caption, caption_wrap)
       ) +
       guides(fill = guide_legend(ncol = legend_ncol, byrow = TRUE, title = stringr::str_wrap(col_title, wrap_col_title)))
   }
   else if (isMobile == TRUE) {
     plot <- plot +
+      theme(plot.title.position = "plot") +
+      theme(plot.caption.position = "plot") +
+      theme(legend.justification = "left") +
       labs(
         title = stringr::str_wrap(title, 40),
         subtitle = stringr::str_wrap(subtitle, 40),
@@ -435,37 +360,30 @@ ggplot_stars_col <- function(data,
 #' @description Map of an array in ggplot that is facetted, but not coloured. 
 #' @param data A stars object with 2 dimensions, x and y, and multiple named attribute layers with usual convention of lower case and underscores. These attribute layers will be facetted. Required input.
 #' @param pal Character vector of hex codes, or provided objects with pal_ prefixes.
-#' @param coastline Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.
-#' @param coastline_behind TRUE or FALSE as to whether the coastline is to be behind the stars object defined in the data argument. Defaults to FALSE.
-#' @param coastline_pal Colour of the coastline. Defaults to "#7F7F7F".
-#' @param facet_nrow The number of rows of facetted plots. Not applicable to where isMobile is TRUE.
+#' @param facet_nrow The number of rows of facetted plots. 
 #' @param title Title string. Defaults to "[Title]".
 #' @param subtitle Subtitle string. Defaults to "[Subtitle]".
 #' @param caption Caption title string. Defaults to NULL.
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
-#' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. 
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @return A ggplot object.
 #' @export
 #' @examples
-#' map_data1 <- example_stars_nz_no3n %>%
-#'   rlang::set_names("nitrate_nitrogen")
+#' map_data1 <- example_stars %>%
+#'   rlang::set_names("Variable A")
 #'
-#' map_data2 <- example_stars_nz_drp %>%
-#'   rlang::set_names("dissolved_reactive_phosphorus")
+#' map_data2 <- example_stars_2 %>%
+#'   rlang::set_names("Variable B")
 #'
 #' map_data <- c(map_data1, map_data2)
 #'
-#' ggplot_stars_facet(data = map_data, coastline = nz)
+#' ggplot_stars_facet(data = map_data)
 ggplot_stars_facet <- function(data,
                                pal = NULL,
-                               coastline = NULL,
-                               coastline_behind = FALSE,
-                               coastline_pal = "black",
                                facet_nrow = NULL,
                                title = "[Title]",
                                subtitle = NULL,
@@ -473,47 +391,24 @@ ggplot_stars_facet <- function(data,
                                font_family = "Helvetica",
                                font_size_title = NULL,
                                font_size_body = NULL,
-                               wrap_title = 70,
-                               wrap_subtitle = 80,
-                               wrap_caption = 80,
-                               isMobile = FALSE) {
+                               title_wrap = 70,
+                               subtitle_wrap = 80,
+                               caption_wrap = 80) {
   
   if (class(data)[1] != "stars") stop("Please use an stars object as data input")
   if (is.na(sf::st_crs(data))) stop("Please assign a coordinate reference system")
   
-  if(is.null(font_size_title)){
-    if (isMobile == FALSE) font_size_title <- 11
-    else if (isMobile == TRUE) font_size_title <- 15
-  }
-  if(is.null(font_size_body)){
-    if (isMobile == FALSE) font_size_body <- 10
-    else if (isMobile == TRUE) font_size_body <- 14
-  }
+  if(is.null(font_size_title)) font_size_title <- 11
+  if(is.null(font_size_body)) font_size_body <- 10
   
   plot <- ggplot() +
     theme_stars(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
-    )
-  
-  if (!is.null(coastline)) {
-    if (sf::st_is_longlat(data) == FALSE) coastline <- sf::st_transform(coastline, sf::st_crs(data))
-    if (coastline_behind == TRUE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
-  else if (is.null(coastline)) {
-    plot <- plot +
-      coord_equal()
-  }
-  
+    ) +
+    coord_equal() #this is applicable only when no boundary
+
   data <- data %>%
     tibble::as_tibble() %>%
     tidyr::pivot_longer(c(-.data$x,-.data$y), names_to = "facet_var", values_to = "col_var")
@@ -528,56 +423,25 @@ ggplot_stars_facet <- function(data,
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0))
   
-  if (!is.null(coastline)) {
-    if (coastline_behind == FALSE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
+  if (is.null(facet_nrow) & length(unique(data$facet_var)) <= 3) facet_nrow <- 1
+  if (is.null(facet_nrow) & length(unique(data$facet_var)) > 3) facet_nrow <- 2
   
-  if (isMobile == FALSE) {
-    if (is.null(facet_nrow) & length(unique(data$facet_var)) <= 3) facet_nrow <- 1
-    if (is.null(facet_nrow) & length(unique(data$facet_var)) > 3) facet_nrow <- 2
-    
-    plot <- plot +
-      labs(
-        title = stringr::str_wrap(title, wrap_title),
-        subtitle = stringr::str_wrap(subtitle, wrap_subtitle),
-        caption = stringr::str_wrap(caption, wrap_caption)
-      ) +
-      facet_wrap(
-        ~ .data$facet_var,
-        scales = "fixed",
-        nrow = facet_nrow,
-        labeller = labeller(
-          facet_var = function(x)
-            stringr::str_to_sentence(stringr::str_replace_all(x, "\\.", " "))
-        )
+  plot <- plot +
+    labs(
+      title = stringr::str_wrap(title, title_wrap),
+      subtitle = stringr::str_wrap(subtitle, subtitle_wrap),
+      caption = stringr::str_wrap(caption, caption_wrap)
+    ) +
+    facet_wrap(
+      ~ .data$facet_var,
+      scales = "fixed",
+      nrow = facet_nrow,
+      labeller = labeller(
+        facet_var = function(x)
+          stringr::str_to_sentence(stringr::str_replace_all(x, "\\.", " "))
       )
-  }
-  else if (isMobile == TRUE) {
-    plot <- plot +
-      labs(
-        title = stringr::str_wrap(title, 40),
-        subtitle = stringr::str_wrap(subtitle, 40),
-        caption = stringr::str_wrap(caption, 50)
-      )  +
-      facet_wrap(
-        ~ .data$facet_var,
-        scales = "fixed",
-        ncol = 1,
-        labeller = labeller(
-          facet_var = function(x)
-            stringr::str_to_sentence(stringr::str_replace_all(x, "\\.", " "))
-        )
-      )
-  }
-  
+    )
+
   return(plot)
 }
 
@@ -589,10 +453,7 @@ ggplot_stars_facet <- function(data,
 #' @param col_quantile_by_facet TRUE of FALSE whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.
 #' @param pal Character vector of hex codes, or provided objects with pal_ prefixes. Defaults to viridis.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
-#' @param coastline Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.
-#' @param coastline_behind TRUE or FALSE as to whether the coastline is to be behind the stars object defined in the data argument. Defaults to FALSE.
-#' @param coastline_pal Colour of the coastline. Defaults to "#7F7F7F".
-#' @param facet_nrow The number of rows of facetted plots. Not applicable to where isMobile is TRUE.
+#' @param facet_nrow The number of rows of facetted plots. 
 #' @param legend_ncol The number of columns in the legend.
 #' @param legend_digits Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.
 #' @param title Title string. Defaults to "[Title]".
@@ -603,34 +464,30 @@ ggplot_stars_facet <- function(data,
 #' @param font_family Font family to use. Defaults to "Helvetica".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
-#' @param wrap_title Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.
-#' @param wrap_subtitle Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.
-#' @param wrap_caption Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.
-#' @param isMobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. 
+#' @param wrap_col_title Number of characters to wrap the colour title to. Defaults to 25. 
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @return A ggplot object.
 #' @export
 #' @examples
-#' map_data1 <- example_stars_nz_no3n %>%
-#'   rlang::set_names("Nitrate nitrogen")
+#' map_data1 <- example_stars %>%
+#'   rlang::set_names("Variable A")
 #'
-#' map_data2 <- example_stars_nz_drp %>%
-#'   rlang::set_names("Dissolved reactive phosphorus")
+#' map_data2 <- example_stars_2 %>%
+#'   rlang::set_names("Variable B")
 #'
 #' map_data <- c(map_data1, map_data2)
 #'
-#' ggplot_stars_col_facet(data = map_data, coastline = nz,
+#' ggplot_stars_col_facet(data = map_data, 
 #'    col_method = "quantile", col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
-#'    title = "River modelled nutrient concentrations, 2013-17")
+#'    title = "Site medians, 2013-17")
 ggplot_stars_col_facet <- function(data,
                                    col_method = "quantile",
                                    col_quantile_by_facet = TRUE,
                                    col_cuts = NULL,
                                    pal = NULL,
                                    pal_rev = FALSE,
-                                   coastline = NULL,
-                                   coastline_behind = TRUE,
-                                   coastline_pal = "#7f7f7f",
                                    facet_nrow = NULL,
                                    legend_ncol = 3,
                                    legend_digits = 1,
@@ -642,48 +499,25 @@ ggplot_stars_col_facet <- function(data,
                                    font_family = "Helvetica",
                                    font_size_title = NULL,
                                    font_size_body = NULL,
-                                   wrap_title = 70,
-                                   wrap_subtitle = 80,
+                                   title_wrap = 70,
+                                   subtitle_wrap = 80,
                                    wrap_col_title = 25,
-                                   wrap_caption = 80,
-                                   isMobile = FALSE) {
+                                   caption_wrap = 80) {
   
   if (class(data)[1] != "stars") stop("Please use an stars object as data input")
   if (is.na(sf::st_crs(data))) stop("Please assign a coordinate reference system")
   
-  if(is.null(font_size_title)){
-    if (isMobile == FALSE) font_size_title <- 11
-    else if (isMobile == TRUE) font_size_title <- 15
-  }
-  if(is.null(font_size_body)){
-    if (isMobile == FALSE) font_size_body <- 10
-    else if (isMobile == TRUE) font_size_body <- 14
-  }
+  if(is.null(font_size_title)) font_size_title <- 11
+  if(is.null(font_size_body)) font_size_body <- 10
   
   plot <- ggplot() +
     theme_stars(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
-    )
-  
-  if (!is.null(coastline)) {
-    if (sf::st_is_longlat(data) == FALSE) coastline <- sf::st_transform(coastline, sf::st_crs(data))
-    if (coastline_behind == TRUE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
-  else if (is.null(coastline)) {
-    plot <- plot +
-      coord_equal()
-  }
-  
+    ) +
+    coord_equal() #this is applicable only when no boundary
+
   if (col_method == "category") {
     data <- data %>%
       tibble::as_tibble() %>%
@@ -695,12 +529,9 @@ ggplot_stars_col_facet <- function(data,
     col_cuts <- seq(min_bin_cut, max_bin_cut + 1, 1)
     no_bins <- length(col_cuts)
     
-    # data <- data %>%
-    #   dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-    
     data <- data %>%
-      dplyr::mutate_at(dplyr::vars(.data$col_var), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+      dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+    
     if (is.null(pal)) pal <- pal_point_set1[1:(length(col_cuts) - 1)]
     if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
     if (is.null(legend_labels)) labels <- LETTERS[1:length(col_cuts) - 1]
@@ -714,12 +545,9 @@ ggplot_stars_col_facet <- function(data,
       
       col_cuts <- pretty(dplyr::pull(data, .data$col_var))
       
-      # data <- data %>%
-      #   dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-      
       data <- data %>%
-        dplyr::mutate_at(dplyr::vars(.data$col_var), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+        dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+      
       if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
       if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
       if (!is.null(legend_labels)) labels <- legend_labels
@@ -729,16 +557,11 @@ ggplot_stars_col_facet <- function(data,
       if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
       if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
       
-      # data <- data %>%
-      #   tibble::as_tibble() %>%
-      #   tidyr::pivot_longer(cols = c(-.data$x, -.data$y), names_to = "facet_var", values_to = "col_var") %>%
-      #   dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-      
       data <- data %>%
         tibble::as_tibble() %>%
         tidyr::pivot_longer(cols = c(-.data$x, -.data$y), names_to = "facet_var", values_to = "col_var") %>%
-        dplyr::mutate_at(dplyr::vars(.data$col_var), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+        dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+      
       if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
       if (is.null(legend_labels)) labels <- numeric_legend_labels(col_cuts, legend_digits)
       if (!is.null(legend_labels)) labels <- legend_labels
@@ -751,37 +574,24 @@ ggplot_stars_col_facet <- function(data,
       if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
     }  
     if (col_quantile_by_facet == TRUE) {
-      # data <- data %>%
-      #   tibble::as_tibble() %>%
-      #   tidyr::pivot_longer(cols = c(-.data$x, -.data$y), names_to = "facet_var", values_to = "col_var") %>%
-      #   dplyr::group_by(.data$facet_var) %>%
-      #   dplyr::mutate(dplyr::across(.data$col_var, ~ percent_rank(.))) %>%
-      #   dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-      
       data <- data %>%
         tibble::as_tibble() %>%
         tidyr::pivot_longer(cols = c(-.data$x, -.data$y), names_to = "facet_var", values_to = "col_var") %>%
         dplyr::group_by(.data$facet_var) %>%
-        dplyr::mutate_at(dplyr::vars(.data$col_var), ~ percent_rank(.)) %>%
-        dplyr::mutate_at(dplyr::vars(.data$col_var), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+        dplyr::mutate(dplyr::across(.data$col_var, ~ percent_rank(.))) %>%
+        dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+      
       if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
       if (is.null(legend_labels)) labels <- paste0(numeric_legend_labels(col_cuts * 100, 0), "\u1D57\u02B0 percentile")
       if (!is.null(legend_labels)) labels <- legend_labels
     }
     else if (col_quantile_by_facet == FALSE) {
-      # data <- data %>%
-      #   tibble::as_tibble() %>%
-      #   tidyr::pivot_longer(cols = c(-.data$x, -.data$y), names_to = "facet_var", values_to = "col_var") %>%
-      #   dplyr::mutate(dplyr::across(.data$col_var, ~ percent_rank(.))) %>%
-      #   dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
-      
       data <- data %>%
         tibble::as_tibble() %>%
         tidyr::pivot_longer(cols = c(-.data$x, -.data$y), names_to = "facet_var", values_to = "col_var") %>%
-        dplyr::mutate_at(dplyr::vars(.data$col_var), ~ percent_rank(.)) %>%
-        dplyr::mutate_at(dplyr::vars(.data$col_var), ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE))
-
+        dplyr::mutate(dplyr::across(.data$col_var, ~ percent_rank(.))) %>%
+        dplyr::mutate(dplyr::across(.data$col_var, ~ cut(., col_cuts, right = FALSE, include.lowest = TRUE)))
+      
       if (is.null(pal)) pal <- viridis::viridis(length(col_cuts) - 1)
       if (is.null(legend_labels)) labels <- paste0(numeric_legend_labels(col_cuts * 100, 0), "\u1D57\u02B0 percentile")
       if (!is.null(legend_labels)) labels <- legend_labels
@@ -803,57 +613,25 @@ ggplot_stars_col_facet <- function(data,
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0))
   
-  if (!is.null(coastline)) {
-    if (coastline_behind == FALSE) {
-      plot <- plot +
-        geom_sf(
-          data = coastline,
-          size = 0.2,
-          colour = coastline_pal,
-          fill = "transparent"
-        )
-    }
-  }
+  if (is.null(facet_nrow) & length(unique(data$facet_var)) <= 3) facet_nrow <- 1
+  if (is.null(facet_nrow) & length(unique(data$facet_var)) > 3) facet_nrow <- 2
   
-  if (isMobile == FALSE) {
-    if (is.null(facet_nrow) & length(unique(data$facet_var)) <= 3) facet_nrow <- 1
-    if (is.null(facet_nrow) & length(unique(data$facet_var)) > 3) facet_nrow <- 2
-    
-    plot <- plot +
-      labs(
-        title = stringr::str_wrap(title, wrap_title),
-        subtitle = stringr::str_wrap(subtitle, wrap_subtitle),
-        caption = stringr::str_wrap(caption, wrap_caption)
-      ) +
-      guides(fill = guide_legend(ncol = legend_ncol, byrow = TRUE, title = stringr::str_wrap(col_title, wrap_col_title))) +
-      facet_wrap(
-        ~ .data$facet_var,
-        scales = "fixed",
-        nrow = facet_nrow,
-        labeller = labeller(
-          facet_var = function(x)
-            stringr::str_to_sentence(stringr::str_replace_all(x, "\\.", " "))
-        )
+  plot <- plot +
+    labs(
+      title = stringr::str_wrap(title, title_wrap),
+      subtitle = stringr::str_wrap(subtitle, subtitle_wrap),
+      caption = stringr::str_wrap(caption, caption_wrap)
+    ) +
+    guides(fill = guide_legend(ncol = legend_ncol, byrow = TRUE, title = stringr::str_wrap(col_title, wrap_col_title))) +
+    facet_wrap(
+      ~ .data$facet_var,
+      scales = "fixed",
+      nrow = facet_nrow,
+      labeller = labeller(
+        facet_var = function(x)
+          stringr::str_to_sentence(stringr::str_replace_all(x, "\\.", " "))
       )
-  }
-  else if (isMobile == TRUE) {
-    plot <- plot +
-      labs(
-        title = stringr::str_wrap(title, 40),
-        subtitle = stringr::str_wrap(subtitle, 40),
-        caption = stringr::str_wrap(caption, 50)
-      )  +
-      guides(fill = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 15))) +
-      facet_wrap(
-        ~ facet_var,
-        scales = "fixed",
-        ncol = 1,
-        labeller = labeller(
-          facet_var = function(x)
-            stringr::str_to_sentence(stringr::str_replace_all(x, "\\.", " "))
-        )
-      )
-  }
-  
+    )
+
   return(plot)
 }

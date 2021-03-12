@@ -4,12 +4,12 @@
 \alias{add_tip}
 \title{Add a quick tooltip text column to data.}
 \usage{
-add_tip(data, vars_vctr, comma = FALSE)
+add_tip(data, vars_vctr = NULL, comma = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
 
-\item{vars_vctr}{A vector of quoted variables to include in the tooltip. Required input.}
+\item{vars_vctr}{A vector of quoted variables to include in the tooltip. Defaults to NULL, which adds all variables in.}
 
 \item{comma}{TRUE or FALSE of whether to convert numeric values to character values with comma seperators.}
 }
@@ -25,7 +25,7 @@ library(dplyr)
 plot_data <- slice_sample(ggplot2::diamonds, prop = 0.05) \%>\% 
   add_tip(vars_vctr = c("carat", "price"), comma = TRUE)
 
-plot <- ggplot_scatter(data = plot_data, x_var = carat, y_var = price,
+plot <- ggplot_point(data = plot_data, x_var = carat, y_var = price,
                        tip_var = tip_text,
                        title = "Diamond price by carat",
                        x_title = "Carat",

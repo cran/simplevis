@@ -10,7 +10,7 @@ leaflet_stars_col(data, col_method = "quantile", col_cuts = NULL,
   map_id = "map")
 }
 \arguments{
-\item{data}{A stars object with dimensions x and y, and 1 attribute layer with crs in wgs84 (epsg4326). Required input.}
+\item{data}{A stars object with dimensions x and y, and 1 attribute layer with crs. Required input.}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." Defaults to "quantile". Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).}
 
@@ -39,7 +39,7 @@ A leaflet object.
 Map of an array in leaflet that is coloured.
 }
 \examples{
-leaflet_stars_col(example_stars_nz_no3n, 
+leaflet_stars_col(example_stars, 
    col_method = "quantile", col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
    title = "River modelled median nitrate-nitrogen concentrations in g/m\\u00b3, 2013\\u201317")
 }

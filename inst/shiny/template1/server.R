@@ -58,9 +58,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$plot_mobile <- renderPlot({
-    plot() +
-      ggplot2::theme(plot.title.position = "plot") +
-      ggplot2::theme(plot.caption.position = "plot")
+    plot() 
   })
   
   ### table ###
@@ -73,7 +71,7 @@ shinyServer(function(input, output, session) {
     table_data(), 
     filter = "top",
     rownames = FALSE,
-    options = list(pageLength = 5, scrollX = TRUE)
+    options = list(scrollX = TRUE)
   )
   
   ### download ###

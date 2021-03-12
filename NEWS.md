@@ -1,3 +1,176 @@
+# simplevis 2.4.0
+
+* Reduce the size of sf example objects.
+* Add vignette for making maps of sf objects.
+* Removed support for boundary arguments in ggplot_stars, as it was not working.
+
+# simplevis 2.3.9
+
+* Updated help for boundary_behind arguments to specify correct default.
+* For ggplot_sf and stars functions, added boundary_size argument in.
+* Added nz_region as a helpful example boundary.
+
+# simplevis 2.3.8
+
+* Renamed example objects to focus on their object class.
+
+# simplevis 2.3.7
+
+* For line, renamed rev_pal to pal_rev for consistency. 
+* For vbar, added in the pal_rev argument for consistency.
+
+# simplevis 2.3.6
+
+* For hbar & vbar, renamed arguments to x_na_bar and y_na_bar.
+
+# simplevis 2.3.5
+
+* Add na_bar argument to vbar_col.
+
+# simplevis 2.3.4
+
+* For hbar_col, fix na_bar so that is works on negative data.
+
+# simplevis 2.2.3
+
+* For hbar and vbar, fix na_bar so that it works for negative and positive data with ggplotly(plot, tooltip = "text").
+
+# simplevis 2.3.2
+
+* For line graphs on mobile, make x axis labels just the minimum and maximum (and zero if applicable). 
+
+# simplevis 2.3.1
+
+* Added y_balance arguments to vbar, line and point functions.
+
+# simplevis 2.3.0
+
+* Defaulted zero reference lines to be on by default if there are positive and negative values in the data. 
+
+# simplevis 2.2.9
+
+* Peplace all superceded scoped functions with across.
+
+# simplevis 2.2.8
+
+* Renamed ggplot_scatter to ggplot_point, and likewise for theme_scatter.  
+
+# simplevis 2.2.7
+
+* Renamed coastline argument to boundary.
+
+# simplevis 2.2.6
+
+* Moved pals to er.helpers package.
+
+# simplevis 2.2.5 
+
+* Changed wrap text arguments to prefix with what is being wrapped.
+
+# simplevis 2.2.4
+
+* Renamed x_na_bar and y_na_bar arguments to na_bar.
+
+# simplevis 2.2.3
+
+* Corrected hbar error messages for faceted plots.
+
+# simplevis 2.2.2
+
+* Adjusted mobile hbar x label justification.
+
+# simplevis 2.2.1
+
+* Ungrouped data in sf functions.
+
+# simplevis 2.2.0
+
+* Removed support for mobile in `_facet` and `_col_facet` functions.
+
+# simplevis 2.1.9
+
+* Updated functions for a more reliable mobile experience.
+
+# simplevis 2.1.8
+
+* Updated app templates css and default table rows.
+
+# simplevis 2.1.7
+
+* For hbar, add mobile wrapping for x labels.
+
+# simplevis 2.1.6
+
+* For hbar, update the mobile x breaks, so always only min and max, and zero if relevant.
+
+# simplevis 2.1.5
+
+* For hbar, made plots x aim for 1 interval of breaks for mobile, and left-align labels.
+
+# simplevis 2.1.4
+
+* For hbar, added x_balance argument to hbar functions.
+
+# simplevis 2.1.3
+
+* Changed name of compare2 pals to alpha2 pals.
+* Made ggplot line functions default to expanding by zero on x.
+
+# simplevis 2.1.2
+
+* Changed hbar and vbar na_grey arguments to be x_na_bar or y__na_bar.
+* Added y_na_na_bar argument to ggplot_hbar_col.
+
+# simplevis 2.1.1
+
+* Removed col_drop and col_remove_na arguments.
+
+# simplevis 2.1.0
+
+* Added two new palettes for graphs that compare a current year against a previous year.
+
+# simplevis 2.09
+
+* Added left-align to hover values with the plotly_camera function.
+
+# simplevis 2.08
+
+* Added expand arguments to all other plots.
+
+# simplevis 2.07
+
+* Changed zero_lines to default off.
+* Removed automatic zero lines, so now they must be manually turned off and on.
+* Added expand arguments to scatterplots.
+
+# simplevis 2.06
+
+* Corrected the direction of bar legend labels if someone manually adds them in.
+* Update the leaflet sf popup so that it does not load if there is only geometry.
+
+# simplevis 2.05
+
+* Reverted default col_title = "" rather than NULL, as this works better with ggplotly.
+* Adjusted add_tip to default to putting in all variables, and work with sf objects.
+
+# simplevis 2.04
+
+* Added support for using logical variables to colour in hbar.
+* Added pal_rev argument in hbar.
+
+# simplevis 2.03
+
+* Removed feature id and row number from popup.
+* Updated add_tip so that it can also work with sf objects.
+
+# simplevis 2.0.2
+
+* Removed geometry from defaulting into the leaflet popup.
+
+# simplevis 2.0.1
+
+* Fixed bug with scatter not working with NAs appropriately.
+
 # simplevis 2.0.0
 
 * Update shiny templates.

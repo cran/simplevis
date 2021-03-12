@@ -6,15 +6,15 @@
 \usage{
 ggplot_box_facet(data, x_var, y_var = NULL, facet_var,
   group_var = NULL, stat = "boxplot", x_labels = waiver(),
-  x_pretty_n = 5, y_zero = TRUE, y_zero_line = TRUE,
-  y_trans = "identity", y_labels = waiver(), y_pretty_n = 5,
+  x_pretty_n = 5, x_expand = NULL, y_zero = TRUE,
+  y_zero_line = NULL, y_trans = "identity", y_labels = waiver(),
+  y_pretty_n = 5, y_expand = NULL, y_balance = FALSE,
   facet_scales = "fixed", facet_nrow = NULL, pal = NULL,
   width = 0.5, title = "[Title]", subtitle = NULL,
   x_title = "[X title]", y_title = "[Y title]", caption = NULL,
   font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_x_title = 50, wrap_y_title = 50, wrap_caption = 80,
-  isMobile = FALSE)
+  font_size_body = NULL, title_wrap = 70, subtitle_wrap = 80,
+  x_title_wrap = 50, y_title_wrap = 50, caption_wrap = 80)
 }
 \arguments{
 \item{data}{An tibble or dataframe. Required input.}
@@ -33,9 +33,11 @@ ggplot_box_facet(data, x_var, y_var = NULL, facet_var,
 
 \item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Only applicable to a x variable that is categorical or date.}
 
+\item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
+
 \item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
 
 \item{y_trans}{TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.}
 
@@ -43,9 +45,13 @@ ggplot_box_facet(data, x_var, y_var = NULL, facet_var,
 
 \item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
+\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
+
+\item{y_balance}{Add balance to the y axis so that zero is in the centre of the y scale. Only applicable where facet_scales equals "fixed" or "free_x".}
+
 \item{facet_scales}{Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".}
 
-\item{facet_nrow}{The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows. Not applicable to where isMobile is TRUE.}
+\item{facet_nrow}{The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
 
@@ -67,17 +73,15 @@ ggplot_box_facet(data, x_var, y_var = NULL, facet_var,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70.}
 
-\item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
 
-\item{wrap_x_title}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50.}
 
-\item{wrap_y_title}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50.}
 
-\item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
-
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 }
 \value{
 A ggplot object.
@@ -92,10 +96,6 @@ plot_data <- ggplot2::diamonds \%>\%
   mutate(price_thousands = (price / 1000)) \%>\%
   slice_sample(prop = 0.05)
 
-plot <- ggplot_box_facet(data = plot_data, x_var = cut, y_var = price_thousands, facet_var = color,
-                         facet_nrow = 4)
+ggplot_box_facet(plot_data, cut, price_thousands, color)
 
-plot
-
-plotly::ggplotly(plot)
 }

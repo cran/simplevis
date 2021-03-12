@@ -5,14 +5,15 @@
 \title{Line ggplot.}
 \usage{
 ggplot_line(data, x_var, y_var, tip_var = NULL, x_labels = waiver(),
-  x_pretty_n = 6, y_zero = TRUE, y_zero_line = TRUE,
-  y_trans = "identity", y_labels = waiver(), y_pretty_n = 5,
+  x_pretty_n = 6, x_expand = NULL, y_zero = TRUE,
+  y_zero_line = NULL, y_trans = "identity", y_labels = waiver(),
+  y_pretty_n = 5, y_expand = NULL, y_balance = FALSE,
   points = TRUE, point_size = 1, lines = TRUE, size = 0.5,
   pal = NULL, title = "[Title]", subtitle = NULL,
   x_title = "[X title]", y_title = "[Y title]", caption = NULL,
   font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_x_title = 50, wrap_y_title = 50, wrap_caption = 80,
+  font_size_body = NULL, title_wrap = 70, subtitle_wrap = 80,
+  x_title_wrap = 50, y_title_wrap = 50, caption_wrap = 80,
   isMobile = FALSE)
 }
 \arguments{
@@ -28,15 +29,21 @@ ggplot_line(data, x_var, y_var, tip_var = NULL, x_labels = waiver(),
 
 \item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.}
 
+\item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
+
 \item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
 
 \item{y_trans}{A string specifying a transformation for the y axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
 \item{y_labels}{Argument to adjust the format of the y scale labels.}
 
 \item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
+
+\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
+
+\item{y_balance}{Add balance to the y axis so that zero is in the centre of the y scale.}
 
 \item{points}{TRUE or FALSE of whether to include points. Defaults to TRUE.}
 
@@ -46,7 +53,7 @@ ggplot_line(data, x_var, y_var, tip_var = NULL, x_labels = waiver(),
 
 \item{size}{Size of lines. Defaults to 0.5. Only applicable to where lines equals TRUE.}
 
-\item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
+\item{pal}{Character vector of hex codes. Defaults to NULL, which selects a default palette.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -64,15 +71,15 @@ ggplot_line(data, x_var, y_var, tip_var = NULL, x_labels = waiver(),
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_x_title}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_y_title}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
 
-\item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
 
 \item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
 }
@@ -89,12 +96,9 @@ plot_data <- storms \%>\%
   group_by(year) \%>\%
   summarise(wind = round(mean(wind), 2)) 
 
-  plot <- ggplot_line(data = plot_data, x_var = year, y_var = wind,
+  ggplot_line(plot_data, year, wind,
       title = "Average wind speed of Atlantic storms, 1975-2015",
       x_title = "Year",
       y_title = "Average maximum sustained wind speed (knots)")
 
-  plot
-
-  plotly::ggplotly(plot)
 }

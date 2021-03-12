@@ -1,43 +1,53 @@
 # shapes
 
 #' @title New Zealand coastline.
-#' @description New Zealand coastline, excluding the Chathams, that is simplified for ggplot.
+#' @description Simplified New Zealand coastline boundary, excluding the Chatham Islands.
 #' @format An \code{sf} object.
 #' @examples
 #' nz
 #'
 #' ggplot_sf(nz)
 #'
-#' ggplot_sf(dplyr::slice(nz, 2))
+#' ggplot_sf(dplyr::slice(nz, 2, 4))
 #'
-#' ggplot_sf(dplyr::slice(nz, 1, 3))
-#' @source \url{https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/}
+#' ggplot_sf(dplyr::slice(nz, 1, 3, 5:7))
 "nz"
 
-#' @title Example sf object of New Zealand livestock.
-#' @description Example sf object of New Zealand livestock.
+#' @title New Zealand clipped regional boundaries
+#' @description Simplified New Zealand regional boundaries, excluding the Chatham Islands.
 #' @format An \code{sf} object.
 #' @examples
-#' example_sf_nz_livestock
-"example_sf_nz_livestock"
+#' nz_region
+#'
+#' ggplot_sf(nz_region)
+#'
+#' ggplot_sf(dplyr::filter(nz_region, region == "Wellington"))
+"nz_region"
 
-#' @title Example sf object of New Zealand river water quality trends.
-#' @description Example sf object of New Zealand river water quality trends.
+#' @title Example sf polygon object.
+#' @description Example sf polygon object.
 #' @format An \code{sf} object.
 #' @examples
-#' example_sf_nz_river_wq
-"example_sf_nz_river_wq"
+#' example_sf_polygon
+"example_sf_polygon"
 
-#' @title Example stars object of New Zealand modelled river water NO3N concentrations.
-#' @description Example stars object of New Zealand modelled river water nitrate concentrations.
+#' @title Example sf point object.
+#' @description Example sf point object.
+#' @format An \code{sf} object.
+#' @examples
+#' example_sf_point
+"example_sf_point"
+
+#' @title Example stars object.
+#' @description Example stars object.
 #' @format An \code{stars} object.
 #' @examples
-#' example_stars_nz_no3n
-"example_stars_nz_no3n"
+#' example_stars
+"example_stars"
 
-#' @title Example stars object of New Zealand modelled river water DRP concentrations.
-#' @description Example stars object of New Zealand modelled river water dissolved reactive phosphorus concentrations.
+#' @title Example stars object 2.
+#' @description Example stars object.
 #' @format An \code{stars} object.
 #' @examples
-#' example_stars_nz_drp
-"example_stars_nz_drp"
+#' example_stars_2
+"example_stars_2"

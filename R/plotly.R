@@ -6,7 +6,7 @@
 #' @examples
 #' plot_data <- dplyr::sample_frac(ggplot2::diamonds, 0.05)
 #' 
-#' plot <- ggplot_scatter(data = plot_data, x_var = carat, y_var = price)
+#' plot <- ggplot_point(data = plot_data, x_var = carat, y_var = price)
 #' 
 #' plotly::ggplotly(plot, tooltip = "text") %>% 
 #'    plotly_camera()
@@ -17,7 +17,8 @@ plotly_camera <- function(plotly, logo = FALSE){
                    "hoverCompareCartesian", "sendDataToCloud", "toggleHover", "resetViews", "toggleSpikelines",
                    "resetViewMapbox", "toggleSpikelines", "resetViewMapbox", "lasso2d", "select2d"
                  ),
-                 displaylogo = logo)
+                 displaylogo = logo) %>% 
+    plotly::style(hoverlabel = list(align = "left"))
 }
 
 #' @title Reverse plotly legend elements.

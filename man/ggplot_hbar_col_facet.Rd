@@ -6,16 +6,17 @@
 \usage{
 ggplot_hbar_col_facet(data, x_var, y_var, col_var, facet_var,
   tip_var = NULL, x_labels = waiver(), x_zero = TRUE,
-  x_zero_line = TRUE, x_trans = "identity", x_pretty_n = 5,
-  y_rev = FALSE, y_labels = waiver(), col_rev = FALSE,
-  col_drop = FALSE, position = "stack", facet_scales = "fixed",
-  facet_nrow = NULL, pal = NULL, legend_ncol = 3, width = 0.75,
+  x_zero_line = NULL, x_trans = "identity", x_pretty_n = 5,
+  x_expand = NULL, x_balance = FALSE, y_rev = FALSE,
+  y_labels = waiver(), y_expand = NULL, col_rev = FALSE,
+  position = "stack", facet_scales = "fixed", facet_nrow = NULL,
+  pal = NULL, pal_rev = FALSE, legend_ncol = 3, width = 0.75,
   title = "[Title]", subtitle = NULL, x_title = "[X title]",
   y_title = "[Y title]", col_title = "", caption = NULL,
   legend_labels = NULL, font_family = "Helvetica",
-  font_size_title = NULL, font_size_body = NULL, wrap_title = 70,
-  wrap_subtitle = 80, wrap_x_title = 50, wrap_y_title = 50,
-  wrap_col_title = 25, wrap_caption = 80, isMobile = FALSE)
+  font_size_title = NULL, font_size_body = NULL, title_wrap = 70,
+  subtitle_wrap = 80, x_title_wrap = 50, y_title_wrap = 50,
+  wrap_col_title = 25, caption_wrap = 80)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -34,27 +35,33 @@ ggplot_hbar_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{x_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
 
-\item{x_zero_line}{TRUE or FALSE whether to add a zero line in for when values are above and below zero. Defaults to TRUE.}
+\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. Defaults to NULL, which is TRUE if there are positive and negative values in x_var. Otherwise it is FALSE.}
 
 \item{x_trans}{A string specifying a transformation for the x scale. Defaults to "identity".}
 
-\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Not applicable where isMobile equals TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5.}
+
+\item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
+
+\item{x_balance}{Add balance to the x axis so that zero is in the centre of the x scale. Only applicable where facet_scales equals "fixed" or "free_y".}
 
 \item{y_rev}{TRUE or FALSE of whether bar order from top to bottom is reversed from default. Defaults to FALSE.}
 
 \item{y_labels}{Argument to adjust the format of the y scale labels.}
 
-\item{col_rev}{TRUE or FALSE of whether bar fill order from left to right is reversed from default. Defaults to FALSE.}
+\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
 
-\item{col_drop}{TRUE or FALSE of whether to drop unused levels from the legend. Defaults to FALSE.}
+\item{col_rev}{TRUE or FALSE of whether bar fill order from left to right is reversed from default. Defaults to FALSE.}
 
 \item{position}{Whether bars are positioned by "stack" or "dodge". Defaults to "stack".}
 
 \item{facet_scales}{Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".}
 
-\item{facet_nrow}{The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows. Not applicable to where isMobile is TRUE.}
+\item{facet_nrow}{The number of rows of facetted plots. Defaults to NULL, which generally chooses 2 rows.}
 
-\item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
+\item{pal}{Character vector of hex codes. Defaults to NULL, which selects a default palette.}
+
+\item{pal_rev}{TRUE or FALSE of whether to reverse the pal.}
 
 \item{legend_ncol}{The number of columns in the legend.}
 
@@ -80,19 +87,17 @@ ggplot_hbar_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70.}
 
-\item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
 
-\item{wrap_x_title}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50.}
 
-\item{wrap_y_title}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50.}
 
-\item{wrap_col_title}{Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.}
+\item{wrap_col_title}{Number of characters to wrap the colour title to. Defaults to 25.}
 
-\item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
-
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 }
 \value{
 A ggplot object.
@@ -107,15 +112,11 @@ plot_data <- ggplot2::diamonds \%>\%
   mutate(cut = stringr::str_to_sentence(cut)) \%>\%
   group_by(cut, clarity, color) \%>\%
   summarise(average_price = mean(price)) \%>\%
-  mutate(average_price_thousands = round(average_price / 1000, 1))
+  mutate(average_price = round(average_price / 1000, 1))
 
-plot <- ggplot_hbar_col_facet(data = plot_data, x_var = average_price_thousands,
-                              y_var = color, col_var = clarity, facet_var = cut,
-                              title = "Average diamond price by colour, clarity and cut", 
-                              x_title = "Average price ($US thousands)", 
-                              y_title = "Colour")
+ggplot_hbar_col_facet(plot_data, average_price, color, clarity, cut,
+  title = "Average diamond price by colour, clarity and cut", 
+  x_title = "Average price ($US thousands)", 
+  y_title = "Colour")
 
-plot
-
-plotly::ggplotly(plot)
 }

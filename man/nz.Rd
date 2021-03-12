@@ -5,22 +5,19 @@
 \alias{nz}
 \title{New Zealand coastline.}
 \format{An \code{sf} object.}
-\source{
-\url{https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/}
-}
 \usage{
 nz
 }
 \description{
-New Zealand coastline, excluding the Chathams, that is simplified for ggplot.
+Simplified New Zealand coastline boundary, excluding the Chatham Islands.
 }
 \examples{
 nz
 
 ggplot_sf(nz)
 
-ggplot_sf(dplyr::slice(nz, 2))
+ggplot_sf(dplyr::slice(nz, 2, 4))
 
-ggplot_sf(dplyr::slice(nz, 1, 3))
+ggplot_sf(dplyr::slice(nz, 1, 3, 5:7))
 }
 \keyword{datasets}

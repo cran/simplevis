@@ -5,11 +5,11 @@
 \title{Map of simple features in ggplot that is facetted.}
 \usage{
 ggplot_sf_facet(data, facet_var, size = 0.5, alpha = 0.1, pal = NULL,
-  facet_nrow = NULL, coastline = NULL, coastline_behind = TRUE,
-  coastline_pal = "#7f7f7f", title = "[Title]", subtitle = NULL,
-  caption = NULL, font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_caption = 80, isMobile = FALSE)
+  facet_nrow = NULL, boundary = NULL, boundary_behind = TRUE,
+  boundary_pal = "#7f7f7f", boundary_size = 0.2, title = "[Title]",
+  subtitle = NULL, caption = NULL, font_family = "Helvetica",
+  font_size_title = NULL, font_size_body = NULL, title_wrap = 70,
+  subtitle_wrap = 80, caption_wrap = 80)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -20,15 +20,17 @@ ggplot_sf_facet(data, facet_var, size = 0.5, alpha = 0.1, pal = NULL,
 
 \item{alpha}{The alpha of the fill. Defaults to 0.1. Only applicable to polygons.}
 
-\item{pal}{Character vector of hex codes. Defaults to NULL, which selects the Stats NZ palette.}
+\item{pal}{Character vector of hex codes. Defaults to NULL, which selects a default palette.}
 
-\item{facet_nrow}{The number of rows of facetted plots. Not applicable to where isMobile is TRUE.}
+\item{facet_nrow}{The number of rows of facetted plots.}
 
-\item{coastline}{Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.}
+\item{boundary}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added.}
 
-\item{coastline_behind}{TRUE or FALSE  as to whether the coastline is to be behind the sf object defined in the data argument. Defaults to FALSE.}
+\item{boundary_behind}{TRUE or FALSE  as to whether the boundary is to be behind the sf object defined in the data argument. Defaults to TRUE.}
 
-\item{coastline_pal}{Colour of the coastline. Defaults to "#7F7F7F".}
+\item{boundary_pal}{Colour of the boundary. Defaults to "#7F7F7F".}
+
+\item{boundary_size}{Size of the boundary. Defaults to 0.2.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -42,13 +44,11 @@ ggplot_sf_facet(data, facet_var, size = 0.5, alpha = 0.1, pal = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70.}
 
-\item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
 
-\item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
-
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 }
 \value{
 A ggplot object.
@@ -57,9 +57,7 @@ A ggplot object.
 Map of simple features in ggplot that is facetted, but not coloured.
 }
 \examples{
-map_data <- example_sf_nz_river_wq \%>\%
- dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
-
-ggplot_sf_facet(data = map_data, facet_var = trend_category, coastline = nz,
-  title = "Monitored river nitrate-nitrogen trends, 2008-17")
+ggplot_sf_facet(data = example_sf_point, facet_var = trend_category, 
+  boundary = nz,
+  title = "Trends, 1990-2017")
 }

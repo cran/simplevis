@@ -6,11 +6,10 @@
 \usage{
 leaflet_sf_col(data, col_var, label_var = NULL, col_method = NULL,
   col_cuts = NULL, col_drop = FALSE, col_na_remove = FALSE,
-  pal = NULL, pal_rev = FALSE,
-  popup = leafpop::popupTable(sentence_spaced_colnames(data)),
-  radius = 1, weight = 2, opacity = 0.9, stroke = TRUE,
-  title = "[Title]", legend_digits = 1, legend_labels = NULL,
-  basemap = "light", map_id = "map")
+  pal = NULL, pal_rev = FALSE, popup = NULL, radius = 1,
+  weight = 2, opacity = 0.9, stroke = TRUE, title = "[Title]",
+  legend_digits = 1, legend_labels = NULL, basemap = "light",
+  map_id = "map")
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
@@ -31,7 +30,7 @@ leaflet_sf_col(data, col_var, label_var = NULL, col_method = NULL,
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{popup}{HTML strings for use in popup. Defaults to making a leafpop::popupTable of all attribute columns in the sf object.}
+\item{popup}{HTML strings for use in popup through a character vector. If NULL, defaults to making a leafpop::popupTable of all columns in the sf object.}
 
 \item{radius}{Radius of points. Defaults to 2.}
 
@@ -58,19 +57,16 @@ A leaflet object.
 Map of simple features in leaflet that is coloured.
 }
 \examples{
-leaflet_sf_col(example_sf_nz_livestock, dairydens,
+leaflet_sf_col(example_sf_polygon, density,
      col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
-     title = "Dairy density in count per km\\u00b2, 2017")
+     title = "Modelled density, 2017")
 
-leaflet_sf_col(example_sf_nz_livestock, dairydens,
+leaflet_sf_col(example_sf_polygon, density,
      col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf), legend_digits = 0,
-     title = "Dairy density in count per km\\u00b2, 2017")
-
-map_data <- example_sf_nz_river_wq \%>\%
-  dplyr::filter(period == "1998-2017", indicator == "Nitrate-nitrogen")
+     title = "Modelled density, 2017")
 
 pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
-leaflet_sf_col(map_data, trend_category, pal = pal, col_method = "category",
+leaflet_sf_col(example_sf_point, trend_category, pal = pal, col_method = "category",
    title = "Monitored river nitrate-nitrogen trends, 2008\\u201317")
 }

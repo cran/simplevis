@@ -5,15 +5,15 @@
 \title{Map of simple features in ggplot that is coloured and facetted.}
 \usage{
 ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
-  col_cuts = NULL, col_quantile_by_facet = TRUE, col_drop = FALSE,
-  col_na_remove = FALSE, pal = NULL, pal_rev = FALSE, size = 0.5,
-  alpha = 0.9, facet_nrow = NULL, legend_ncol = 3,
-  legend_digits = 1, coastline = NULL, coastline_behind = TRUE,
-  coastline_pal = "#7f7f7f", title = "[Title]", subtitle = NULL,
+  col_cuts = NULL, col_quantile_by_facet = TRUE, pal = NULL,
+  pal_rev = FALSE, size = 0.5, alpha = 0.9, facet_nrow = NULL,
+  legend_ncol = 3, legend_digits = 1, boundary = NULL,
+  boundary_behind = TRUE, boundary_pal = "#7f7f7f",
+  boundary_size = 0.2, title = "[Title]", subtitle = NULL,
   col_title = "", caption = NULL, legend_labels = NULL,
   font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_col_title = 25, wrap_caption = 80, isMobile = FALSE)
+  font_size_body = NULL, title_wrap = 70, subtitle_wrap = 80,
+  wrap_col_title = 25, caption_wrap = 80)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -28,10 +28,6 @@ ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
 
 \item{col_quantile_by_facet}{TRUE of FALSE  whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.}
 
-\item{col_drop}{TRUE or FALSE  of whether to drop unused levels from the legend. Defaults to FALSE.}
-
-\item{col_na_remove}{TRUE or FALSE  of whether to remove NAs of the colour variable. Defaults to FALSE.}
-
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.}
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
@@ -40,17 +36,19 @@ ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
 
 \item{alpha}{The opacity of polygons. Defaults to 0.9.}
 
-\item{facet_nrow}{The number of rows of facetted plots. Not applicable to where isMobile is TRUE.}
+\item{facet_nrow}{The number of rows of facetted plots.}
 
 \item{legend_ncol}{The number of columns in the legend.}
 
 \item{legend_digits}{Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.}
 
-\item{coastline}{Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.}
+\item{boundary}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added.}
 
-\item{coastline_behind}{TRUE or FALSE  as to whether the coastline is to be behind the sf object defined in the data argument. Defaults to FALSE.}
+\item{boundary_behind}{TRUE or FALSE  as to whether the boundary is to be behind the sf object defined in the data argument. Defaults to TRUE.}
 
-\item{coastline_pal}{Colour of the coastline. Defaults to "#7F7F7F".}
+\item{boundary_pal}{Colour of the boundary. Defaults to "#7F7F7F".}
+
+\item{boundary_size}{Size of the boundary. Defaults to 0.2.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -68,15 +66,13 @@ ggplot_sf_col_facet(data, col_var, facet_var, col_method = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70.}
 
-\item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
 
-\item{wrap_col_title}{Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.}
+\item{wrap_col_title}{Number of characters to wrap the colour title to. Defaults to 25.}
 
-\item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
-
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 }
 \value{
 A ggplot object.
@@ -85,13 +81,9 @@ A ggplot object.
 Map of simple features in ggplot that is coloured and facetted.
 }
 \examples{
-map_data <- example_sf_nz_river_wq \%>\%
- dplyr::filter(period == "1998-2017",
- indicator \%in\% c("Nitrate-nitrogen", "Dissolved reactive phosphorus"))
- 
  pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
-ggplot_sf_col_facet(data = map_data, col_var = trend_category, facet_var = indicator,
- coastline = nz, pal = pal,
- title = "Monitored river nitrate-nitrogen trends, 2008-17")
+ggplot_sf_col_facet(data = example_sf_point, col_var = trend_category, facet_var = trend_category,
+ boundary = nz, pal = pal,
+ title = "Trends, 1990-2017")
 }

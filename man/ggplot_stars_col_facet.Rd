@@ -6,13 +6,12 @@
 \usage{
 ggplot_stars_col_facet(data, col_method = "quantile",
   col_quantile_by_facet = TRUE, col_cuts = NULL, pal = NULL,
-  pal_rev = FALSE, coastline = NULL, coastline_behind = TRUE,
-  coastline_pal = "#7f7f7f", facet_nrow = NULL, legend_ncol = 3,
+  pal_rev = FALSE, facet_nrow = NULL, legend_ncol = 3,
   legend_digits = 1, title = "[Title]", subtitle = NULL,
   col_title = "", caption = NULL, legend_labels = NULL,
   font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL, wrap_title = 70, wrap_subtitle = 80,
-  wrap_col_title = 25, wrap_caption = 80, isMobile = FALSE)
+  font_size_body = NULL, title_wrap = 70, subtitle_wrap = 80,
+  wrap_col_title = 25, caption_wrap = 80)
 }
 \arguments{
 \item{data}{A stars object with 2 dimensions, x and y, and multiple named attribute layers with usual convention of lower case and underscores. Each attribute layer will be a facet. Required input.}
@@ -27,13 +26,7 @@ ggplot_stars_col_facet(data, col_method = "quantile",
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{coastline}{Add a sf object as a coastline (or administrative boundaries). Defaults to NULL. Use nz (or nz_region) to add a new zealand coastline. Or add a custom sf object.}
-
-\item{coastline_behind}{TRUE or FALSE as to whether the coastline is to be behind the stars object defined in the data argument. Defaults to FALSE.}
-
-\item{coastline_pal}{Colour of the coastline. Defaults to "#7F7F7F".}
-
-\item{facet_nrow}{The number of rows of facetted plots. Not applicable to where isMobile is TRUE.}
+\item{facet_nrow}{The number of rows of facetted plots.}
 
 \item{legend_ncol}{The number of columns in the legend.}
 
@@ -55,15 +48,13 @@ ggplot_stars_col_facet(data, col_method = "quantile",
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{wrap_title}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70.}
 
-\item{wrap_subtitle}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
 
-\item{wrap_col_title}{Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.}
+\item{wrap_col_title}{Number of characters to wrap the colour title to. Defaults to 25.}
 
-\item{wrap_caption}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
-
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 }
 \value{
 A ggplot object.
@@ -72,15 +63,15 @@ A ggplot object.
 Map of an array in ggplot that is coloured and facetted.
 }
 \examples{
-map_data1 <- example_stars_nz_no3n \%>\%
-  rlang::set_names("Nitrate nitrogen")
+map_data1 <- example_stars \%>\%
+  rlang::set_names("Variable A")
 
-map_data2 <- example_stars_nz_drp \%>\%
-  rlang::set_names("Dissolved reactive phosphorus")
+map_data2 <- example_stars_2 \%>\%
+  rlang::set_names("Variable B")
 
 map_data <- c(map_data1, map_data2)
 
-ggplot_stars_col_facet(data = map_data, coastline = nz,
+ggplot_stars_col_facet(data = map_data, 
    col_method = "quantile", col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
-   title = "River modelled nutrient concentrations, 2013-17")
+   title = "Site medians, 2013-17")
 }

@@ -1,5 +1,6 @@
-example_sf_nz_livestock
-example_sf_nz_river_wq
-example_stars_nz_drp
-example_stars_nz_no3n
+example_sf_point
+example_sf_polygon
+example_stars
+example_stars_2
 nz
+nz_region
