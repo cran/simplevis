@@ -16,74 +16,28 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(simplevis)
+```
+
 ### Purpose 
 
-`simplevis` is a package of `ggplot2` and `leaflet` wrapper functions designed to support effortless high quality `ggplot2` and `leaflet` visualisations  for reports or interactive `shiny` apps. The intent is that these can be made more consistently with less effort, code and expertise than would otherwise be required.
-
-### Example
-
-Below is a simple example dataset.
-```{r, message = FALSE, warning = FALSE}
-library(simplevis)
-library(dplyr)
-library(ggplot2)
-
-data <- tibble::tribble(
-  ~pet, ~count,
-  "Cat", 567,
-  "Dog", 443,
-  "Horse", 11)  
-
-data
-```
-
-We can make a `ggplot2` plot quickly. However, it does not look ready for a report or app.
-```{r, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 6}
-ggplot(data) +
-  geom_col(aes(pet, count)) +
-  labs(title = "Wellington pets, 2020", x = "Pet", y = "Count")
-```
-
-We can modify the design with `ggplot2`. However, there is a lot of code. 
-```{r, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 6}
-ggplot(data) +
-  geom_col(aes(pet, count), fill = "#085C75", width = 0.75) +
-  labs(title = "Wellington pets, 2020", x = "Pet", y = "Count") +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 600)) + #hardcoded = bad!
-  theme_minimal() +
-  theme(plot.title = element_text(family = "Helvetica", hjust = 0.5, size = 11, face = "bold", colour = "#000000")) +
-  theme(axis.title = element_text(family = "Helvetica", hjust = 0.5, size = 10, face = "plain", colour = "#323232")) +
-  theme(axis.text = element_text(family = "Helvetica", hjust = 0.5, size = 10, face = "plain", colour = "#323232")) +
-  theme(panel.grid.major.x = element_blank()) +
-  theme(panel.grid.minor.y = element_blank()) +
-  theme(axis.line = element_line(colour = "#323232", size = 0.3)) +
-  theme(axis.ticks = element_line(colour = "#323232", size = 0.3)) +
-  theme(axis.title.x = element_text(margin = margin(t = 10))) +
-  theme(axis.title.y = element_text(margin = margin(r = 10)))
-```
-
-`simplevis` wraps these defaults into the functions, but allows the user to modify as required.
-
-```{r, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 6}
-ggplot_vbar(data, pet, count, 
-            title = "Wellington pets, 2020", 
-            x_title = "Pet", 
-            y_title = "Count")
-```
+`simplevis` is a package of wrapper functions to make 'ggplot2' and 'leaflet' visualisation easier and prettier.
 
 ### simplevis ggplot graph types
 
-`simplevis` provides the following types of `ggplot` graph:
+`simplevis` provides the following types of `ggplot`:
 
-* horizontal bar (e.g. `ggplot_hbar`)
-* vertical bar (e.g. `ggplot_vbar`)
-* line plot (e.g. `ggplot_line`)
-* point plot (e.g. `ggplot_point`)
-* boxplot (e.g. `ggplot_box`)
+* horizontal bar
+* vertical bar
+* line plot 
+* point plot
+* boxplot
 
-For each graph type 4 functions are available.
+For each ggplot type, 4 functions are available.
 
-1. A `ggplot` not coloured or faceted (e.g. `ggplot_hbar`)
+1. A `ggplot` <i>not</i> coloured or faceted (e.g. `ggplot_hbar`)
 ```{r, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 6}
 plot_data <- ggplot2::diamonds %>%
   mutate(cut = stringr::str_to_sentence(cut)) %>%
@@ -108,7 +62,6 @@ plot_data <- ggplot2::diamonds %>%
   mutate(average_price = round(average_price / 1000, 1))
 
 ggplot_hbar_col(plot_data, average_price, cut, clarity, 
-                legend_ncol = 4,
                 title = "Average diamond price by cut and clarity", 
                 x_title = "Average price ($US thousands)", 
                 y_title = "Cut")
@@ -124,6 +77,7 @@ plot_data <- ggplot2::diamonds %>%
   mutate(average_price = round(average_price / 1000, 1))
 
 ggplot_hbar_facet(plot_data, average_price, cut, clarity,
+                  facet_ncol = 4,
                   title = "Average diamond price by cut and clarity", 
                   x_title = "Average price ($US thousands)", 
                   y_title = "Cut")
@@ -139,14 +93,13 @@ plot_data <- ggplot2::diamonds %>%
   mutate(average_price = round(average_price / 1000, 1))
 
 ggplot_hbar_col_facet(plot_data, average_price, color, clarity, cut,
-                      legend_ncol = 4, 
                       title = "Average diamond price by colour, clarity and cut", 
                       x_title = "Average price ($US thousands)", 
                       y_title = "Colour")
 
 ```
 
-These `ggplot` graphs have been designed that users can convert them easily to html interactive objects by wrapping them in `plotly::ggplotly(plot)`. A customised tooltip can be provided using the `tip_var` argument in `simplevis` functions with `plotly::ggplotly(plot, tooltip = "text)`. Automated tip_text columns can be created using the `add_tip` function.
+These `ggplot` graphs have been designed that users can convert them easily to html interactive objects by wrapping them in `plotly::ggplotly(plot)`. A customised tooltip can be provided using the `text_var` argument in `simplevis` functions with `plotly::ggplotly(plot, tooltip = "text")`. Automated `text` columns can be created using the `mutate_text` function.
 
 ```{r, echo = TRUE, eval = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7}
 plot_data <- storms %>%
@@ -173,19 +126,16 @@ tibble::tribble(
   "hbar", "numeric", "categorical", "categorical or numeric", "categorical", "identity",
   "line", "numeric or date", "numeric", "categorical or numeric", "categorical", "identity",
   "point", "numeric", "numeric", "categorical or numeric", "categorical", "identity",
-    "box", "categorical", "numeric", "categorical or numeric", "categorical", "boxplot or identity"
+    "boxplot", "categorical", "numeric", NA, "categorical", "boxplot or identity"
   ) %>% 
   DT::datatable()
 ```
 
 ### simplevis ggplot maps
 
-`simplevis` provides the following types of `ggplot` map:
+`simplevis` provides simple feature (`sf`) maps (i.e. maps with point, line or polygon features). 
 
-* simple feature (`sf`) maps
-* spatial-temporal array (i.e. `stars`) maps 
-
-Simple feature (`sf`) maps are maps of points, lines or polygons.  
+Spatial-temporal array (i.e. `stars`) maps may be supported in future. 
 
 The following functions are available:
 
@@ -200,13 +150,13 @@ These functions work in the same way as the `ggplot` graph functions, but with t
 * Data must be of `POINT`/`MULTIPOINT`, `LINESTRING`/`MULTILINESTRING`, or `POLYGON`/`MULTIPOLYGON` geometry types
 * Data can have any coordinate reference system (CRS), but it must be defined
 * No `x_var` and `y_var` variables are required
-* There is a boundary specification, which allows for a further `sf` object as a boundary or administrative boundaries to be added to the map. An example New Zealand boundary (`nz`) has been provided with the package. 
+* There is a borders specification, which allows for a further `sf` object as a borders or administrative boundaries to be added to the map. An example New Zealand borders (`nz`) has been provided with the package. 
 * They do _not_ support conversion to interactive objects through `plotly::ggplotly`.
 
 ```{r, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7}
 ggplot_sf(example_sf_point, 
-          boundary = nz, 
-          size = 0.25,
+          borders = nz, 
+          point_size = 0.25,
           title = "Site trends, 2008\u201317",
           title_wrap = 40)
 ```
@@ -215,8 +165,8 @@ ggplot_sf(example_sf_point,
 pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
 ggplot_sf_col(example_sf_point, trend_category, 
-              boundary = nz, 
-              size = 0.25, 
+              borders = nz, 
+              point_size = 0.25, 
               pal = pal, 
               title = "Site trends, 2008\u201317",
               title_wrap = 40)
@@ -224,8 +174,8 @@ ggplot_sf_col(example_sf_point, trend_category,
 
 ```{r, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7}
 ggplot_sf_facet(example_sf_point, trend_category, 
-                boundary = nz, 
-                size = 0.25,
+                borders = nz, 
+                point_size = 0.25,
                 title = "Site trends, 2008\u201317")
 ```
 
@@ -233,55 +183,19 @@ ggplot_sf_facet(example_sf_point, trend_category,
 pal <- c("#4575B4", "#D3D3D3", "#D73027")
 
 ggplot_sf_col_facet(example_sf_point, trend_category, trend_category,
-                    boundary = nz, 
-                    size = 0.25, 
+                    borders = nz, 
+                    point_size = 0.25, 
                     pal = pal,
                     title = "Site trends, 1990\u201317")
 ```
 
-`simplevis` provides `ggplot` maps made for spatial temporal arrays (`stars`). 
-
-The following functions are available:
-
-* `ggplot_sf_col`
-* `ggplot_sf_col_facet`
-
-These functions work in the same way as the `ggplot` `sf` map functions, but with the following key differences:
-
-* No non-colouring functions have been made, as it is assumed that this functionality is not required
-* They do _not_ support conversion to interactive objects through `plotly::ggplotly`.
-* Data must be provided in the format of a `stars` object. For, `ggplot_sf_col`, the `stars` object must have 2 dimensions x and y, and only 1 attribute layer. Required input. For, `ggplot_sf_col_facet`,  the stars object must have 2 dimensions, x and y, and multiple named attribute layers with the usual convention of lower case and underscores. Use `select`, `slice`, `c` and `split`to get the `stars` object into the appropriate format.
-
-```{r, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7}
-ggplot_stars_col(example_stars, 
-                 col_method = "quantile", col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
-                 title = "Site medians, 2013-2017",
-                 title_wrap = 40, 
-                 legend_digits = 1)
-```
-
-```{r, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7}
-map_data1 <- example_stars %>% rlang::set_names("A")
-
-map_data2 <- example_stars_2 %>% rlang::set_names("B")
-
-map_data <- c(map_data1, map_data2)
-
-ggplot_stars_col_facet(map_data, 
-                       col_method = "quantile", col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
-                       title = "Site medians, 2013-2017")
-```
-
 ### simplevis leaflet maps
 
-`simplevis` provides the following types of `leaflet` map:
+`simplevis` provides `sf` `leaflet` maps.
 
-* simple feature (`sf`) maps
-* spatial-temporal array (i.e. `stars`) maps 
+These work in the same way as the `ggplot` map functions, but with no borders arguments.
 
-These work in the same way as the `ggplot` map functions, but with no boundary arguments.
-
-Outputs are hidden to keep the size of the vignette manageable. 
+Spatial-temporal array (i.e. `stars`) maps may be supported in future. 
 
 ```{r, echo = TRUE, results = 'hide', message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7}
 leaflet_sf(data = example_sf_polygon)
@@ -291,14 +205,8 @@ leaflet_sf(data = example_sf_polygon)
 leaflet_sf_col(example_sf_polygon, density, 
                col_method = "bin", 
                col_cuts = c(0, 10, 50, 100, 150, 200, Inf), 
-               legend_digits = 0,
+               col_labels_dp = 0,
                title = "Modelled density, 2013-2017")
-```
-
-```{r, echo = TRUE, results = 'hide', fig.height = 4, fig.width = 7}
-leaflet_stars_col(example_stars,
-  col_method = "quantile", col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
-   title = "Modelled density, 2013-2017")
 ```
 
 ### shiny apps with simplevis

@@ -1,8 +1,118 @@
+# simplevis 2.6.0
+
+* Added template zip files.
+
+# simplevis 2.5.9
+
+* Breaking change: changed point_size to default to 1 for all functions.
+* Breaking change: removed line_alpha from leaflet functions, as not required.
+* Breaking change: removed col_drop from leaflet function.
+* Breaking change: removed col_quantile_by_facet function from ggplot_sf_col_facet.
+
+# simplevis 2.5.8
+
+* Breaking change: In leaflet_sf functions, changed opacity to fill_alpha.
+* Breaking change: In leaflet_sf functions, changed weight to line_size.
+* Breaking change: In leaflet_sf functions, changed radius to point_size.
+* Breaking change: In ggplot_line functions, removed points and lines argument. 
+* Breaking change: In ggplot_sf functions, changed size argument to point_size and line_size for consistency.
+
+# simplevis 2.5.7
+
+* New feature: For boxplot, added line_size argument and alpha. 
+* New feature: Default colour changed for where 2 values. 
+* Breaking change: Changed x_na_bar/y_na_bar to x_na_inf/y_na_inf. 
+
+# simplevis 2.5.6
+
+* Breaking change: changed output of mutate_text to name the new column text.
+* Breaking change: removed all stars functions, as these need more development work.
+
+# simplevis 2.5.5 
+
+* Breaking change: Rename tip_var to text_var to align with ggplot2.
+* Breaking change: Rename add_tip to mutate_text to align with ggplot2 and dplyr.
+* Breaking change: Rename boundary with borders to align with ggplot2.
+* Breaking change: Rename ggplot_box with ggplot_boxplot to align with ggplot2.
+
+# simplevis 2.5.4
+
+* Bug fix: Make ggplot_vbar and vbar_facet scales pretty.
+* New feature: Change default point_size to 1.5.
+
+# simplevis 2.5.3
+
+* New feature: Add line_size argument to hbar and vbar functions.
+
+# simplevis 2.5.2
+
+* New feature: Make ggplot_vbar function x scales pretty, where max or min equals the x limit.
+
+# simplevis 2.5.1 
+
+* New feature: Change default of ggplots to legend on right with 1 column.
+* New feature: Add facet_ncol argument.
+* New feature: Add col_labels_ncol argument.
+
+# simplevis 2.5.0
+
+* Breaking change: Rename col_label_digits argument to col_labels_dp.
+* Breaking change: Rename leaflet_sf label_var to tip_var to avoid confusion.
+* Breaking change: Rename size arguments in ggplot_point and ggplot_line functions.
+* New feature: Fixed vbar legend elements being reversed. 
+
+# simplevis 2.4.9
+
+* Breaking change: In leaflet_sf, rename col_na_remove for consistency.
+* Breaking change: In leaflet_sf functions, rename popup as popup_var and improve help.
+* Breaking change: Rename col_digits argument to col_label_digits.
+
+# simplevis 2.4.8
+
+* Breaking change: In line functions, rename size argument to size_point for clarity.
+* New feature: In line functions, add size_line argument.
+* Breaking change: Rename all legend_ arguments to col_ arguments for internal consistency.
+* Breaking change: Rename wrap_col_title to col_title_wrap for internal consistency.
+
+# simplevis 2.4.7
+
+* New feature: Defaulted colours to viridis for all functions.
+* New feature: Improved ggplot_point and ggplot_sf colouring code.
+* New feature: Added col_na arguments to ggplot_point and ggplot_sf functions to show na col_var values or not.  
+* New feature: Added alpha argument for the fill of hbar and vbar.
+
+# simplevis 2.4.6
+
+* Breaking change: Removed size argument in line functions.
+* Breaking change: Renamed point_size as size in line functions.
+
+# simplevis 2.4.5
+
+* New feature: Add alpha argument into hbar and vbar.
+* Breaking change: Changed quantile_by_facet argument to col_quantile_by_facet for internal consistency.
+
+# simplevis 2.4.4
+
+* Breaking change: Remove leaflet_basemap_nz.
+
+# simplevis 2.4.3
+
+* New feature: Updated leaflet_basemap to include an argument for bounds.
+
+# simplevis 2.4.2 
+
+* Breaking change: Removed rnaturalearth wrapper functions, but referenced the package in help, examples and articles instead.
+
+# simplevis 2.4.1
+
+* New feature: Add the ability to set bounds in leaflet basemap for country boundaries from the rnaturalearth package.
+* New feature: Add wrapper functions to easily extract sf boundaries and bounds from the rnaturalearth package.
+
 # simplevis 2.4.0
 
-* Reduce the size of sf example objects.
-* Add vignette for making maps of sf objects.
-* Removed support for boundary arguments in ggplot_stars, as it was not working.
+* New feature: Reduce the size of sf example objects.
+* New feature: Add vignette for making maps of sf objects.
+* New feature: Removed support for boundary arguments in ggplot_stars, as it was not working.
 
 # simplevis 2.3.9
 

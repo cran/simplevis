@@ -4,12 +4,12 @@
 \alias{plotly_legend_order}
 \title{Order plotly legend elements.}
 \usage{
-plotly_legend_order(plotly, numeric_order = NULL)
+plotly_legend_order(plotly, order = NULL)
 }
 \arguments{
 \item{plotly}{A plotly object.}
 
-\item{numeric_order}{A vector specifying the numeric order of elements. Required input.}
+\item{order}{A vector specifying the numeric order of elements. Required input.}
 }
 \description{
 Order plotly legend elements.
@@ -26,7 +26,7 @@ plot <- ggplot_hbar_col(data = plot_data,
                        x_var = average_price_thousands, 
                        y_var = cut, 
                        col_var = clarity, 
-                       legend_ncol = 4,
+                       col_labels_ncol = 4,
                        title = "Average diamond price by cut and clarity", 
                        x_title = "Average price ($US thousands)", 
                        y_title = "Cut")

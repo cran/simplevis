@@ -4,7 +4,8 @@
 #' @param logo TRUE or FALSE of whether to display the plotly logo. Defaults to FALSE.
 #' @export
 #' @examples
-#' plot_data <- dplyr::sample_frac(ggplot2::diamonds, 0.05)
+#' plot_data <- dplyr::sample_frac(ggplot2::diamonds, 0.05) %>% 
+#'    mutate_text()
 #' 
 #' plot <- ggplot_point(data = plot_data, x_var = carat, y_var = price)
 #' 
@@ -37,7 +38,7 @@ plotly_camera <- function(plotly, logo = FALSE){
 #'                        x_var = average_price_thousands, 
 #'                        y_var = cut, 
 #'                        col_var = clarity, 
-#'                        legend_ncol = 4,
+#'                        col_labels_ncol = 4,
 #'                        title = "Average diamond price by cut and clarity", 
 #'                        x_title = "Average price ($US thousands)", 
 #'                        y_title = "Cut")
@@ -55,7 +56,7 @@ plotly_legend_rev <- function(plotly) {
 #' @title Order plotly legend elements.
 #' @description Order plotly legend elements.
 #' @param plotly A plotly object.
-#' @param numeric_order A vector specifying the numeric order of elements. Required input.
+#' @param order A vector specifying the numeric order of elements. Required input.
 #' @export
 #' @examples
 #' plot_data <- ggplot2::diamonds %>%
@@ -69,7 +70,7 @@ plotly_legend_rev <- function(plotly) {
 #'                        x_var = average_price_thousands, 
 #'                        y_var = cut, 
 #'                        col_var = clarity, 
-#'                        legend_ncol = 4,
+#'                        col_labels_ncol = 4,
 #'                        title = "Average diamond price by cut and clarity", 
 #'                        x_title = "Average price ($US thousands)", 
 #'                        y_title = "Cut")
@@ -78,9 +79,9 @@ plotly_legend_rev <- function(plotly) {
 #' 
 #' plotly::ggplotly(plot, tooltip = "text") %>% 
 #'    plotly_legend_order(c(4, 1:3, 5:8))
-plotly_legend_order <- function(plotly, numeric_order = NULL) {
-  if(is.null(numeric_order)) stop("A numeric order vector must be provided")
+plotly_legend_order <- function(plotly, order = NULL) {
+  if(is.null(order)) stop("A numeric order vector must be provided")
   n_labels <- length(plotly$x$data)
-  plotly$x$data[1:n_labels] <- plotly$x$data[numeric_order]
+  plotly$x$data[1:n_labels] <- plotly$x$data[order]
   plotly
 }

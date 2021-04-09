@@ -19,7 +19,7 @@ shinyServer(function(input, output, session) {
       summarise(average_price = round(mean(price), 0)) %>%
       mutate(average_price_thousands = round(average_price / 1000, 1)) %>%
       mutate(average_price = paste0("US$", prettyNum(average_price,  big.mark = ","))) %>% 
-      add_tip(c("cut", "clarity", "average_price"))
+      mutate_text(c("cut", "clarity", "average_price"))
     
     return(plot_data)
   })
@@ -40,8 +40,8 @@ shinyServer(function(input, output, session) {
                             x_var = average_price_thousands, 
                             y_var = cut, 
                             col_var = clarity, 
-                            tip_var = tip_text,
-                            legend_ncol = 4,
+                            text_var = tip_text,
+                            col_labels_ncol = 4,
                             title = title, 
                             x_title = x_title, 
                             y_title = y_title,
@@ -67,11 +67,7 @@ shinyServer(function(input, output, session) {
   
   map_data <- reactive({ # create a reactive map_data object
     
-    selected_metric <- input$map_metric
-    
-    map_data <- data2 %>%
-      filter(period == "2008-2017") %>% 
-      filter(indicator == selected_metric)
+    map_data <- data2 
     
     return(map_data)
   })
@@ -95,8 +91,7 @@ shinyServer(function(input, output, session) {
                    trend_category, 
                    pal = pal, 
                    col_method = "category",
-                   title = title,
-                   radius = 2)
+                   title = title)
   }
   
   observe({
@@ -132,18 +127,6 @@ shinyServer(function(input, output, session) {
     },
     content <- function(file) {
       file.copy("data/data.zip", file)
-    },
-    contentType = "application/zip"
-  )
-  
-  ### download code ###
-  
-  output$download_code <- downloadHandler(
-    filename <- function() {
-      "template2.zip"
-    },
-    content <- function(file) {
-      file.copy("data/template2.zip", file)
     },
     contentType = "application/zip"
   )
