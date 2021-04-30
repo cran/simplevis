@@ -5,19 +5,20 @@
 \title{Point ggplot that is coloured.}
 \usage{
 ggplot_point_col(data, x_var, y_var, col_var, text_var = NULL,
-  point_size = 1, pal = NULL, pal_rev = FALSE, col_method = NULL,
-  col_cuts = NULL, col_na = TRUE, x_zero = TRUE,
-  x_zero_line = NULL, x_trans = "identity", x_labels = waiver(),
-  x_pretty_n = 6, x_expand = NULL, y_zero = TRUE,
-  y_zero_line = NULL, y_trans = "identity", y_labels = waiver(),
-  y_pretty_n = 5, y_expand = NULL, title = "[Title]",
-  subtitle = NULL, x_title = "[X title]", y_title = "[Y title]",
-  col_title = "", caption = NULL, col_labels = NULL,
-  col_labels_ncol = NULL, col_labels_nrow = NULL, col_labels_dp = 1,
+  size_point = 1, pal = NULL, pal_rev = FALSE, col_method = NULL,
+  col_cuts = NULL, col_na = TRUE, x_balance = FALSE,
+  x_zero = FALSE, x_zero_line = NULL, x_trans = "identity",
+  x_labels = waiver(), x_pretty_n = 6, x_expand = NULL,
+  y_balance = FALSE, y_expand = NULL, y_labels = waiver(),
+  y_pretty_n = 5, y_trans = "identity", y_zero = FALSE,
+  y_zero_line = NULL, title = "[Title]", subtitle = NULL,
+  x_title = "[X title]", y_title = "[Y title]", col_title = "",
+  caption = NULL, col_labels = NULL, col_labels_ncol = NULL,
+  col_labels_nrow = NULL, col_labels_dp = 1,
   font_family = "Helvetica", font_size_title = NULL,
   font_size_body = NULL, title_wrap = 70, subtitle_wrap = 80,
   x_title_wrap = 50, y_title_wrap = 50, col_title_wrap = 25,
-  caption_wrap = 80, isMobile = FALSE)
+  caption_wrap = 80, mobile = FALSE)
 }
 \arguments{
 \item{data}{An ungrouped summarised tibble or dataframe. Required input.}
@@ -30,7 +31,7 @@ ggplot_point_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
-\item{point_size}{Size of points. Defaults to 1.}
+\item{size_point}{Size of points. Defaults to 1.}
 
 \item{pal}{Character vector of hex codes. Defaults to viridis. Use the pals package to find a suitable palette.}
 
@@ -40,31 +41,35 @@ ggplot_point_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable.}
+\item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable. Defaults to TRUE.}
+
+\item{x_balance}{Add balance to the x axis so that zero is in the centre of the x scale.}
 
 \item{x_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
 
-\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. Defaults to NULL, which is TRUE if there are positive and negative values in x_var. Otherwise it is FALSE.}
+\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
 \item{x_trans}{A string specifying a transformation for the x scale. Defaults to "identity".}
 
 \item{x_labels}{Adjust the  x scale labels through a function or vector.}
 
-\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where mobile equals TRUE.}
 
 \item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
 
-\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{y_balance}{Add balance to the y axis so that zero is in the centre of the y scale.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
-
-\item{y_trans}{A string specifying a transformation for the y scale. Defaults to "identity".}
+\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
 
 \item{y_labels}{Adjust the  y scale labels through a function or vector.}
 
 \item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
-\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
+\item{y_trans}{A string specifying a transformation for the y scale. Defaults to "identity".}
+
+\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to FALSE.}
+
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -80,7 +85,7 @@ ggplot_point_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{col_labels}{Adjust the colour scale labels through a vector.}
 
-\item{col_labels_ncol}{The number of columns in the legend. Defaults to 1.}
+\item{col_labels_ncol}{The number of columns in the legend.}
 
 \item{col_labels_nrow}{The number of rows in the legend.}
 
@@ -92,19 +97,19 @@ ggplot_point_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70. Not applicable where mobile equals TRUE.}
 
-\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where mobile equals TRUE.}
 
-\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where mobile equals TRUE.}
 
-\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where mobile equals TRUE.}
 
-\item{col_title_wrap}{Number of characters to wrap the colour title to. Defaults to 25. Not applicable where isMobile equals TRUE.}
+\item{col_title_wrap}{Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.}
 
-\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use mobile = input$isMobile.}
 }
 \value{
 A ggplot object.

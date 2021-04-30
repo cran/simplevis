@@ -15,9 +15,9 @@ mobileDetect <-
 
 shinyUI(
   fluidPage(
-    tags$div(tags$br()),
-    downloadButton("download_code", tags$strong("Download code")),
-    tags$div(tags$br()),
+    tags$div(tags$br()), # delete this line 
+    downloadButton("download_code", tags$strong("Download code")),  # delete this line 
+    tags$div(tags$br()),  # delete this line 
     tags$head(includeCSS("www/style.css")),
     tags$head(includeScript("www/js/tag-manager.js")),
     mobileDetect("isMobile"),

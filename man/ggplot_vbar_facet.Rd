@@ -5,17 +5,16 @@
 \title{Vertical bar ggplot that is facetted.}
 \usage{
 ggplot_vbar_facet(data, x_var, y_var, facet_var, text_var = NULL,
-  pal = NULL, width = 0.75, alpha = 1, line_size = 0.5,
+  pal = NULL, width = 0.75, alpha = 1, size_line = 0.5,
   title = "[Title]", title_wrap = 70, subtitle = NULL,
   subtitle_wrap = 80, x_expand = NULL, x_labels = waiver(),
   x_pretty_n = 5, x_title = "[X title]", x_title_wrap = 50,
   y_balance = FALSE, y_expand = NULL, y_labels = waiver(),
-  y_na_inf = FALSE, y_pretty_n = 5, y_title = "[Y title]",
-  y_title_wrap = 50, y_trans = "identity", y_zero = TRUE,
-  y_zero_line = NULL, facet_ncol = NULL, facet_nrow = NULL,
-  facet_scales = "fixed", caption = NULL, caption_wrap = 80,
-  font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL)
+  y_pretty_n = 5, y_title = "[Y title]", y_title_wrap = 50,
+  y_trans = "identity", y_zero = TRUE, y_zero_line = NULL,
+  facet_ncol = NULL, facet_nrow = NULL, facet_scales = "fixed",
+  caption = NULL, caption_wrap = 80, font_family = "Helvetica",
+  font_size_title = NULL, font_size_body = NULL)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -34,7 +33,7 @@ ggplot_vbar_facet(data, x_var, y_var, facet_var, text_var = NULL,
 
 \item{alpha}{The alpha of the fill. Defaults to 1.}
 
-\item{line_size}{The size of the outlines of bars.}
+\item{size_line}{The size of the outlines of bars.}
 
 \item{title}{Title string. Defaults to [Title].}
 
@@ -60,8 +59,6 @@ ggplot_vbar_facet(data, x_var, y_var, facet_var, text_var = NULL,
 
 \item{y_labels}{Adjust the  y scale labels through a function or vector.}
 
-\item{y_na_inf}{TRUE or FALSE of whether to make NA y_var values infinity with a light grey colour to emphasise them. Defaults to FALSE. Only functional where facet_scales = "fixed" or "free_x".}
-
 \item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{y_title}{Y axis title string. Defaults to [Y title].}
@@ -72,7 +69,7 @@ ggplot_vbar_facet(data, x_var, y_var, facet_var, text_var = NULL,
 
 \item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
 \item{facet_ncol}{The number of columns of facetted plots.}
 

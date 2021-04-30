@@ -5,17 +5,19 @@
 \title{Line ggplot that is coloured and facetted.}
 \usage{
 ggplot_line_col_facet(data, x_var, y_var, col_var, facet_var,
-  text_var = NULL, pal = NULL, pal_rev = FALSE, point_size = 1,
-  line_size = 0.5, title = "[Title]", title_wrap = 70,
-  subtitle = NULL, subtitle_wrap = 80, x_expand = NULL,
-  x_labels = waiver(), x_pretty_n = 5, x_title = "[X title]",
-  x_title_wrap = 50, y_balance = FALSE, y_expand = NULL,
-  y_labels = waiver(), y_pretty_n = 5, y_trans = "identity",
-  y_title = "[Y title]", y_title_wrap = 50, y_zero = TRUE,
-  y_zero_line = NULL, col_title = "", col_title_wrap = 25,
+  text_var = NULL, pal = NULL, pal_rev = FALSE, size_point = 1,
+  size_line = 0.5, title = "[Title]", title_wrap = 70,
+  subtitle = NULL, subtitle_wrap = 80, x_balance = FALSE,
+  x_expand = NULL, x_labels = waiver(), x_pretty_n = 5,
+  x_title = "[X title]", x_title_wrap = 50, x_trans = "identity",
+  x_zero = FALSE, x_zero_line = NULL, y_balance = FALSE,
+  y_expand = NULL, y_labels = waiver(), y_pretty_n = 5,
+  y_trans = "identity", y_title = "[Y title]", y_title_wrap = 50,
+  y_zero = FALSE, y_zero_line = NULL, col_na = TRUE,
   col_labels = NULL, col_labels_ncol = NULL, col_labels_nrow = NULL,
-  facet_ncol = NULL, facet_nrow = NULL, facet_scales = "fixed",
-  caption = NULL, caption_wrap = 80, font_family = "Helvetica",
+  col_title = "", col_title_wrap = 25, facet_ncol = NULL,
+  facet_nrow = NULL, facet_scales = "fixed", caption = NULL,
+  caption_wrap = 80, font_family = "Helvetica",
   font_size_title = NULL, font_size_body = NULL)
 }
 \arguments{
@@ -35,9 +37,9 @@ ggplot_line_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{point_size}{Size of points. Defaults to 1.}
+\item{size_point}{Size of points. Defaults to 1.}
 
-\item{line_size}{Size of lines. Defaults to 0.5.}
+\item{size_line}{Size of lines. Defaults to 0.5.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -46,6 +48,8 @@ ggplot_line_col_facet(data, x_var, y_var, col_var, facet_var,
 \item{subtitle}{Subtitle string. Defaults to "[Subtitle]".}
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
+
+\item{x_balance}{Add balance to the x axis so that zero is in the centre of the x scale.}
 
 \item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
 
@@ -56,6 +60,12 @@ ggplot_line_col_facet(data, x_var, y_var, col_var, facet_var,
 \item{x_title}{X axis title string. Defaults to "[X title]".}
 
 \item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50.}
+
+\item{x_trans}{A string specifying a transformation for the x scale. Defaults to "identity".}
+
+\item{x_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to FALSE.}
+
+\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
 \item{y_balance}{Add balance to the y axis so that zero is in the centre of the y scale. Only applicable where facet_scales equals "fixed" or "free_x".}
 
@@ -71,19 +81,21 @@ ggplot_line_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50.}
 
-\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to FALSE.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
+
+\item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable. Defaults to TRUE.}
+
+\item{col_labels}{Adjust the  colour scale labels through a vector.}
+
+\item{col_labels_ncol}{The number of columns in the legend.}
+
+\item{col_labels_nrow}{The number of rows in the legend.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL.}
 
 \item{col_title_wrap}{Number of characters to wrap the colour title to. Defaults to 25.}
-
-\item{col_labels}{Adjust the  colour scale labels through a vector.}
-
-\item{col_labels_ncol}{The number of columns in the legend. Defaults to 1.}
-
-\item{col_labels_nrow}{The number of rows in the legend.}
 
 \item{facet_ncol}{The number of columns of facetted plots.}
 

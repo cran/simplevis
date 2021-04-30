@@ -1,3 +1,108 @@
+# simplevis 3.0.0
+
+* Bumped version for CRAN release.
+
+# simplevis 2.8.2
+
+* Corrected vbar default reversing of col_var.
+* Removed vbar x_rev argument, as unsure of logic rules.
+
+# simplevis 2.8.1
+
+* Corrected vbar default reversing of x_var.
+
+# simplevis 2.8.0
+
+* Update templates.
+
+# simplevis 2.7.9
+
+* Added ggplot_boxplot_col_facet function. 
+
+# simplevis 2.7.8
+
+* Make handling of all zero values pretty for all plots other than point.
+
+# simplevis 2.7.7
+
+* Breaking change: changed the isMobile argument to mobile for snakecase consistency across the package.
+* Fixed where trans was equal to log or log10, and zero was selected
+* Added ggplot_boxplot_col
+
+# simplevis 2.7.6
+
+* Updated scale_x_date to remove oob.
+
+# simplevis 2.7.5
+
+* Updated website vignette and articles.
+
+# simplevis 2.7.4
+
+* Breaking change: Removed x_na_inf and y_na_inf arguments.
+
+# simplevis 2.7.3
+
+* Export breaks functions.
+* Corrected bug fix with x_na_inf and y_na_inf.
+
+# simplevis 2.7.2
+
+* Added col_na argument to all functions lacking it.
+* Added x_rev and col_rev to vbar functions.
+
+# simplevis 2.7.1
+
+* Modularised all x_zero adjustments and automatic x_zero line components, and likewise the y_ ones.
+
+# simplevis 2.7.0
+
+* Modularised all x and y numeric breaks.
+* New feature: added balance, trans and zero arguments to all numeric arguments.
+* New feature: Changed x_zero and y_zero defaults for non-bar graph numeric scales to FALSE.
+
+# simplevis 2.6.9
+
+* Underlying code change of hbar to not use `coord_flip`.
+* Rebuilt y numeric breaks.
+
+# simplevis 2.6.8
+
+* Rebuilt default font size code.
+
+# simplevis 2.6.7
+
+* New feature: Added to all themes legend.direction = "vertical" to make titles always be above legends.
+* Documentation: added shiny for mobile article.
+
+# simplevis 2.6.6
+
+* New feature: Changed leaflet default alpha to 0.9.
+* Documentation: added scales article.
+
+# simplevis 2.6.5
+
+* New feature: Changed boxplot for outlines to be always coloured black, and alpha defaulted to 1. 
+* Breaking change: Changed point_size and line_size to size_point and size_line.
+
+# simplevis 2.6.4
+
+* New feature: Changed leaflet_sf default point_size to 2.
+
+# simplevis 2.6.3
+
+* New feature: added text_var arguments to ggplot sf functions to fully support plotly interactive maps. 
+
+# simplevis 2.6.2
+
+* Bug fix: Fix mutate_text, so that it does not add Not available to non-NA charcter values with NA in them. 
+* New feature: Make ggplot sf functions not adjust alpha of outlines.
+* New feature: Remove key_glyph, as it is not implemented in ggplotly.  
+
+# simplevis 2.6.1
+
+* Updated vignette and articles.
+
 # simplevis 2.6.0
 
 * Added template zip files.

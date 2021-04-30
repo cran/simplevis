@@ -22,7 +22,8 @@ shinyServer(function(input, output, session) {
       mutate_text(c("cut", "clarity", "average_price"))
     
     return(plot_data)
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   plot <- reactive({ # create a reactive ggplot object
     
@@ -40,25 +41,28 @@ shinyServer(function(input, output, session) {
                             x_var = average_price_thousands, 
                             y_var = cut, 
                             col_var = clarity, 
-                            text_var = tip_text,
+                            text_var = text,
                             col_labels_ncol = 4,
                             title = title, 
                             x_title = x_title, 
                             y_title = y_title,
-                            isMobile = input$isMobile)
+                            mobile = input$isMobile)
     
     
     return(plot)
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   output$plot_desktop <- plotly::renderPlotly({ 
     plotly::ggplotly(plot(), tooltip = "text") %>%
       plotly_camera()
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   output$plot_mobile <- renderPlot({
     plot() 
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   ### map ###
   output$map <- leaflet::renderLeaflet({
@@ -67,11 +71,19 @@ shinyServer(function(input, output, session) {
   
   map_data <- reactive({ # create a reactive map_data object
     
-    map_data <- data2 
+    map_filter <- input$map_filter
+    
+    if(map_filter == "None") {
+      map_data <- data2 
+    } else if(map_filter != "None") {
+      map_data <- data2 %>% 
+        filter(trend_category == map_filter)
+    }
     
     return(map_data)
-  })
-  
+  }) %>% 
+    bindCache(input$map_filter)
+
   draw_map <- function() {
     
     # add leaflet code from make_data_vis.R
@@ -81,11 +93,10 @@ shinyServer(function(input, output, session) {
     
     # reactive_radius <-  case_when(input$map_zoom < 7, 1, ifelse(input$map_zoom < 9, 2, ifelse(input$map_zoom < 12, 3, 4)))  
 
-    selected_metric <- input$map_metric
-    
     pal <- c("#4575B4", "#D3D3D3", "#D73027")
+    names(pal) <- c("Improving", "Indeterminate", "Worsening")
     
-    title <- paste0("Monitored river ", selected_metric, " trends, 2008\u201317")
+    title <- paste0("Monitored trends, 2008\u201317")
     
     leaflet_sf_col(map_data(), 
                    trend_category, 

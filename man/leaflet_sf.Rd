@@ -4,8 +4,8 @@
 \alias{leaflet_sf}
 \title{Map of simple features in leaflet.}
 \usage{
-leaflet_sf(data, popup_var = NULL, pal = NULL, point_size = 1,
-  line_size = 2, alpha = 0.1, basemap = "light", title = "[Title]",
+leaflet_sf(data, popup_var = NULL, pal = NULL, size_point = 2,
+  size_line = 2, alpha = 0.9, basemap = "light", title = "[Title]",
   col_labels_dp = 1, col_labels = "[Feature]", map_id = "map")
 }
 \arguments{
@@ -15,11 +15,11 @@ leaflet_sf(data, popup_var = NULL, pal = NULL, point_size = 1,
 
 \item{pal}{Character vector of hex codes. Defaults to viridis. Use the pals package to find a suitable palette.}
 
-\item{point_size}{Size of points (i.e. radius). Defaults to 1.}
+\item{size_point}{Size of points (i.e. radius). Defaults to 2.}
 
-\item{line_size}{Size of lines around features (i.e. weight). Defaults to 2.}
+\item{size_line}{Size of lines around features (i.e. weight). Defaults to 2.}
 
-\item{alpha}{The opacity of the fill within features (i.e. fillOpacity). Defaults to 0.1.}
+\item{alpha}{The opacity of the fill within features (i.e. fillOpacity). Defaults to 0.9.}
 
 \item{basemap}{The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.}
 

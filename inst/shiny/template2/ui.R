@@ -15,6 +15,9 @@ mobileDetect <-
 
 shinyUI(
   fluidPage(
+    tags$div(tags$br()), # delete this line 
+    downloadButton("download_code", tags$strong("Download code")),  # delete this line 
+    tags$div(tags$br()),  # delete this line 
     tags$head(includeCSS("www/style.css")),
     tags$head(includeScript("www/js/tag-manager.js")),
     mobileDetect("isMobile"),
@@ -56,8 +59,8 @@ shinyUI(
         icon = icon("globe-americas", lib = "font-awesome"),
         sidebarLayout(
           sidebarPanel(
-            width = 3
-            # add widgets
+            width = 3,
+            radioButtons("map_filter", "Filter", c("None", "Improving", "Indeterminate", "Worsening"))
           ),
           mainPanel(width = 9,
                     fluidRow(

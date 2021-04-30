@@ -4,16 +4,17 @@
 \alias{ggplot_point}
 \title{Point ggplot.}
 \usage{
-ggplot_point(data, x_var, y_var, text_var = NULL, point_size = 1,
+ggplot_point(data, x_var, y_var, text_var = NULL, size_point = 1,
   pal = NULL, title = "[Title]", title_wrap = 70, subtitle = NULL,
-  subtitle_wrap = 80, x_expand = NULL, x_labels = waiver(),
-  x_pretty_n = 6, x_title = "[X title]", x_title_wrap = 50,
-  x_trans = "identity", x_zero = TRUE, x_zero_line = NULL,
-  y_trans = "identity", y_labels = waiver(), y_pretty_n = 5,
-  y_expand = NULL, y_title = "[Y title]", y_title_wrap = 50,
-  y_zero = TRUE, y_zero_line = NULL, caption = NULL,
-  caption_wrap = 80, font_family = "Helvetica",
-  font_size_title = NULL, font_size_body = NULL, isMobile = FALSE)
+  subtitle_wrap = 80, x_balance = FALSE, x_expand = NULL,
+  x_labels = waiver(), x_pretty_n = 6, x_title = "[X title]",
+  x_title_wrap = 50, x_trans = "identity", x_zero = FALSE,
+  x_zero_line = NULL, y_balance = FALSE, y_expand = NULL,
+  y_labels = waiver(), y_pretty_n = 5, y_title = "[Y title]",
+  y_title_wrap = 50, y_trans = "identity", y_zero = FALSE,
+  y_zero_line = NULL, caption = NULL, caption_wrap = 80,
+  font_family = "Helvetica", font_size_title = NULL,
+  font_size_body = NULL, mobile = FALSE)
 }
 \arguments{
 \item{data}{An ungrouped summarised tibble or dataframe. Required input.}
@@ -24,53 +25,57 @@ ggplot_point(data, x_var, y_var, text_var = NULL, point_size = 1,
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
-\item{point_size}{Size of points. Defaults to 1.}
+\item{size_point}{Size of points. Defaults to 1.}
 
 \item{pal}{Character vector of hex codes. Defaults to viridis. Use the pals package to find a suitable palette.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
-\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70. Not applicable where isMobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 70. Not applicable where mobile equals TRUE.}
 
 \item{subtitle}{Subtitle string. Defaults to "[Subtitle]".}
 
-\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where mobile equals TRUE.}
+
+\item{x_balance}{Add balance to the x axis so that zero is in the centre of the x scale.}
 
 \item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
 
 \item{x_labels}{Adjust the  x scale labels through a function or vector.}
 
-\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where isMobile equals TRUE.}
+\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 6. Not applicable where mobile equals TRUE.}
 
 \item{x_title}{X axis title string. Defaults to "[X title]".}
 
-\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50. Not applicable where mobile equals TRUE.}
 
 \item{x_trans}{A string specifying a transformation for the x scale. Defaults to "identity".}
 
 \item{x_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
 
-\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. Defaults to NULL, which is TRUE if there are positive and negative values in x_var. Otherwise it is FALSE.}
+\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
-\item{y_trans}{A string specifying a transformation for the y scale. Defaults to "identity".}
+\item{y_balance}{Add balance to the y axis so that zero is in the centre of the y scale.}
+
+\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
 
 \item{y_labels}{Adjust the  y scale labels through a function or vector.}
 
 \item{y_pretty_n}{The desired number of intervals on the y axis, as calculated by the pretty algorithm. Defaults to 5.}
 
-\item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
-
 \item{y_title}{Y axis title string. Defaults to "[Y title]".}
 
-\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where isMobile equals TRUE.}
+\item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50. Not applicable where mobile equals TRUE.}
 
-\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{y_trans}{A string specifying a transformation for the y scale. Defaults to "identity".}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
+\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to FALSE.}
+
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
 \item{caption}{Caption title string. Defaults to NULL.}
 
-\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where isMobile equals TRUE.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.}
 
 \item{font_family}{Font family to use. Defaults to "Helvetica".}
 
@@ -78,7 +83,7 @@ ggplot_point(data, x_var, y_var, text_var = NULL, point_size = 1,
 
 \item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
 
-\item{isMobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use isMobile = input$isMobile.}
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within an app with the mobileDetect function, then use mobile = input$isMobile.}
 }
 \value{
 A ggplot object.

@@ -22,7 +22,8 @@ shinyServer(function(input, output, session) {
       mutate_text(c("cut", "clarity", "average_price"))
     
     return(plot_data)
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   plot <- reactive({ # create a reactive ggplot object
     
@@ -40,26 +41,28 @@ shinyServer(function(input, output, session) {
                             x_var = average_price_thousands, 
                             y_var = cut, 
                             col_var = clarity,
-                            text_var = tip_text,
+                            text_var = text,
                             col_labels_ncol = 4,
                             title = title, 
                             x_title = x_title, 
                             y_title = y_title,
-                            isMobile = input$isMobile)
+                            mobile = input$isMobile)
     
     
     return(plot)
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   output$plot_desktop <- plotly::renderPlotly({ 
     plotly::ggplotly(plot(), tooltip = "text") %>%
       plotly_camera() 
-
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   output$plot_mobile <- renderPlot({
     plot() 
-  })
+  }) %>% 
+    bindCache(input$plot_color)
   
   ### table ###
   

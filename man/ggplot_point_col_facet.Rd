@@ -5,19 +5,20 @@
 \title{Point ggplot that is coloured and facetted.}
 \usage{
 ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
-  text_var = NULL, point_size = 1, pal = NULL, pal_rev = FALSE,
+  text_var = NULL, size_point = 1, pal = NULL, pal_rev = FALSE,
   title = "[Title]", title_wrap = 70, subtitle = NULL,
-  subtitle_wrap = 80, x_expand = NULL, x_labels = waiver(),
-  x_pretty_n = 5, x_title = "[X title]", x_title_wrap = 50,
-  x_trans = "identity", x_zero = TRUE, x_zero_line = NULL,
-  y_expand = NULL, y_labels = waiver(), y_pretty_n = 5,
-  y_title = "[Y title]", y_title_wrap = 50, y_trans = "identity",
-  y_zero = TRUE, y_zero_line = NULL, col_cuts = NULL,
-  col_labels_dp = 1, col_labels = NULL, col_labels_ncol = NULL,
-  col_labels_nrow = NULL, col_method = NULL, col_na = TRUE,
-  col_quantile_by_facet = TRUE, col_title = "", col_title_wrap = 25,
-  facet_ncol = NULL, facet_nrow = NULL, facet_scales = "fixed",
-  caption = NULL, caption_wrap = 80, font_family = "Helvetica",
+  subtitle_wrap = 80, x_balance = FALSE, x_expand = NULL,
+  x_labels = waiver(), x_pretty_n = 5, x_title = "[X title]",
+  x_title_wrap = 50, x_trans = "identity", x_zero = FALSE,
+  x_zero_line = NULL, y_balance = FALSE, y_expand = NULL,
+  y_labels = waiver(), y_pretty_n = 5, y_title = "[Y title]",
+  y_title_wrap = 50, y_trans = "identity", y_zero = FALSE,
+  y_zero_line = NULL, col_cuts = NULL, col_labels_dp = 1,
+  col_labels = NULL, col_labels_ncol = NULL, col_labels_nrow = NULL,
+  col_method = NULL, col_na = TRUE, col_quantile_by_facet = TRUE,
+  col_title = "", col_title_wrap = 25, facet_ncol = NULL,
+  facet_nrow = NULL, facet_scales = "fixed", caption = NULL,
+  caption_wrap = 80, font_family = "Helvetica",
   font_size_title = NULL, font_size_body = NULL)
 }
 \arguments{
@@ -33,7 +34,7 @@ ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
-\item{point_size}{Size of points. Defaults to 1.}
+\item{size_point}{Size of points. Defaults to 1.}
 
 \item{pal}{Character vector of hex codes. Defaults to viridis. Use the pals package to find a suitable palette.}
 
@@ -46,6 +47,8 @@ ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
 \item{subtitle}{Subtitle string. Defaults to "[Subtitle]".}
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
+
+\item{x_balance}{Add balance to the x axis so that zero is in the centre of the x scale.}
 
 \item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
 
@@ -61,7 +64,9 @@ ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{x_zero}{TRUE or FALSE whether the minimum of the x scale is zero. Defaults to TRUE.}
 
-\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. Defaults to NULL, which is TRUE if there are positive and negative values in x_var. Otherwise it is FALSE.}
+\item{x_zero_line}{TRUE or FALSE whether to add a zero reference line to the x axis. TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
+
+\item{y_balance}{Add balance to the y axis so that zero is in the centre of the y scale.}
 
 \item{y_expand}{A vector of range expansion constants used to add some padding on the y scale.}
 
@@ -75,9 +80,9 @@ ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{y_trans}{A string specifying a transformation for the y scale. Defaults to "identity".}
 
-\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to FALSE.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
@@ -85,13 +90,13 @@ ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{col_labels}{Adjust the colour scale labels through a vector.}
 
-\item{col_labels_ncol}{The number of columns in the legend. Defaults to 1.}
+\item{col_labels_ncol}{The number of columns in the legend.}
 
 \item{col_labels_nrow}{The number of rows in the legend.}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "quantile".}
 
-\item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable.}
+\item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable. Defaults to TRUE.}
 
 \item{col_quantile_by_facet}{TRUE of FALSE whether quantiles should be calculated for each group of the facet variable. Defaults to TRUE.}
 

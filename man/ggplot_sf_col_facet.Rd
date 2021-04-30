@@ -4,17 +4,17 @@
 \alias{ggplot_sf_col_facet}
 \title{Map of simple features in ggplot that is coloured and facetted.}
 \usage{
-ggplot_sf_col_facet(data, col_var, facet_var, pal = NULL,
-  pal_rev = FALSE, point_size = 1, line_size = 0.5, alpha = 1,
-  borders = NULL, borders_behind = TRUE, borders_pal = "#7f7f7f",
-  borders_size = 0.2, title = "[Title]", title_wrap = 70,
-  subtitle = NULL, subtitle_wrap = 80, col_cuts = NULL,
-  col_labels_dp = 1, col_labels = NULL, col_method = NULL,
-  col_na = TRUE, col_labels_ncol = NULL, col_labels_nrow = NULL,
-  col_title = "", col_title_wrap = 25, facet_ncol = NULL,
-  facet_nrow = NULL, caption = NULL, caption_wrap = 80,
-  font_family = "Helvetica", font_size_title = NULL,
-  font_size_body = NULL)
+ggplot_sf_col_facet(data, col_var, facet_var, text_var = NULL,
+  pal = NULL, pal_rev = FALSE, size_point = 1, size_line = 0.5,
+  alpha = 1, borders = NULL, borders_behind = TRUE,
+  borders_pal = "#7f7f7f", borders_size = 0.2, title = "[Title]",
+  title_wrap = 70, subtitle = NULL, subtitle_wrap = 80,
+  col_cuts = NULL, col_labels_dp = 1, col_labels = NULL,
+  col_method = NULL, col_na = TRUE, col_labels_ncol = NULL,
+  col_labels_nrow = NULL, col_title = "", col_title_wrap = 25,
+  facet_ncol = NULL, facet_nrow = NULL, caption = NULL,
+  caption_wrap = 80, font_family = "Helvetica",
+  font_size_title = NULL, font_size_body = NULL)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -23,13 +23,15 @@ ggplot_sf_col_facet(data, col_var, facet_var, pal = NULL,
 
 \item{facet_var}{Unquoted categorical variable to facet the data by. Required input.}
 
+\item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
+
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.}
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{point_size}{Size of points. Defaults to 0.5.}
+\item{size_point}{Size of points. Defaults to 0.5.}
 
-\item{line_size}{Size of lines. Defaults to 0.5.}
+\item{size_line}{Size of lines. Defaults to 0.5.}
 
 \item{alpha}{The opacity of polygons. Defaults to 0.9.}
 
@@ -57,9 +59,9 @@ ggplot_sf_col_facet(data, col_var, facet_var, pal = NULL,
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or "quantile" if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).}
 
-\item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable.}
+\item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable. Defaults to TRUE.}
 
-\item{col_labels_ncol}{The number of columns in the legend. Defaults to 1.}
+\item{col_labels_ncol}{The number of columns in the legend.}
 
 \item{col_labels_nrow}{The number of rows in the legend.}
 

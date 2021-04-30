@@ -6,16 +6,16 @@
 \usage{
 ggplot_boxplot_facet(data, x_var, y_var = NULL, facet_var,
   group_var = NULL, stat = "boxplot", pal = NULL, width = 0.5,
-  alpha = 0.1, line_size = 0.5, point_size = 1, title = "[Title]",
+  alpha = 1, size_line = 0.5, size_point = 1, title = "[Title]",
   title_wrap = 70, subtitle = NULL, subtitle_wrap = 80,
-  x_expand = NULL, x_labels = waiver(), x_pretty_n = 5,
-  x_title = "[X title]", x_title_wrap = 50, y_balance = FALSE,
-  y_expand = NULL, y_labels = waiver(), y_pretty_n = 5,
-  y_title = "[Y title]", y_title_wrap = 50, y_trans = "identity",
-  y_zero = TRUE, y_zero_line = NULL, facet_ncol = NULL,
-  facet_nrow = NULL, facet_scales = "fixed", caption = NULL,
-  caption_wrap = 80, font_family = "Helvetica",
-  font_size_title = NULL, font_size_body = NULL)
+  x_expand = NULL, x_labels = waiver(), x_title = "[X title]",
+  x_title_wrap = 50, y_balance = FALSE, y_expand = NULL,
+  y_labels = waiver(), y_pretty_n = 5, y_title = "[Y title]",
+  y_title_wrap = 50, y_trans = "identity", y_zero = FALSE,
+  y_zero_line = NULL, facet_ncol = NULL, facet_nrow = NULL,
+  facet_scales = "fixed", caption = NULL, caption_wrap = 80,
+  font_family = "Helvetica", font_size_title = NULL,
+  font_size_body = NULL)
 }
 \arguments{
 \item{data}{An tibble or dataframe. Required input.}
@@ -34,11 +34,11 @@ ggplot_boxplot_facet(data, x_var, y_var = NULL, facet_var,
 
 \item{width}{Width of the box. Defaults to 0.5.}
 
-\item{alpha}{The alpha of the fill. Defaults to 0.1.}
+\item{alpha}{The alpha of the fill. Defaults to 1.}
 
-\item{line_size}{The size of the outlines of boxplots. Defaults to 0.5.}
+\item{size_line}{The size of the outlines of boxplots. Defaults to 0.5.}
 
-\item{point_size}{The size of the outliers. Defaults to 1.}
+\item{size_point}{The size of the outliers. Defaults to 1.}
 
 \item{title}{Title string. Defaults to "[Title]".}
 
@@ -51,8 +51,6 @@ ggplot_boxplot_facet(data, x_var, y_var = NULL, facet_var,
 \item{x_expand}{A vector of range expansion constants used to add some padding on the x scale.}
 
 \item{x_labels}{Adjust the  x scale labels through a function or vector.}
-
-\item{x_pretty_n}{The desired number of intervals on the x axis, as calculated by the pretty algorithm. Defaults to 5. Only applicable to a x variable that is categorical or date.}
 
 \item{x_title}{X axis title string. Defaults to "[X title]".}
 
@@ -72,9 +70,9 @@ ggplot_boxplot_facet(data, x_var, y_var = NULL, facet_var,
 
 \item{y_trans}{TRUEransformation of y-axis scale (e.g. "signed_sqrt"). Defaults to "identity", which has no transformation.}
 
-\item{y_zero}{TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
+\item{y_zero}{TRUE or FALSE whether the minimum of the y scale is zero. Defaults to FALSE.}
 
-\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. Defaults to NULL, which is TRUE if there are positive and negative values in y_var. Otherwise it is FALSE.}
+\item{y_zero_line}{TRUE or FALSE whether to add a zero reference line to the y axis. TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
 \item{facet_ncol}{The number of columns of facetted plots.}
 
@@ -102,9 +100,7 @@ Boxplot ggplot that is facetted, but not coloured.
 library(dplyr)
 
 plot_data <- ggplot2::diamonds \%>\%
-  mutate(price_thousands = (price / 1000)) \%>\%
-  slice_sample(prop = 0.05)
+  mutate(price_thousands = (price / 1000)) 
 
 ggplot_boxplot_facet(plot_data, cut, price_thousands, color)
-
 }
