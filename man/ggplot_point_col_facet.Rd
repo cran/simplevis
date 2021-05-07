@@ -14,7 +14,7 @@ ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
   y_labels = waiver(), y_pretty_n = 5, y_title = "[Y title]",
   y_title_wrap = 50, y_trans = "identity", y_zero = FALSE,
   y_zero_line = NULL, col_cuts = NULL, col_labels_dp = 1,
-  col_labels = NULL, col_labels_ncol = NULL, col_labels_nrow = NULL,
+  col_labels = NULL, col_legend_ncol = NULL, col_legend_nrow = NULL,
   col_method = NULL, col_na = TRUE, col_quantile_by_facet = TRUE,
   col_title = "", col_title_wrap = 25, facet_ncol = NULL,
   facet_nrow = NULL, facet_scales = "fixed", caption = NULL,
@@ -90,9 +90,9 @@ ggplot_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{col_labels}{Adjust the colour scale labels through a vector.}
 
-\item{col_labels_ncol}{The number of columns in the legend.}
+\item{col_legend_ncol}{The number of columns in the legend.}
 
-\item{col_labels_nrow}{The number of rows in the legend.}
+\item{col_legend_nrow}{The number of rows in the legend.}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "quantile".}
 

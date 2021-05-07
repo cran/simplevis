@@ -60,8 +60,4 @@ Map of simple features in ggplot that is not coloured and not facetted.
 }
 \examples{
 ggplot_sf(data = example_sf_point, borders = nz)
-
-sf <- rnaturalearth::ne_countries(scale = "medium", country = "Indonesia", returnclass = "sf")
-
-ggplot_sf(sf, alpha = 0, pal = "#232323")
 }

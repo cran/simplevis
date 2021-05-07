@@ -1,3 +1,19 @@
+# simplevis 3.1.0
+
+* Removed rnaturalearth from suggests.
+* Corrected is_null bug in leaflet_sf.
+* Corrected hbar y_var reversing bug.
+
+# simplevis 3.0.2
+
+* Breaking change: changed mutate_text vars_vctr argument to text_vars_vctr.
+
+# simplevis 3.0.1
+
+* Breaking change: Changed col_labels_nrow and col_labels_ncol to col_legend_ncol and col_legend_nrow.
+* Breaking change: Added plotly_col_legend function, and removed plotly_legend_rev and plotly_legend_order.
+* Breaking change: leaflet popup_var has been removed, and replaced with a popup_vars_vctr argument.
+
 # simplevis 3.0.0
 
 * Bumped version for CRAN release.

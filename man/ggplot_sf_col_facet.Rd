@@ -10,8 +10,8 @@ ggplot_sf_col_facet(data, col_var, facet_var, text_var = NULL,
   borders_pal = "#7f7f7f", borders_size = 0.2, title = "[Title]",
   title_wrap = 70, subtitle = NULL, subtitle_wrap = 80,
   col_cuts = NULL, col_labels_dp = 1, col_labels = NULL,
-  col_method = NULL, col_na = TRUE, col_labels_ncol = NULL,
-  col_labels_nrow = NULL, col_title = "", col_title_wrap = 25,
+  col_method = NULL, col_na = TRUE, col_legend_ncol = NULL,
+  col_legend_nrow = NULL, col_title = "", col_title_wrap = 25,
   facet_ncol = NULL, facet_nrow = NULL, caption = NULL,
   caption_wrap = 80, font_family = "Helvetica",
   font_size_title = NULL, font_size_body = NULL)
@@ -61,9 +61,9 @@ ggplot_sf_col_facet(data, col_var, facet_var, text_var = NULL,
 
 \item{col_na}{TRUE or FALSE of whether to show NA values of the colour variable. Defaults to TRUE.}
 
-\item{col_labels_ncol}{The number of columns in the legend.}
+\item{col_legend_ncol}{The number of columns in the legend.}
 
-\item{col_labels_nrow}{The number of rows in the legend.}
+\item{col_legend_nrow}{The number of rows in the legend.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL.}
 

@@ -11,7 +11,7 @@ library(simplevis)
 ## ---- message = FALSE, warning = FALSE, fig.height = 3, fig.width = 6---------
 plot_data <- ggplot2::diamonds %>% 
   slice_sample(prop = 0.05) %>% 
-  as_tibble()
+  tibble::as_tibble()
 
 plot_data
 
@@ -23,7 +23,7 @@ plot_data <- ggplot2::diamonds %>%
   summarise(average_price = mean(price)) %>%
   mutate(average_price = average_price / 1000) %>%  
   mutate(cut = stringr::str_to_sentence(cut)) %>% 
-  as_tibble()
+  tibble::as_tibble()
 
 plot_data
 
@@ -38,7 +38,7 @@ ggplot_hbar(plot_data,
 plot_data <- storms %>%
   group_by(year) %>%
   summarise(average_wind = mean(wind)) %>% 
-  as_tibble()
+  tibble::as_tibble()
 
 plot_data
 
@@ -50,7 +50,7 @@ ggplot_vbar(plot_data,
 plot_data <- storms %>%
   group_by(year) %>%
   summarise(wind = mean(wind)) %>% 
-  as_tibble()
+  tibble::as_tibble()
 
 plot_data 
 
@@ -61,7 +61,7 @@ ggplot_line(plot_data,
 ## ---- message = FALSE, warning = FALSE, fig.height = 3, fig.width = 6---------
 plot_data <- iris %>%
   mutate(Species = stringr::str_to_sentence(Species)) %>% 
-  as_tibble()
+  tibble::as_tibble()
 
 plot_data
 
@@ -75,7 +75,7 @@ plot_data <- ggplot2::diamonds %>%
   summarise(average_price = mean(price)) %>% 
   mutate(average_price = average_price / 1000) %>% 
   mutate(cut = stringr::str_to_sentence(cut)) %>% 
-  as_tibble()
+  tibble::as_tibble()
 
 plot_data
 
@@ -90,7 +90,7 @@ plot_data <- ggplot2::diamonds %>%
   group_by(cut, clarity) %>%
   summarise(average_price = mean(price)) %>%
   mutate(average_price = average_price / 1000) %>% 
-  as_tibble()
+  tibble::as_tibble()
 
 plot_data
 
@@ -175,10 +175,10 @@ leaflet_sf_col(example_sf_point,
 ggplot_point(iris, Sepal.Width, Sepal.Length) +
   ggplot2::geom_smooth(ggplot2::aes(Sepal.Width, Sepal.Length), col = viridis::viridis(4)[2])
 
-## -----------------------------------------------------------------------------
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 ggplot_point(iris, Sepal.Width, Sepal.Length, pal = "#e7298a")
 
-## -----------------------------------------------------------------------------
+## ---- message = FALSE, warning = FALSE, fig.height = 4, fig.width = 7---------
 ggplot_point_col(iris, Sepal.Width, Sepal.Length, Species, 
                  pal = c("#1B9E77", "#D95F02", "#7570B3"))
 
