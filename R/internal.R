@@ -1,30 +1,84 @@
-#' @title Convert column names to snake case and then to sentence case.
-#' @description Convert colnames to snakecase and then to sentence case to present colnames visually.
-#' @param data The number of digits to round the legend labels.
-#' @return A numeric value.
+#' Calculate the breaks for a y axis numeric vector.
+#' 
+#' @param var_vctr A numeric vector for the vertical scale from which to determine breaks from. 
+#' @param balance Add balance to the vertical axis so that zero is in the centre of the vertical scale.
+#' @param pretty_n The desired number of intervals on the vertical axis, as calculated by the pretty algorithm. Defaults to 5. 
+#' @param trans A string specifying a transformation for the vertical axis scale, such as "log10" or "sqrt". Defaults to "identity".
+#' @param zero TRUE or FALSE of whether the minimum of the vertical scale is zero. Defaults to TRUE.
+#' @param mobile Whether the plot is to be displayed on a mobile device. Defaults to NULL. 
+#' @return A vector of breaks
 #' @keywords internal
-sv_colnames_to_present <- function(data) {
+sv_numeric_breaks_v <- function(var_vctr, 
+                                balance = FALSE, 
+                                pretty_n = 5, 
+                                trans = "identity", 
+                                zero = TRUE) {
   
-  data <- janitor::clean_names(data) 
+  min <- min(var_vctr, na.rm = TRUE)
+  max <- max(var_vctr, na.rm = TRUE)
+  min_max <- c(min, max)
   
-  colnames(data) <-  stringr::str_replace_all(stringr::str_to_sentence(colnames(data)), "_", " ")
+  if (zero == TRUE) min_max <- c(0, min_max)
+  if (balance == TRUE) min_max <- c(-min_max, min_max)
   
-  return(data)
+  breaks <- pretty(min_max, n = pretty_n)
+  if(trans == "log10" | trans == "log") {
+    if(breaks[1] == 0) breaks[1] <- 1
+  }
+  
+  return(breaks)
+}
+
+#' Calculate the breaks for a horizontal axis numeric vector.
+#' 
+#' @param var_vctr A numeric vector for the horizontal scale from which to determine breaks from. 
+#' @param balance Add balance to the y axis so that zero is in the centre of the horizontal scale.
+#' @param pretty_n The desired number of intervals on the horizontal axis, as calculated by the pretty algorithm. Defaults to 6. 
+#' @param trans A string specifying a transformation for the horizontal axis scale, such as "log10" or "sqrt". Defaults to "identity".
+#' @param zero TRUE or FALSE of whether the minimum of the horizontal scale is zero. Defaults to TRUE.
+#' @param mobile Whether the plot is to be displayed on a mobile device. Defaults to FALSE. 
+#' @return A vector of breaks
+#' @keywords internal
+sv_numeric_breaks_h <- function(var_vctr, 
+                                balance = FALSE, 
+                                pretty_n = 6, 
+                                trans = "identity", 
+                                zero = TRUE,
+                                mobile = FALSE) {
+  
+  min <- min(var_vctr, na.rm = TRUE)
+  max <- max(var_vctr, na.rm = TRUE)
+  min_max <- c(min, max)
+  
+  if (zero == TRUE) min_max <- c(0, min_max)
+  if (balance == TRUE) min_max <- c(-min_max, min_max)
+  
+  breaks <- pretty(min_max, n = pretty_n)
+  if(trans == "log10" | trans == "log") {
+    if(breaks[1] == 0) breaks[1] <- 1 
+  }
+  
+  if(mobile == TRUE) {
+    breaks <- c(min(breaks), max(breaks))
+    if (min(breaks) < 0 & max(breaks > 0)) breaks <- c(breaks[1], 0, breaks[2])
+  }
+  
+  return(breaks)
 }
 
 #' @title Numeric legend labels.
 #' @description Pretty numeric legend labels.
 #' @param cuts_vctr A numeric vector of bin cuts from which to create a vector of legend labels.
-#' @param col_labels_dp The number of digits to round the legend labels.
+#' @param labels_dp The number of digits to round the legend labels.
 #' @return A vector of labels.
 #' @keywords internal
-sv_labels_from_cuts <- function(cuts_vctr, col_labels_dp = 1) {
+sv_numeric_bin_labels <- function(cuts_vctr, labels_dp = 1) {
   
   labels <- vector("character", 0)
   cuts_vctr_no <- length(cuts_vctr)
   cuts_vctr <-
-    sprintf(paste0("%.", col_labels_dp, "f"),
-            round(cuts_vctr, col_labels_dp))
+    sprintf(paste0("%.", labels_dp, "f"),
+            round(cuts_vctr, labels_dp))
   
   if (cuts_vctr_no == 2) {
     labels <- c("Feature")
@@ -42,6 +96,23 @@ sv_labels_from_cuts <- function(cuts_vctr, col_labels_dp = 1) {
         labels,
         paste0("\u2265", cuts_vctr[length(cuts_vctr) - 1]))
   }
+}
+
+
+#' Identify the maximum decimal places in a numeric vector. 
+#'
+#' @param vctr A numeric vector. 
+#'
+#' @return a numeric value.
+#' @keywords internal
+sv_max_dp <- function(vctr) {
+  if (length(vctr) == 0) return(numeric())
+  vctr_nchr <- vctr %>% abs() %>% as.character() %>% nchar() %>% as.numeric()
+  vctr_int <- floor(vctr) %>% abs() %>% nchar()
+  vctr_nchr <- vctr_nchr - 1 - vctr_int
+  vctr_nchr[vctr_nchr < 0] <- 0
+  vctr_nchr <- max(vctr_nchr, na.rm = TRUE)
+  return(vctr_nchr)
 }
 
 #' Get default font_size_title
@@ -71,7 +142,8 @@ sv_pal <- function(n_col) {
   
   if(n_col == 1) viridis::viridis(4)[2]
   else if(n_col == 2) viridis::viridis(4)[c(2, 3)]
-  else if(n_col > 2) viridis::viridis(n_col)
+  else if(n_col == 3) viridis::viridis(4)[1:3]
+  else if(n_col > 3) viridis::viridis(n_col)
 }
 
 #' Automatically adjust x_zero and x_zero_line if necessary

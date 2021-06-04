@@ -37,14 +37,12 @@ shinyServer(function(input, output, session) {
     x_title <- "Average price ($US thousands)"
     y_title <- "Cut"
     
-    plot <- ggplot_hbar_col(data = plot_data(), 
-                            x_var = average_price_thousands, 
-                            y_var = cut, 
-                            col_var = clarity, 
+    plot <- gg_hbar_col(data = plot_data(), average_price_thousands, cut, clarity, 
                             text_var = text,
                             title = title, 
                             x_title = x_title, 
                             y_title = y_title,
+                            font_family = "Helvetica",
                             mobile = input$isMobile)
     
     
@@ -116,10 +114,12 @@ shinyServer(function(input, output, session) {
   
   table_data <- reactive({    # create a reactive table_data object
     if(input$table_data == "Diamonds") ggplot2::diamonds %>% 
-      select(carat:price)
+      select(carat:price) %>% 
+      rlang::set_names(~snakecase::to_sentence_case(.))
     
     else if(input$table_data == "Storms") dplyr::storms %>% 
-      select(name, year, month, day, status, wind, pressure)
+      select(name, year, month, day, status, wind, pressure) %>% 
+      rlang::set_names(~snakecase::to_sentence_case(.))
   })
   
   output$table <- DT::renderDT(
@@ -137,6 +137,18 @@ shinyServer(function(input, output, session) {
     },
     content <- function(file) {
       file.copy("data/data.zip", file)
+    },
+    contentType = "application/zip"
+  )
+  
+  ### download code ###
+  
+  output$download_code <- downloadHandler(
+    filename <- function() {
+      "template2.zip"
+    },
+    content <- function(file) {
+      file.copy("data/template2.zip", file)
     },
     contentType = "application/zip"
   )

@@ -4,11 +4,10 @@
 \alias{theme_line}
 \title{Theme for line ggplots.}
 \usage{
-theme_line(font_family = "Helvetica", font_size_title = 11,
-  font_size_body = 10)
+theme_line(font_family = "", font_size_title = 11, font_size_body = 10)
 }
 \arguments{
-\item{font_family}{Font family to use. Defaults to "Helvetica".}
+\item{font_family}{Font family to use. Defaults to "".}
 
 \item{font_size_title}{Font size for the title text. Defaults to 11.}
 
@@ -25,5 +24,5 @@ library(ggplot2)
 
 ggplot() +
   theme_line("Courier", 9, 7) +
-  ggtitle("This is a title of a selected font family and size")
+  ggtitle("This is a title of a font family and size")
 }

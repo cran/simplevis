@@ -37,15 +37,13 @@ shinyServer(function(input, output, session) {
     x_title <- "Average price ($US thousands)"
     y_title <- "Cut"
     
-    plot <- ggplot_hbar_col(data = plot_data(), 
-                            x_var = average_price_thousands, 
-                            y_var = cut, 
-                            col_var = clarity,
-                            text_var = text,
-                            title = title, 
-                            x_title = x_title, 
-                            y_title = y_title,
-                            mobile = input$isMobile)
+    plot <- gg_hbar_col(data = plot_data(), average_price_thousands, cut, clarity,
+                        text_var = text,
+                        title = title, 
+                        x_title = x_title, 
+                        y_title = y_title,
+                        font_family = "Helvetica", 
+                        mobile = input$isMobile)
     
     
     return(plot)
@@ -66,7 +64,8 @@ shinyServer(function(input, output, session) {
   ### table ###
   
   table_data <- reactive({   
-    ggplot2::diamonds 
+    ggplot2::diamonds %>% 
+      rlang::set_names(~snakecase::to_sentence_case(.))
   })
   
   output$table <- DT::renderDT(

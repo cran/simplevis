@@ -2,18 +2,27 @@
 % Please edit documentation in R/leaflet_sf.R
 \name{leaflet_sf}
 \alias{leaflet_sf}
-\title{Map of simple features in leaflet.}
+\title{Simple feature leaflet map.}
 \usage{
-leaflet_sf(data, popup_vars_vctr = NULL, pal = NULL, size_point = 2,
-  size_line = 2, alpha = 0.9, basemap = "light", title = "[Title]",
-  col_labels_dp = 1, col_labels = "[Feature]", map_id = "map")
+leaflet_sf(
+  data,
+  popup_vars_vctr = NULL,
+  pal = NULL,
+  size_point = 2,
+  size_line = 2,
+  alpha = 0.9,
+  basemap = "light",
+  title = NULL,
+  col_labels_dp = 1,
+  map_id = "map"
+)
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
 
 \item{popup_vars_vctr}{Vector of quoted variable names to include in the popup. If NULL, defaults to making a leafpop::popupTable of all columns.}
 
-\item{pal}{Character vector of hex codes. Defaults to viridis. Use the pals package to find a suitable palette.}
+\item{pal}{Character vector of hex codes.}
 
 \item{size_point}{Size of points (i.e. radius). Defaults to 2.}
 
@@ -23,11 +32,9 @@ leaflet_sf(data, popup_vars_vctr = NULL, pal = NULL, size_point = 2,
 
 \item{basemap}{The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.}
 
-\item{title}{A title string that will be wrapped into the legend. Defaults to "Title"}
+\item{title}{A title string that will be wrapped into the legend.}
 
 \item{col_labels_dp}{Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.}
-
-\item{col_labels}{A vector of legend label values. Defaults to "[Feature]".}
 
 \item{map_id}{The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".}
 }

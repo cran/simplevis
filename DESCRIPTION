@@ -1,7 +1,7 @@
 Package: simplevis
 Type: Package
-Title: Make 'ggplot2' and 'leaflet' Visualisation Easier
-Version: 3.1.0
+Title: Make 'ggplot2' Visualisation Easier and Quicker
+Version: 4.0.0
 Authors@R: 
     c(person(given = "David", 
                family = "Hodge", 
@@ -10,7 +10,7 @@ Authors@R:
                comment = c(ORCID = "0000-0002-3868-7501")),
       person("Statistics New Zealand", 
              role = c("cph")))
-Description: Wrapper functions to make 'ggplot2' and 'leaflet' visualisation easier and prettier.
+Description: Wrapper functions to make 'ggplot2' visualisation easier and quicker.
 License: MIT + file LICENSE
 URL: https://statisticsnz.github.io/simplevis/,
         https://github.com/statisticsnz/simplevis/
@@ -18,18 +18,18 @@ BugReports: https://github.com/statisticsNZ/simplevis/issues/
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
-Imports: dplyr (>= 1.0.0), DT, forcats, ggplot2 (>= 2.0.0), htmltools,
-        leaflet (>= 2.0.0), leafpop, leaflet.extras, janitor, jsonlite,
-        lubridate, magrittr, methods, plotly, readr, rlang (>= 0.4.0),
-        rmarkdown, scales, sf, shiny, shinycssloaders, stats, stringr,
-        tibble, tidyr (>= 1.0.0), viridis
-Suggests: knitr, rgdal, rgeos
+Imports: dplyr (>= 1.0.0), DT, forcats, ggplot2 (>= 3.0.0), htmltools,
+        leaflet (>= 2.0.0), leafpop, leaflet.extras, jsonlite,
+        lubridate, magrittr, plotly, readr, rlang (>= 0.4.0), scales,
+        sf, shiny, shinycssloaders, snakecase, stringr, tibble, tidyr
+        (>= 1.0.0), viridis
+Suggests: knitr, palmerpenguins, rgdal, rgeos, rmarkdown
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-05-07 06:03:22 UTC; dhodge
+Packaged: 2021-06-04 10:23:16 UTC; dhodge
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-05-07 06:30:02 UTC
+Date/Publication: 2021-06-04 10:50:02 UTC

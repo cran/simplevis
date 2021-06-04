@@ -2,13 +2,26 @@
 % Please edit documentation in R/leaflet_sf.R
 \name{leaflet_sf_col}
 \alias{leaflet_sf_col}
-\title{Map of simple features in leaflet that is coloured.}
+\title{Simple feature leaflet map that is coloured.}
 \usage{
-leaflet_sf_col(data, col_var, text_var = NULL, popup_vars_vctr = NULL,
-  pal = NULL, pal_rev = FALSE, size_point = 2, size_line = 2,
-  alpha = 0.9, basemap = "light", title = "[Title]",
-  col_cuts = NULL, col_labels_dp = 1, col_labels = NULL,
-  col_method = NULL, col_na = TRUE, map_id = "map")
+leaflet_sf_col(
+  data,
+  col_var,
+  text_var = NULL,
+  popup_vars_vctr = NULL,
+  pal = NULL,
+  pal_rev = FALSE,
+  size_point = 2,
+  size_line = 2,
+  alpha = 0.9,
+  basemap = "light",
+  title = NULL,
+  col_cuts = NULL,
+  col_labels_dp = NULL,
+  col_method = NULL,
+  col_na = TRUE,
+  map_id = "map"
+)
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
@@ -19,7 +32,7 @@ leaflet_sf_col(data, col_var, text_var = NULL, popup_vars_vctr = NULL,
 
 \item{popup_vars_vctr}{Vector of quoted variable names to include in the popup. If NULL, defaults to making a leafpop::popupTable of all columns.}
 
-\item{pal}{Character vector of hex codes. Defaults to viridis. Use the pals package to find a suitable palette.}
+\item{pal}{Character vector of hex codes.}
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
@@ -31,17 +44,15 @@ leaflet_sf_col(data, col_var, text_var = NULL, popup_vars_vctr = NULL,
 
 \item{basemap}{The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.}
 
-\item{title}{A title string that will be wrapped into the legend. Defaults to "Title".}
+\item{title}{A title string that will be wrapped into the legend.}
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_labels_dp}{Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.}
-
-\item{col_labels}{Adjust the  x scale labels through a vector.}
+\item{col_labels_dp}{For numeric colour variables, the number of decimal places. Defaults to 1 for "quantile" col_method, and the lowest dp within the col_cuts vector for "bin".}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." if categorical colour variable, NULL results in "category". If numeric variable, defaults to "quantile". Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).}
 
-\item{col_na}{TRUE or FALSE  of whether to include NAs of the colour variable. Defaults to TRUE.}
+\item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
 
 \item{map_id}{The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".}
 }
@@ -53,15 +64,10 @@ Map of simple features in leaflet that is coloured.
 }
 \examples{
 leaflet_sf_col(example_sf_polygon, density,
-     col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1),
-     title = "Modelled density, 2017")
+     col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
 
 leaflet_sf_col(example_sf_polygon, density,
-     col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf),  col_labels_dp = 0,
-     title = "Modelled density, 2017")
+     col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
 
-pal <- c("#4575B4", "#D3D3D3", "#D73027")
-
-leaflet_sf_col(example_sf_point, trend_category, pal = pal, col_method = "category",
-   title = "Monitored trends, 2008\\u201317")
+leaflet_sf_col(example_sf_point, trend_category, pal = c("#4575B4", "#D3D3D3", "#D73027"))
 }

@@ -1,5 +1,5 @@
 #' @title Theme for box ggplots.
-#' @param font_family Font family to use. Defaults to "Helvetica".
+#' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
@@ -9,9 +9,9 @@
 #' 
 #' ggplot() +
 #'   theme_boxplot("Courier", 9, 7) +
-#'   ggtitle("This is a title of a selected font family and size")
+#'   ggtitle("This is a title of a font family and size")
 theme_boxplot <-
-  function(font_family = "Helvetica",
+  function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
     list(
@@ -60,7 +60,7 @@ theme_boxplot <-
           family = font_family,
           colour = "#323232",
           size = font_size_body,
-          hjust = 0.475
+          hjust = 0.5
         ),
         axis.title.x = element_text(
           family = font_family,
@@ -110,7 +110,7 @@ theme_boxplot <-
   }
 
 #' @title Theme for horizontal bar ggplots.
-#' @param font_family Font family to use. Defaults to "Helvetica".
+#' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
@@ -120,9 +120,9 @@ theme_boxplot <-
 #' 
 #' ggplot() +
 #'   theme_hbar("Courier", 9, 7) +
-#'   ggtitle("This is a title of a selected font family and size")
+#'   ggtitle("This is a title of a font family and size")
 theme_hbar <-
-  function(font_family = "Helvetica",
+  function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
     list(
@@ -171,7 +171,7 @@ theme_hbar <-
           family = font_family,
           colour = "#323232",
           size = font_size_body,
-          hjust = 0.425
+          hjust = 0.5
         ),
         axis.title.x = element_text(
           family = font_family,
@@ -220,7 +220,7 @@ theme_hbar <-
   }
 
 #' @title Theme for line ggplots.
-#' @param font_family Font family to use. Defaults to "Helvetica".
+#' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
@@ -230,9 +230,9 @@ theme_hbar <-
 #' 
 #' ggplot() +
 #'   theme_line("Courier", 9, 7) +
-#'   ggtitle("This is a title of a selected font family and size")
+#'   ggtitle("This is a title of a font family and size")
 theme_line <-
-  function(font_family = "Helvetica",
+  function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
     list(
@@ -329,7 +329,7 @@ theme_line <-
     )
   }
 #' @title Theme for point ggplots.
-#' @param font_family Font family to use. Defaults to "Helvetica".
+#' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
@@ -339,9 +339,9 @@ theme_line <-
 #' 
 #' ggplot() +
 #'   theme_point("Courier", 9, 7) +
-#'   ggtitle("This is a title of a selected font family and size")
+#'   ggtitle("This is a title of a font family and size")
 theme_point <-
-  function(font_family = "Helvetica",
+  function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
     list(
@@ -439,7 +439,7 @@ theme_point <-
   }
 
 #' @title Theme for ggplot maps of simple features.
-#' @param font_family Font family to use. Defaults to "Helvetica".
+#' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
@@ -449,9 +449,9 @@ theme_point <-
 #' 
 #' ggplot() +
 #'   theme_sf("Courier", 9, 7) +
-#'   ggtitle("This is a title of a selected font family and size")
+#'   ggtitle("This is a title of a font family and size")
 theme_sf <-
-  function(font_family = "Helvetica",
+  function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
     list(
@@ -529,7 +529,7 @@ theme_sf <-
   }
 
 #' @title Theme for vertical bar ggplots.
-#' @param font_family Font family to use. Defaults to "Helvetica".
+#' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
@@ -538,10 +538,10 @@ theme_sf <-
 #' library(ggplot2)
 #' 
 #' ggplot() +
-#'   theme_vbar("Courier", 9, 7) +
-#'   ggtitle("This is a title of a selected font family and size")
-theme_vbar <-
-  function(font_family = "Helvetica",
+#'   theme_bar("Courier", 9, 7) +
+#'   ggtitle("This is a title of a font family and size")
+theme_bar <-
+  function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
     list(

@@ -4,7 +4,9 @@
 \name{nz}
 \alias{nz}
 \title{New Zealand coastline.}
-\format{An \code{sf} object.}
+\format{
+An \code{sf} object.
+}
 \usage{
 nz
 }
@@ -14,10 +16,10 @@ Simplified New Zealand coastline boundary, excluding the Chatham Islands.
 \examples{
 nz
 
-ggplot_sf(nz)
+gg_sf(nz)
 
-ggplot_sf(dplyr::slice(nz, 2, 4))
+gg_sf(dplyr::slice(nz, 2, 4))
 
-ggplot_sf(dplyr::slice(nz, 1, 3, 5:7))
+gg_sf(dplyr::slice(nz, 1, 3, 5:7))
 }
 \keyword{datasets}

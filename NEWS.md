@@ -1,8 +1,325 @@
+# simplevis 4.0.0
+
+* Bump version for CRAN major release.
+
+# simplevis 3.9.8
+
+* Updated app templates.
+
+# simplevis 3.9.7
+
+* Updated defaults for facetted pretty breaks.
+
+# simplevis 3.9.6
+
+* Added code to ensure logical variables work.
+
+# simplevis 3.9.5
+
+* Updated app templates.
+
+# simplevis 3.9.4
+
+* Changed vbar family to hbar.
+
+# simplevis 3.9.3
+
+* Removed hack example.
+
+# simplevis 3.9.2
+
+* Removed col_rev from gg_boxplot family.
+
+# simplevis 3.9.1
+
+* Added hack example.
+
+# simplevis 3.9.0
+
+* Removed facet_scales arg from gg_sf family.
+
+# simplevis 3.8.9
+
+* Added facet_scales arg into gg_sf family.
+
+# simplevis 3.8.8
+
+* Subtle changes to the aim of the project.
+
+# simplevis 3.8.7
+
+* Updated vignette.
+
+# simplevis 3.8.6
+
+* Updated help for facet_labels.
+
+# simplevis 3.8.5
+
+* Modified group by statement for col stack bars, so that zeros are not dropped.
+* Updated bar x_var and y_var help for the specific.
+
+# simplevis 3.8.4
+
+* Updated help.
+
+# simplevis 3.8.3
+
+* Updated examples.
+
+# simplevis 3.8.2
+
+* Fixed col_labels default bug.
+
+# simplevis 3.8.1
+
+* Fixed col_labels default bug.
+
+# simplevis 3.8.0
+
+* Updated col_labels default. 
+
+# simplevis 3.7.9
+
+* Updated help. 
+
+# simplevis 3.7.8
+
+* Added facet_labels argument. 
+
+# simplevis 3.7.7
+
+* Updated leaflet_sf_col col_label_dp defaults.
+* Replaced internal function with rlang::set_names(~snakecase::to_sentence_case(.))
+
+# simplevis 3.7.6
+
+* Added new col_labels code for gg_sf family.
+
+# simplevis 3.7.5
+
+* Added new col_labels code for gg_point family.
+
+# simplevis 3.7.4
+
+* Added default sentence case x and y labels for categorical variables.
+
+# simplevis 3.7.3
+
+* Fixed bugs with default titles.
+
+# simplevis 3.7.2
+
+* Changed more Helvetica font defaults to "".
+
+# simplevis 3.7.1
+
+* Removed discrete horizontal scale mobile wrapping.
+
+# simplevis 3.7.0
+
+* Updated code to use snakecase::to_sentence_case where possible.
+
+# simplevis 3.6.9
+
+* Removed hbar reversing of breaks, as not required.
+
+# simplevis 3.6.8
+
+* Updated boxplot x_var scale.
+* Removed flipping of scales for boxplot on mobile.
+
+# simplevis 3.6.7 
+
+* Changed themes to default to "".
+
+# simplevis 3.6.6
+
+* Fixed bar scales.
+
+# simplevis 3.6.5
+
+* Reverted bar expand default to c(0, 0).
+
+# simplevis 3.6.4
+
+* Added datetime support to hbar.
+
+# simplevis 3.6.3
+
+* Added support for datetime for point, boxplot and vbar.
+* Removed x_trans from line as unnecessary.
+
+# simplevis 3.6.2
+
+* Added support for datetime to the other gg_line functions.
+
+# simplevis 3.6.1
+
+* Added support for datetime to gg_line().
+
+# simplevis 3.6.0
+
+* Added in arguments to filter out NA values.
+
+# simplevis 3.5.8
+
+* For bar, removed the ability to reverse x and y scales for numeric variables. 
+
+# simplevis 3.5.7
+
+* Fixed bar reorder direction.
+
+# simplevis 3.5.6
+
+* Updated boxplot code for how it works with stat = "identity".
+
+# simplevis 3.5.5
+
+* Corrected the hbar and vbar x_var and y_var help.
+
+# simplevis 3.5.4
+
+* Changed position default to "dodge" from "stack".
+
+# simplevis 3.5.3
+
+* Moved palmerpenguins to suggests.
+
+# simplevis 3.5.2
+
+* Removed col_na argument.
+* Updated all statement to remove NAs.
+
+# simplevis 3.5.1
+
+* Tweaked hbar title wrapping defaults.
+
+# simplevis 3.5.0
+
+* Breaking change: renamed all ggplot_ prefixes with gg_.
+
+# simplevis 3.4.7
+
+* Update x_rev and col_rev to support logical variables.
+
+# simplevis 3.4.6
+
+* Updated titles logic.
+
+# simplevis 3.4.5
+
+* Fixed bug with hbar x_title and y_title around the wrong way.
+
+# simplevis 3.4.4
+
+* Updated support for x logical variables.
+
+# simplevis 3.4.2 
+
+* Updated col_title wrapping for mobile.
+
+# simplevis 3.4.1
+
+* Updated default colours for 3 values.
+
+# simplevis 3.4.0
+
+* Fixed hbar mobile scales.
+
+# simplevis 3.3.8
+
+* Rewrote hbar_col_facet based on vbar code to expand variable types and arguments available.
+
+# simplevis 3.3.7
+
+* Rewrote hbar_facet based on vbar code to expand variable types and arguments available.
+
+# simplevis 3.3.6
+
+* Rewrote hbar_col based on vbar code to expand variable types and arguments available.
+
+# simplevis 3.3.5
+
+* For hbar, fixed ordering of date or numeric on y scale.
+* For vbar and hbar, added x_reorder and y_reorder argument.
+
+# simplevis 3.3.1 
+
+* Rewrote hbar based on vbar code to expand variable types and arguments available.
+
+# simplevis 3.3.0
+
+* Fixed vbar x_limits defaults. 
+
+# simplevis 3.2.4
+
+* Fixed x_rev for if character in vbar, point and line.
+* Corrected vbar_col_facet labels bug.
+* Stop people from trying to stacjk
+
+# simplevis 3.2.3
+
+* Fixed x_rev in point and line.
+
+# simplevis 3.2.2
+
+* Updated breaks functions for better speed.
+
+# simplevis 3.2.1
+
+* For ggplot functions, updated col_labels.
+
+# simplevis 3.2.0
+
+* For ggplot functions, updated help for x and y_labels arguments.
+
+# simplevis 3.1.9
+
+* For vbar, added support for all variables on the x scale.
+* For vbar, added an x_rev argument. 
+
+# simplevis 3.1.8
+
+* Removed x_trans from vbar and boxplot.
+* Removed col_quantile_by_facet argument from point.
+
+# simplevis 3.1.7
+
+* Update all boxplot, point, and line x scales to be consistent.
+* Added x_rev argument to all boxplot, point, and line x scales.
+
+# simplevis 3.1.6
+
+* Update boxplot x scales to be more flexible.
+
+# simplevis 3.1.5
+
+* Update vbar x scales to be more flexible.
+
+# simplevis 3.1.4
+
+* Breaking change: removed group_var argument, and updated grouping code.
+
+# simplevis 3.1.3
+
+* New feature: added support for x categorical variables in point.
+* New feature: added support for x categorical and date variables in boxplot.
+
+# simplevis 3.1.2
+
+* New feature: added support for x date variables in vbar.
+* New feature: added support for x categorical variables in line.
+
+# simplevis 3.1.1 
+
+* Bug fix: Updated col_rev code to fix colouring of factors where rev = TRUE.
+
 # simplevis 3.1.0
 
-* Removed rnaturalearth from suggests.
-* Corrected is_null bug in leaflet_sf.
-* Corrected hbar y_var reversing bug.
+* Minor change: Removed rnaturalearth from suggests.
+* Bug fix: Corrected is_null bug in leaflet_sf.
+* Bug fix: Corrected hbar y_var reversing bug.
 
 # simplevis 3.0.2
 
