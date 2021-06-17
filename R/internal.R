@@ -133,19 +133,6 @@ sv_font_size_body <- function(mobile) {
   else if (mobile == TRUE) font_size_body <- 14
 }
 
-#' Get default palette.
-#' 
-#' @param n_col The number of col_var levels or values.
-#' @return A numeric value.
-#' @keywords internal
-sv_pal <- function(n_col) {
-  
-  if(n_col == 1) viridis::viridis(4)[2]
-  else if(n_col == 2) viridis::viridis(4)[c(2, 3)]
-  else if(n_col == 3) viridis::viridis(4)[1:3]
-  else if(n_col > 3) viridis::viridis(n_col)
-}
-
 #' Automatically adjust x_zero and x_zero_line if necessary
 #' @param description Generate a list of x_zero and x_zero_line elements that are adjusted if necessary.
 #'

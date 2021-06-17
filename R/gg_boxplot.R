@@ -10,9 +10,9 @@
 #' @param size_point The size of the outliers. Defaults to 1.
 #' @param size_line The size of the outlines of boxplots. Defaults to 0.5.
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. Not applicable where mobile equals TRUE.
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -74,9 +74,9 @@ gg_boxplot <- function(data,
                        size_line = 0.5,
                        size_point = 1,
                        title = NULL,
-                       title_wrap = 70,
+                       title_wrap = 100,
                        subtitle = NULL,
-                       subtitle_wrap = 80,
+                       subtitle_wrap = 100,
                        x_balance = FALSE,
                        x_labels = NULL,
                        x_na = TRUE,
@@ -108,7 +108,7 @@ gg_boxplot <- function(data,
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = mobile)
   if(is.null(font_size_body)) font_size_body <- sv_font_size_body(mobile = mobile)
   
-  if (is.null(pal)) pal <- sv_pal(1)
+  if (is.null(pal)) pal <- pal_viridis_reorder(1)
   else pal <- pal[1]
   
   data <- dplyr::ungroup(data)
@@ -329,9 +329,9 @@ gg_boxplot <- function(data,
 #' @param size_point The size of the outliers. Defaults to 1.
 #' @param size_line The size of the outlines of boxplots. Defaults to 0.5.
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. Not applicable where mobile equals TRUE.
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -392,9 +392,9 @@ gg_boxplot_col <- function(data,
                            size_line = 0.5,
                            size_point = 1,
                            title = NULL,
-                           title_wrap = 70,
+                           title_wrap = 100,
                            subtitle = NULL,
-                           subtitle_wrap = 80,
+                           subtitle_wrap = 100,
                            x_balance = FALSE,
                            x_labels = NULL,
                            x_pretty_n = 6,
@@ -496,12 +496,12 @@ gg_boxplot_col <- function(data,
   }
 
   if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
-    n_col <- length(levels(col_var_vctr))
+    col_n <- length(levels(col_var_vctr))
   }
-  else n_col <- length(unique(col_var_vctr))
+  else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- sv_pal(n_col)
-  else pal <- pal[1:n_col]
+  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+  else pal <- pal[1:col_n]
   
   if (pal_rev == TRUE) pal <- rev(pal)
   
@@ -644,7 +644,7 @@ gg_boxplot_col <- function(data,
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = "#A8A8A8"
+      na.value = "#7F7F7FFF"
     ) 
   
   if (mobile == FALSE){
@@ -702,9 +702,9 @@ gg_boxplot_col <- function(data,
 #' @param size_line The size of the outlines of boxplots. Defaults to 0.5.
 #' @param size_point The size of the outliers. Defaults to 1.
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -755,9 +755,9 @@ gg_boxplot_facet <- function(data,
                              size_line = 0.5,
                              size_point = 1,
                              title = NULL,
-                             title_wrap = 70,
+                             title_wrap = 100,
                              subtitle = NULL,
-                             subtitle_wrap = 80,
+                             subtitle_wrap = 100,
                              x_balance = FALSE,
                              x_expand = NULL,
                              x_labels = NULL,
@@ -855,7 +855,7 @@ gg_boxplot_facet <- function(data,
       x_var_vctr <- dplyr::pull(data, !!x_var)
     }
     
-    if (is.null(pal)) pal <- sv_pal(1)
+    if (is.null(pal)) pal <- pal_viridis_reorder(1)
     else pal <- pal[1]
     
     data <- data %>% 
@@ -1030,9 +1030,9 @@ gg_boxplot_facet <- function(data,
 #' @param size_point The size of the outliers. Defaults to 1.
 #' @param size_line The size of the outlines of boxplots. Defaults to 0.5.
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. Not applicable where mobile equals TRUE.
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -1102,9 +1102,9 @@ gg_boxplot_col_facet <- function(data,
                                  size_line = 0.5,
                                  size_point = 1,
                                  title = NULL,
-                                 title_wrap = 70,
+                                 title_wrap = 100,
                                  subtitle = NULL,
-                                 subtitle_wrap = 80,
+                                 subtitle_wrap = 100,
                                  x_balance = FALSE,
                                  x_labels = NULL,
                                  x_na = TRUE,
@@ -1223,12 +1223,12 @@ gg_boxplot_col_facet <- function(data,
   if(is.null(font_size_body)) font_size_body <- sv_font_size_body(mobile = FALSE)
   
   if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
-    n_col <- length(levels(col_var_vctr))
+    col_n <- length(levels(col_var_vctr))
   }
-  else n_col <- length(unique(col_var_vctr))
+  else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- sv_pal(n_col)
-  else pal <- pal[1:n_col]
+  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+  else pal <- pal[1:col_n]
   
   if (pal_rev == TRUE) pal <- rev(pal)
   
@@ -1381,7 +1381,7 @@ gg_boxplot_col_facet <- function(data,
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = "#A8A8A8"
+      na.value = "#7F7F7FFF"
     ) +
     labs(
       title = stringr::str_wrap(title, title_wrap),

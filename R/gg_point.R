@@ -7,9 +7,9 @@
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. Not applicable where mobile equals TRUE.
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -52,9 +52,9 @@ gg_point <- function(data,
                      size_point = 1,
                      pal = NULL,
                      title = NULL,
-                     title_wrap = 70,
+                     title_wrap = 100,
                      subtitle = NULL,
-                     subtitle_wrap = 80,
+                     subtitle_wrap = 100,
                      x_balance = FALSE,
                      x_expand = NULL,
                      x_labels = NULL,
@@ -128,7 +128,7 @@ gg_point <- function(data,
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   
-  if (is.null(pal)) pal <- sv_pal(1)
+  if (is.null(pal)) pal <- pal_viridis_reorder(1)
   else pal <- pal[1]
   
   plot <- ggplot(data) +
@@ -263,9 +263,9 @@ gg_point <- function(data,
 #' @param pal Character vector of hex codes. 
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. Not applicable where mobile equals TRUE.
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -351,8 +351,8 @@ gg_point_col <- function(data,
                          font_family = "",
                          font_size_title = NULL,
                          font_size_body = NULL,
-                         title_wrap = 70,
-                         subtitle_wrap = 80,
+                         title_wrap = 100,
+                         subtitle_wrap = 100,
                          x_title_wrap = 50,
                          y_title_wrap = 50,
                          col_title_wrap = 25,
@@ -447,18 +447,18 @@ gg_point_col <- function(data,
     
     if(is.null(col_labels)) col_labels <- sv_numeric_bin_labels(col_cuts, col_labels_dp)
     
-    n_col <- length(col_cuts) - 1
-    if (is.null(pal)) pal <- sv_pal(n_col)
-    else pal <- pal[1:n_col]
+    col_n <- length(col_cuts) - 1
+    if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+    else pal <- pal[1:col_n]
   }
   else if (col_method == "category") {
     if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
-      n_col <- length(levels(col_var_vctr))
+      col_n <- length(levels(col_var_vctr))
     }
-    else n_col <- length(unique(col_var_vctr))
+    else col_n <- length(unique(col_var_vctr))
     
-    if (is.null(pal)) pal <- sv_pal(n_col)
-    else pal <- pal[1:n_col]
+    if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+    else pal <- pal[1:col_n]
     
     if(is.null(col_labels)) col_labels <- function(x) snakecase::to_sentence_case(x)
   }
@@ -563,7 +563,7 @@ gg_point_col <- function(data,
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = "#A8A8A8"
+      na.value = "#7F7F7FFF"
     ) 
   
   if (mobile == FALSE) {
@@ -603,9 +603,9 @@ gg_point_col <- function(data,
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -653,9 +653,9 @@ gg_point_facet <- function(data,
                            size_point = 1,
                            pal = NULL,
                            title = NULL,
-                           title_wrap = 70,
+                           title_wrap = 100,
                            subtitle = NULL,
-                           subtitle_wrap = 80,
+                           subtitle_wrap = 100,
                            x_balance = FALSE,
                            x_expand = NULL,
                            x_labels = NULL,
@@ -746,7 +746,7 @@ gg_point_facet <- function(data,
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = FALSE)
   if(is.null(font_size_body)) font_size_body <- sv_font_size_body(mobile = FALSE)
   
-  if (is.null(pal)) pal <- sv_pal(1)
+  if (is.null(pal)) pal <- pal_viridis_reorder(1)
   else pal <- pal[1]
   
   plot <- ggplot(data) +
@@ -878,9 +878,9 @@ gg_point_facet <- function(data,
 #' @param pal Character vector of hex codes. 
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 70. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 80. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -940,9 +940,9 @@ gg_point_col_facet <-
            pal = NULL,
            pal_rev = FALSE,
            title = NULL,
-           title_wrap = 70,
+           title_wrap = 100,
            subtitle = NULL,
-           subtitle_wrap = 80,
+           subtitle_wrap = 100,
            x_balance = FALSE,
            x_expand = NULL,
            x_labels = NULL,
@@ -1085,18 +1085,18 @@ gg_point_col_facet <-
       
       if(is.null(col_labels)) col_labels <- sv_numeric_bin_labels(col_cuts, col_labels_dp)
       
-      n_col <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- sv_pal(n_col)
-      else pal <- pal[1:n_col]
+      col_n <- length(col_cuts) - 1
+      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
       if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
-        n_col <- length(levels(col_var_vctr))
+        col_n <- length(levels(col_var_vctr))
       }
-      else n_col <- length(unique(col_var_vctr))
+      else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- sv_pal(n_col)
-      else pal <- pal[1:n_col]
+      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      else pal <- pal[1:col_n]
       
       if(is.null(col_labels)) col_labels <- function(x) snakecase::to_sentence_case(x)
     }
@@ -1212,7 +1212,7 @@ gg_point_col_facet <-
         values = pal,
         drop = FALSE,
         labels = col_labels,
-        na.value = "#A8A8A8"
+        na.value = "#7F7F7FFF"
       ) +
       labs(
         title = stringr::str_wrap(title, title_wrap),

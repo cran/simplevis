@@ -1,3 +1,10 @@
+# simplevis 4.1.0
+
+* Add categorical colour palette.
+* Adjusted NA colour.
+* Increase title and subtitle wrap defaults to 100.
+* Updated hbar col reversing and legend order.
+
 # simplevis 4.0.0
 
 * Bump version for CRAN major release.

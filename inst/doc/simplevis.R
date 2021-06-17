@@ -89,20 +89,15 @@ gg_line(plot_data, year, wind,
 gg_point_col(penguins, bill_length_mm, body_mass_g, sex, col_na = FALSE)
 
 ## -----------------------------------------------------------------------------
-gg_sf_col(example_sf_point, trend_category, 
-          size_point = 0.5,
-          pal = c("#4575B4", "#D3D3D3", "#D73027"))
+gg_sf_col(example_sf_point, trend_category)
 
 ## -----------------------------------------------------------------------------
 gg_sf_col(example_sf_point, trend_category,
-          borders = nz, 
-          size_point = 0.5,
-          pal = c("#4575B4", "#D3D3D3", "#D73027"))
+          borders = nz)
 
 
 ## -----------------------------------------------------------------------------
-leaflet_sf_col(example_sf_point, trend_category,
-          pal = c("#4575B4", "#D3D3D3", "#D73027"))
+leaflet_sf_col(example_sf_point, trend_category)
 
 ## ---- message = FALSE, warning = FALSE, fig.width = 7-------------------------
 tibble::tribble(
