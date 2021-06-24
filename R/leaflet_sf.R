@@ -16,6 +16,8 @@
 #' @export
 #' @examples
 #' leaflet_sf(example_sf_point)
+#' 
+#' leaflet_sf(example_sf_polygon)
 leaflet_sf <- function(data,
                        popup_vars_vctr = NULL,
                        pal = NULL,
@@ -215,13 +217,16 @@ leaflet_sf <- function(data,
 #' @return A leaflet object.
 #' @export
 #' @examples
+#' leaflet_sf_col(example_sf_point, trend_category)
+#' 
 #' leaflet_sf_col(example_sf_polygon, density,
-#'      col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
+#'      col_method = "quantile", 
+#'      col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
 #'
 #' leaflet_sf_col(example_sf_polygon, density,
-#'      col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
+#'      col_method = "bin", 
+#'      col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
 #'
-#' leaflet_sf_col(example_sf_point, trend_category, pal = c("#4575B4", "#D3D3D3", "#D73027"))
 leaflet_sf_col <- function(data,
                            col_var,
                            text_var = NULL,
@@ -286,12 +291,12 @@ leaflet_sf_col <- function(data,
     
     pal_fun <- colorFactor(palette = pal,
                            domain = col_var_vctr,
-                           na.color = "#7F7F7FFF")
+                           na.color = pal_na())
   }
   else if (col_method == "bin") {
     if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr)
     else if (!is.null(col_cuts)) {
-      if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+      if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
       if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
     }
     
@@ -306,7 +311,7 @@ leaflet_sf_col <- function(data,
       bins = col_cuts,
       pretty = FALSE,
       right = FALSE,
-      na.color = "#7F7F7FFF"
+      na.color = pal_na()
     )
     
     if(is.null(col_labels_dp)) col_labels_dp <- sv_max_dp(col_cuts)
@@ -331,7 +336,7 @@ leaflet_sf_col <- function(data,
       domain = col_var_vctr,
       bins = col_cuts,
       right = FALSE,
-      na.color = "#7F7F7FFF"
+      na.color = pal_na()
     )
     
     if(is.null(col_labels_dp)) col_labels_dp <- 1

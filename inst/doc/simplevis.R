@@ -57,6 +57,9 @@ gg_point_facet(penguins, bill_length_mm, body_mass_g, species)
 gg_point_col_facet(penguins, bill_length_mm, body_mass_g, sex, species)
 
 ## -----------------------------------------------------------------------------
+gg_point_col(penguins, bill_length_mm, body_mass_g, species)
+
+## -----------------------------------------------------------------------------
 gg_point_col(penguins, bill_length_mm, body_mass_g, species, 
              title = "Adult penguin mass by bill length and species",
              subtitle = "Palmer station, Antarctica",
@@ -66,7 +69,8 @@ gg_point_col(penguins, bill_length_mm, body_mass_g, species,
              caption = "Source: Gorman KB, Williams TD, Fraser WR (2014)")
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, species)
+gg_point_col(penguins, bill_length_mm, body_mass_g, species, 
+             col_title = "")
 
 ## -----------------------------------------------------------------------------
 gg_point(iris, Sepal.Width, Sepal.Length, pal = "#e7298a")
@@ -83,10 +87,11 @@ gg_line(plot_data, year, wind,
         y_labels = scales::comma_format(accuracy = 0.1), 
         y_zero = T, 
         y_pretty_n = 10,
-        y_expand = c(0, 2))
+        y_expand = ggplot2::expansion(mult = c(0.025, 0.025)))
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, sex, col_na = FALSE)
+gg_point_col(penguins, bill_length_mm, body_mass_g, sex, 
+             col_na = FALSE)
 
 ## -----------------------------------------------------------------------------
 gg_sf_col(example_sf_point, trend_category)
@@ -101,13 +106,13 @@ leaflet_sf_col(example_sf_point, trend_category)
 
 ## ---- message = FALSE, warning = FALSE, fig.width = 7-------------------------
 tibble::tribble(
-  ~type, ~data, ~x_var, ~y_var, ~col_var, ~facet_var, ~stat,
-  "bar", "tibble or data.frame", "Any*", "Numeric", "Categorical or numeric", "Categorical", "Identity",
-  "hbar", "tibble or data.frame", "Numeric", "Any*", "Categorical or numeric", "Categorical", "Identity",
-  "line", "tibble or data.frame", "Any*", "Numeric", "Categorical or numeric", "Categorical", "Identity",
-  "point", "tibble or data.frame", "Any*", "Numeric", "Categorical or numeric", "Categorical", "Identity",
-  "boxplot", "tibble or data.frame", "Any*", "Numeric", "Categorical", "Categorical", "Boxplot or identity",
-  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "Identity",
+  ~family, ~data, ~x_var, ~y_var, ~col_var, ~facet_var, ~stat,
+  "bar", "tibble or data.frame", "Any*", "Numeric", "Categorical or numeric", "Categorical", "identity",
+  "hbar", "tibble or data.frame", "Numeric", "Any*", "Categorical or numeric", "Categorical", "identity",
+  "line", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical", "identity",
+  "point", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical", "identity",
+  "boxplot", "tibble or data.frame", "Any*", "Numeric", "Categorical", "Categorical", "boxplot or identity",
+  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "identity",
   ) %>% 
   DT::datatable()
 
@@ -141,10 +146,12 @@ gg_point_col(penguins, bill_length_mm, body_mass_g, species) +
 ## ---- fig.height = 4.5--------------------------------------------------------
 plot_data <- penguins %>% 
   group_by(species, sex, island) %>% 
-  summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE)) %>% 
-  filter(!is.na(sex))
+  summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE))
 
-gg_bar(plot_data, sex, body_mass_g, width = 0.66, y_pretty_n = 3, x_na = FALSE) +
+gg_bar(plot_data, sex, body_mass_g, 
+       width = 0.66, 
+       x_na = FALSE, 
+       y_pretty_n = 3) +
   facet_grid(rows = vars(species), 
              cols = vars(island), 
              labeller = as_labeller(snakecase::to_sentence_case))

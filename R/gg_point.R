@@ -146,7 +146,7 @@ gg_point <- function(data,
     x_zero <- x_zero_list[[1]]
     x_zero_line <- x_zero_list[[2]]
     
-    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = "identity", zero = x_zero, mobile = mobile)
+    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = x_trans, zero = x_zero, mobile = mobile)
     x_limits <- c(min(x_breaks), max(x_breaks))
     if(is.null(x_expand)) x_expand <- c(0, 0)
     if(is.null(x_labels)) x_labels <- waiver()
@@ -191,7 +191,7 @@ gg_point <- function(data,
   }
   else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
     if(is.null(x_expand)) x_expand <- waiver()
-    if(is.null(x_labels)) x_labels <- function(x) snakecase::to_sentence_case(x)
+    if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
 
     plot <- plot +
       scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -436,14 +436,14 @@ gg_point_col <- function(data,
     else if (col_method == "bin") {
       if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr)
       else({
-        if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+        if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
         if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
       })
       if(is.null(col_labels_dp)) col_labels_dp <- sv_max_dp(col_cuts)
     }
     
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, right = FALSE, include.lowest = TRUE)))
+      dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, right = FALSE, include.lowest = TRUE), .names = "col_var2"))
     
     if(is.null(col_labels)) col_labels <- sv_numeric_bin_labels(col_cuts, col_labels_dp)
     
@@ -460,7 +460,10 @@ gg_point_col <- function(data,
     if (is.null(pal)) pal <- pal_d3_reorder(col_n)
     else pal <- pal[1:col_n]
     
-    if(is.null(col_labels)) col_labels <- function(x) snakecase::to_sentence_case(x)
+    if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
+    
+    data <- data %>% 
+      dplyr::mutate(col_var2 = !!col_var)
   }
   
   if (pal_rev == TRUE) pal <- rev(pal)
@@ -474,7 +477,7 @@ gg_point_col <- function(data,
     coord_cartesian(clip = "off")
   
   plot <- plot +
-    geom_point(aes(x = !!x_var, y = !!y_var, col = !!col_var, text = !!text_var), size = size_point)
+    geom_point(aes(x = !!x_var, y = !!y_var, col = .data$col_var2, text = !!text_var), size = size_point)
   
   if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
     
@@ -482,7 +485,7 @@ gg_point_col <- function(data,
     x_zero <- x_zero_list[[1]]
     x_zero_line <- x_zero_list[[2]]
     
-    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = "identity", zero = x_zero, mobile = mobile)
+    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = x_trans, zero = x_zero, mobile = mobile)
     x_limits <- c(min(x_breaks), max(x_breaks))
     if(is.null(x_expand)) x_expand <- c(0, 0)
     if(is.null(x_labels)) x_labels <- waiver()
@@ -527,7 +530,7 @@ gg_point_col <- function(data,
   }
   else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
     if(is.null(x_expand)) x_expand <- waiver()
-    if(is.null(x_labels)) x_labels <- function(x) snakecase::to_sentence_case(x)
+    if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
     
     plot <- plot +
       scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -558,12 +561,17 @@ gg_point_col <- function(data,
       )
   })
   
+  if(y_zero_line == TRUE) {
+    plot <- plot +
+      geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
+  }
+  
   plot <- plot +
     scale_color_manual(
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = "#7F7F7FFF"
+      na.value = pal_na()
     ) 
   
   if (mobile == FALSE) {
@@ -627,7 +635,7 @@ gg_point_col <- function(data,
 #' @param y_trans For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(snakecase::to_sentence_case). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
+#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
 #' @param facet_ncol The number of columns of facetted plots. 
 #' @param facet_nrow The number of rows of facetted plots. 
@@ -765,7 +773,7 @@ gg_point_facet <- function(data,
       x_zero <- x_zero_list[[1]]
       x_zero_line <- x_zero_list[[2]]
       
-      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = "identity", zero = x_zero, mobile = FALSE)
+      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = x_trans, zero = x_zero, mobile = FALSE)
       x_limits <- c(min(x_breaks), max(x_breaks))
       if(is.null(x_expand)) x_expand <- c(0, 0)
       if(is.null(x_labels)) x_labels <- waiver()
@@ -805,7 +813,7 @@ gg_point_facet <- function(data,
     }
     else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
       if(is.null(x_expand)) x_expand <- waiver()
-      if(is.null(x_labels)) x_labels <- function(x) snakecase::to_sentence_case(x)
+      if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
       
       plot <- plot +
         scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -851,7 +859,7 @@ gg_point_facet <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
-  if(is.null(facet_labels)) facet_labels <- as_labeller(snakecase::to_sentence_case)
+  if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
   
   plot <- plot +
     labs(
@@ -911,7 +919,7 @@ gg_point_facet <- function(data,
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. 
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(snakecase::to_sentence_case). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
+#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
 #' @param facet_ncol The number of columns of facetted plots. 
 #' @param facet_nrow The number of rows of facetted plots. 
@@ -1081,7 +1089,7 @@ gg_point_col_facet <-
       }
       
       data <- data %>% 
-        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, right = FALSE, include.lowest = TRUE)))
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, right = FALSE, include.lowest = TRUE), .names = "col_var2"))
       
       if(is.null(col_labels)) col_labels <- sv_numeric_bin_labels(col_cuts, col_labels_dp)
       
@@ -1098,7 +1106,10 @@ gg_point_col_facet <-
       if (is.null(pal)) pal <- pal_d3_reorder(col_n)
       else pal <- pal[1:col_n]
       
-      if(is.null(col_labels)) col_labels <- function(x) snakecase::to_sentence_case(x)
+      if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
+      
+      data <- data %>% 
+        dplyr::mutate(col_var2 = !!col_var)
     }
     
     if (pal_rev == TRUE) pal <- rev(pal)
@@ -1110,7 +1121,7 @@ gg_point_col_facet <-
         font_size_title = font_size_title
       ) +
       coord_cartesian(clip = "off") +
-      geom_point(aes(x = !!x_var, y = !!y_var, col = !!col_var, text = !!text_var), size = size_point)
+      geom_point(aes(x = !!x_var, y = !!y_var, col = .data$col_var2, text = !!text_var), size = size_point)
     
     if (facet_scales %in% c("fixed", "free_y")) {
       if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
@@ -1119,7 +1130,7 @@ gg_point_col_facet <-
         x_zero <- x_zero_list[[1]]
         x_zero_line <- x_zero_list[[2]]
         
-        x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = "identity", zero = x_zero, mobile = FALSE)
+        x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, pretty_n = x_pretty_n, trans = x_trans, zero = x_zero, mobile = FALSE)
         x_limits <- c(min(x_breaks), max(x_breaks))
         if(is.null(x_expand)) x_expand <- c(0, 0)
         if(is.null(x_labels)) x_labels <- waiver()
@@ -1159,7 +1170,7 @@ gg_point_col_facet <-
       }
       else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
         if(is.null(x_expand)) x_expand <- waiver()
-        if(is.null(x_labels)) x_labels <- function(x) snakecase::to_sentence_case(x)
+        if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
         
         plot <- plot +
           scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -1205,14 +1216,14 @@ gg_point_col_facet <-
         geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
     
-    if(is.null(facet_labels)) facet_labels <- as_labeller(snakecase::to_sentence_case)
+    if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
       
     plot <- plot +
       scale_color_manual(
         values = pal,
         drop = FALSE,
         labels = col_labels,
-        na.value = "#7F7F7FFF"
+        na.value = pal_na()
       ) +
       labs(
         title = stringr::str_wrap(title, title_wrap),

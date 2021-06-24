@@ -1,3 +1,34 @@
+# simplevis 4.1.7
+
+* For point*, fixed bug to support use of the same col_var as x or y.
+
+# simplevis 4.1.6
+
+* Changed gg_sf* family alpha default to 0.9.
+
+# simplevis 4.1.5
+
+* Fixed point* family bug to support log10 x axis with x_zero equals TRUE.
+
+# simplevis 4.1.4
+
+* Updated pal_na to add a col_n argument for consistency with other pal functions.
+* Add article on titles.
+
+# simplevis 4.1.3
+
+* Added pal_na function.
+* Updated colour article.
+
+# simplevis 4.1.2
+
+* Changed label default conversion to use stringr::str_to_sentence.
+
+# simplevis 4.1.1
+
+* Fixed gg_point_col bug to make the zero lines work.
+* Updated articles and vignettes.
+
 # simplevis 4.1.0
 
 * Add categorical colour palette.

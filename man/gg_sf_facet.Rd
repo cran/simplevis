@@ -10,7 +10,7 @@ gg_sf_facet(
   text_var = NULL,
   size_point = 1,
   size_line = 0.5,
-  alpha = 1,
+  alpha = 0.9,
   pal = NULL,
   facet_labels = NULL,
   facet_na = TRUE,
@@ -42,11 +42,11 @@ gg_sf_facet(
 
 \item{size_line}{Size of lines. Defaults to 0.5.}
 
-\item{alpha}{The alpha of the fill. Defaults to 1.}
+\item{alpha}{The alpha of the fill. Defaults to 0.9.}
 
 \item{pal}{Character vector of hex codes.}
 
-\item{facet_labels}{As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(snakecase::to_sentence_case). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.}
+\item{facet_labels}{As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.}
 
 \item{facet_na}{TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.}
 

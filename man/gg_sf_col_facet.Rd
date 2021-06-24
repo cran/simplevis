@@ -13,7 +13,7 @@ gg_sf_col_facet(
   pal_rev = FALSE,
   size_point = 1,
   size_line = 0.5,
-  alpha = 1,
+  alpha = 0.9,
   borders = NULL,
   borders_behind = TRUE,
   borders_pal = "#7f7f7f",
@@ -95,7 +95,7 @@ gg_sf_col_facet(
 
 \item{col_title_wrap}{Number of characters to wrap the colour title to. Defaults to 25.}
 
-\item{facet_labels}{As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(snakecase::to_sentence_case). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.}
+\item{facet_labels}{As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.}
 
 \item{facet_na}{TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.}
 
@@ -121,6 +121,6 @@ Map of simple features in ggplot that is coloured and facetted.
 }
 \examples{
 gg_sf_col_facet(example_sf_point, trend_category, trend_category,
- borders = nz, pal = c("#4575B4", "#D3D3D3", "#D73027"))
+ borders = nz)
  
 }

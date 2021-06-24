@@ -4,7 +4,7 @@
 #' @param data A sf object with defined coordinate reference system. Required input.
 #' @param size_point Size of points. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param alpha The alpha of the fill. Defaults to 1. 
+#' @param alpha The alpha of the fill. Defaults to 0.9. 
 #' @param pal Character vector of hex codes. 
 #' @param borders A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.
 #' @param borders_behind TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.
@@ -28,7 +28,7 @@ gg_sf <- function(data,
                   text_var = NULL,
                   size_point = 1,
                   size_line = 0.5,
-                  alpha = 1,
+                  alpha = 0.9,
                   pal = NULL,
                   borders = NULL,
                   borders_behind = TRUE,
@@ -166,7 +166,7 @@ gg_sf <- function(data,
 #' @export
 #' @examples
 #' gg_sf_col(example_sf_point, trend_category, 
-#'           borders = nz, pal = c("#4575B4", "#D3D3D3", "#D73027"))
+#'           borders = nz)
 #'    
 #' gg_sf_col(example_sf_polygon, density, 
 #'      borders = nz, col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
@@ -180,7 +180,7 @@ gg_sf_col <- function(data,
                       pal_rev = FALSE,
                       size_point = 1,
                       size_line = 0.5,
-                      alpha = 1,
+                      alpha = 0.9,
                       borders = NULL,
                       borders_behind = TRUE,
                       borders_pal = "#7f7f7f",
@@ -273,7 +273,7 @@ gg_sf_col <- function(data,
     else if (col_method == "bin") {
       if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr)
       else({
-        if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+        if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
         if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
       })
       if(is.null(col_labels_dp)) col_labels_dp <- sv_max_dp(col_cuts)
@@ -297,7 +297,7 @@ gg_sf_col <- function(data,
     if (is.null(pal)) pal <- pal_d3_reorder(col_n)
     else pal <- pal[1:col_n]
     
-    if(is.null(col_labels)) col_labels <- function(x) snakecase::to_sentence_case(x)
+    if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
   }
   
   if (pal_rev == TRUE) pal <- rev(pal)
@@ -333,7 +333,7 @@ gg_sf_col <- function(data,
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = "#7F7F7FFF"
+      na.value = pal_na()
     )
   
     if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
@@ -342,7 +342,7 @@ gg_sf_col <- function(data,
         values = pal,
         drop = FALSE,
         labels = col_labels,
-        na.value = "#7F7F7FFF"
+        na.value = pal_na()
       )
   }
   
@@ -390,9 +390,9 @@ gg_sf_col <- function(data,
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
 #' @param size_point Size of points. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param alpha The alpha of the fill. Defaults to 1. 
+#' @param alpha The alpha of the fill. Defaults to 0.9. 
 #' @param pal Character vector of hex codes. 
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(snakecase::to_sentence_case). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
+#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
 #' @param facet_ncol The number of columns of facetted plots. 
 #' @param facet_nrow The number of rows of facetted plots. 
@@ -418,7 +418,7 @@ gg_sf_facet <- function(data,
                         text_var = NULL,
                         size_point = 1,
                         size_line = 0.5,
-                        alpha = 1,
+                        alpha = 0.9,
                         pal = NULL,
                         facet_labels = NULL,
                         facet_na = TRUE,
@@ -532,7 +532,7 @@ gg_sf_facet <- function(data,
     }
   }
   
-  if(is.null(facet_labels)) facet_labels <- as_labeller(snakecase::to_sentence_case)
+  if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
   
   plot <- plot +
     labs(
@@ -565,7 +565,7 @@ gg_sf_facet <- function(data,
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(snakecase::to_sentence_case). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
+#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
 #' @param col_labels A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case, and numeric variable labels to pretty labels with an internal function. Use ggplot2::waiver() to keep colour labels untransformed.   
 #' @param col_labels_dp For numeric colour variables and where col_labels equals NULL, the number of decimal places. Defaults to 1 for "quantile" col_method, and the lowest dp within the col_cuts vector for "bin".
 #' @param col_legend_ncol The number of columns in the legend. 
@@ -586,7 +586,7 @@ gg_sf_facet <- function(data,
 #' @export
 #' @examples
 #' gg_sf_col_facet(example_sf_point, trend_category, trend_category,
-#'  borders = nz, pal = c("#4575B4", "#D3D3D3", "#D73027"))
+#'  borders = nz)
 #'  
 gg_sf_col_facet <- function(data,
                             col_var,
@@ -596,7 +596,7 @@ gg_sf_col_facet <- function(data,
                             pal_rev = FALSE,
                             size_point = 1,
                             size_line = 0.5,
-                            alpha = 1,
+                            alpha = 0.9,
                             borders = NULL,
                             borders_behind = TRUE,
                             borders_pal = "#7f7f7f",
@@ -705,7 +705,7 @@ gg_sf_col_facet <- function(data,
     else if (col_method == "bin") {
       if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr)
       else({
-        if (!(dplyr::first(col_cuts) %in% c(0,-Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+        if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
         if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
       })
       if(is.null(col_labels_dp)) col_labels_dp <- sv_max_dp(col_cuts)
@@ -729,7 +729,7 @@ gg_sf_col_facet <- function(data,
     if (is.null(pal)) pal <- pal_d3_reorder(col_n)
     else pal <- pal[1:col_n]
     
-    if(is.null(col_labels)) col_labels <- function(x) snakecase::to_sentence_case(x)
+    if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
   }
   
   if (pal_rev == TRUE) pal <- rev(pal)
@@ -765,7 +765,7 @@ gg_sf_col_facet <- function(data,
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = "#7F7F7FFF"
+      na.value = pal_na()
     )
   
   if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
@@ -774,7 +774,7 @@ gg_sf_col_facet <- function(data,
         values = pal,
         drop = FALSE,
         labels = col_labels,
-        na.value = "#7F7F7FFF"
+        na.value = pal_na()
       )
   }
   
@@ -790,7 +790,7 @@ gg_sf_col_facet <- function(data,
     }
   }
   
-  if(is.null(facet_labels)) facet_labels <- as_labeller(snakecase::to_sentence_case)
+  if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
   
   plot <- plot +
     labs(
