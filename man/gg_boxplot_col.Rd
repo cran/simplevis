@@ -4,55 +4,20 @@
 \alias{gg_boxplot_col}
 \title{Boxplot ggplot that is coloured}
 \usage{
-gg_boxplot_col(
-  data,
-  x_var,
-  y_var = NULL,
-  col_var,
-  stat = "boxplot",
-  pal = NULL,
-  pal_rev = FALSE,
-  width = 0.5,
-  alpha = 1,
-  size_line = 0.5,
-  size_point = 1,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  x_balance = FALSE,
-  x_labels = NULL,
-  x_pretty_n = 6,
-  x_expand = NULL,
-  x_na = TRUE,
-  x_title = NULL,
-  x_title_wrap = 50,
-  x_zero = FALSE,
-  x_zero_line = NULL,
-  y_balance = FALSE,
-  y_expand = NULL,
-  y_labels = waiver(),
-  y_na = TRUE,
-  y_pretty_n = 5,
-  x_rev = FALSE,
-  y_title = NULL,
-  y_title_wrap = 50,
-  y_trans = "identity",
-  y_zero = FALSE,
-  y_zero_line = NULL,
-  col_labels = NULL,
-  col_legend_ncol = NULL,
-  col_legend_nrow = NULL,
-  col_na = TRUE,
-  col_title = NULL,
-  col_title_wrap = 25,
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
-  mobile = FALSE
-)
+gg_boxplot_col(data, x_var, y_var = NULL, col_var, stat = "boxplot",
+  pal = NULL, pal_rev = FALSE, width = 0.5, alpha = 1,
+  size_line = 0.5, size_point = 1, title = NULL, title_wrap = 100,
+  subtitle = NULL, subtitle_wrap = 100, x_balance = FALSE,
+  x_labels = NULL, x_pretty_n = 6, x_expand = NULL, x_na = TRUE,
+  x_title = NULL, x_title_wrap = 50, x_zero = FALSE,
+  x_zero_line = NULL, y_balance = FALSE, y_expand = NULL,
+  y_gridlines_minor = FALSE, y_labels = waiver(), y_na = TRUE,
+  y_pretty_n = 5, x_rev = FALSE, y_title = NULL, y_title_wrap = 50,
+  y_trans = "identity", y_zero = FALSE, y_zero_line = NULL,
+  col_labels = NULL, col_legend_ncol = NULL, col_legend_nrow = NULL,
+  col_na = TRUE, col_title = NULL, col_title_wrap = 25,
+  caption = NULL, caption_wrap = 80, font_family = "",
+  font_size_title = NULL, font_size_body = NULL, mobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -107,6 +72,8 @@ gg_boxplot_col(
 
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
+\item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
+
 \item{y_labels}{A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
 \item{y_na}{TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.}
@@ -159,9 +126,15 @@ Boxplot ggplot that is coloured
 library(simplevis)
 library(palmerpenguins)
 
-gg_boxplot_col(penguins, species, body_mass_g, sex)
+gg_boxplot_col(penguins, 
+               x_var = species, 
+               y_var = body_mass_g, 
+               col_var = sex)
 
-plot <- gg_boxplot_col(penguins, species, body_mass_g, sex)
+plot <- gg_boxplot_col(penguins, 
+                       x_var = species, 
+                       y_var = body_mass_g, 
+                       col_var = sex)
 
 plotly::ggplotly(plot) \%>\%
   plotly::layout(boxmode = "group") \%>\%

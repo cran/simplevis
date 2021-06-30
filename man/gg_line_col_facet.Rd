@@ -4,58 +4,22 @@
 \alias{gg_line_col_facet}
 \title{Line ggplot that is coloured and facetted.}
 \usage{
-gg_line_col_facet(
-  data,
-  x_var,
-  y_var,
-  col_var,
-  facet_var,
-  text_var = NULL,
-  pal = NULL,
-  pal_rev = FALSE,
-  size_point = 1,
-  size_line = 0.5,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  x_balance = FALSE,
-  x_expand = NULL,
-  x_labels = NULL,
-  x_na = TRUE,
-  x_pretty_n = 3,
-  x_rev = FALSE,
-  x_title = NULL,
-  x_title_wrap = 50,
-  x_zero = FALSE,
-  x_zero_line = NULL,
-  y_balance = FALSE,
-  y_expand = NULL,
-  y_labels = waiver(),
-  y_na = TRUE,
-  y_pretty_n = 4,
-  y_trans = "identity",
-  y_title = NULL,
-  y_title_wrap = 50,
-  y_zero = FALSE,
-  y_zero_line = NULL,
-  col_labels = NULL,
-  col_legend_ncol = NULL,
-  col_legend_nrow = NULL,
-  col_na = TRUE,
-  col_title = NULL,
-  col_title_wrap = 25,
-  facet_labels = NULL,
-  facet_na = TRUE,
-  facet_ncol = NULL,
-  facet_nrow = NULL,
-  facet_scales = "fixed",
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
-)
+gg_line_col_facet(data, x_var, y_var, col_var, facet_var,
+  text_var = NULL, pal = NULL, pal_rev = FALSE, size_point = 1,
+  size_line = 0.5, title = NULL, title_wrap = 100, subtitle = NULL,
+  subtitle_wrap = 100, x_balance = FALSE, x_expand = NULL,
+  x_labels = NULL, x_na = TRUE, x_pretty_n = 3, x_rev = FALSE,
+  x_title = NULL, x_title_wrap = 50, x_zero = FALSE,
+  x_zero_line = NULL, y_balance = FALSE, y_expand = NULL,
+  y_gridlines_minor = FALSE, y_labels = waiver(), y_na = TRUE,
+  y_pretty_n = 4, y_trans = "identity", y_title = NULL,
+  y_title_wrap = 50, y_zero = FALSE, y_zero_line = NULL,
+  col_labels = NULL, col_legend_ncol = NULL, col_legend_nrow = NULL,
+  col_na = TRUE, col_title = NULL, col_title_wrap = 25,
+  facet_labels = NULL, facet_na = TRUE, facet_ncol = NULL,
+  facet_nrow = NULL, facet_scales = "fixed", caption = NULL,
+  caption_wrap = 80, font_family = "", font_size_title = NULL,
+  font_size_body = NULL)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -109,6 +73,8 @@ gg_line_col_facet(
 \item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
 
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
+
+\item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
 
 \item{y_labels}{A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
@@ -174,6 +140,10 @@ plot_data <- penguins \%>\%
   summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE)) \%>\% 
   mutate(year = as.character(year))
 
-gg_line_col_facet(plot_data, year, body_mass_g, sex, species)
+gg_line_col_facet(plot_data, 
+                  x_var = year, 
+                  y_var = body_mass_g, 
+                  col_var = sex, 
+                  facet_var = species)
 
 }

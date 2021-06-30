@@ -4,51 +4,19 @@
 \alias{gg_hbar_facet}
 \title{Horizontal bar ggplot that is facetted.}
 \usage{
-gg_hbar_facet(
-  data,
-  x_var,
-  y_var,
-  facet_var,
-  text_var = NULL,
-  pal = NULL,
-  width = 0.75,
-  alpha = 1,
-  size_line = 0.5,
-  title = NULL,
-  title_wrap = 80,
-  subtitle = NULL,
-  subtitle_wrap = 80,
-  x_balance = FALSE,
-  x_expand = NULL,
-  x_labels = waiver(),
-  x_na = TRUE,
-  x_pretty_n = 3,
-  x_title = NULL,
-  x_title_wrap = 50,
-  x_trans = "identity",
-  x_zero = TRUE,
-  x_zero_line = NULL,
-  y_balance = FALSE,
-  y_expand = NULL,
-  y_labels = NULL,
-  y_na = TRUE,
-  y_pretty_n = 4,
-  y_rev = FALSE,
-  y_title = NULL,
-  y_title_wrap = 50,
-  y_zero = FALSE,
-  y_zero_line = NULL,
-  facet_labels = NULL,
-  facet_na = TRUE,
-  facet_ncol = NULL,
-  facet_nrow = NULL,
-  facet_scales = "fixed",
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
-)
+gg_hbar_facet(data, x_var, y_var, facet_var, text_var = NULL,
+  pal = NULL, width = 0.75, alpha = 1, size_line = 0.5,
+  title = NULL, title_wrap = 80, subtitle = NULL,
+  subtitle_wrap = 80, x_balance = FALSE, x_expand = NULL,
+  x_gridlines_minor = FALSE, x_labels = waiver(), x_na = TRUE,
+  x_pretty_n = 3, x_title = NULL, x_title_wrap = 50,
+  x_trans = "identity", x_zero = TRUE, x_zero_line = NULL,
+  y_balance = FALSE, y_expand = NULL, y_labels = NULL, y_na = TRUE,
+  y_pretty_n = 4, y_rev = FALSE, y_title = NULL, y_title_wrap = 50,
+  y_zero = FALSE, y_zero_line = NULL, facet_labels = NULL,
+  facet_na = TRUE, facet_ncol = NULL, facet_nrow = NULL,
+  facet_scales = "fixed", caption = NULL, caption_wrap = 80,
+  font_family = "", font_size_title = NULL, font_size_body = NULL)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -80,6 +48,8 @@ gg_hbar_facet(
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
 
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
+
+\item{x_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.}
 
 \item{x_labels}{A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
@@ -152,6 +122,9 @@ plot_data <- penguins \%>\%
   group_by(species, sex) \%>\% 
   summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE))  
 
-gg_hbar_facet(plot_data, body_mass_g, sex, species)
+gg_hbar_facet(plot_data, 
+              x_var = body_mass_g, 
+              y_var = sex, 
+              facet_var = species)
 
 }

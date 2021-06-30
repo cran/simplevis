@@ -19,48 +19,81 @@ plot_data <- storms %>%
   group_by(year) %>%
   summarise(wind = mean(wind))
 
-gg_bar(plot_data, year, wind)
+gg_bar(plot_data, 
+       x_var = year, 
+       y_var = wind)
 
 ## -----------------------------------------------------------------------------
-gg_point(iris, Sepal.Width, Sepal.Length)
+gg_point(iris, 
+         x_var = Sepal.Width, 
+         y_var = Sepal.Length)
 
 ## -----------------------------------------------------------------------------
 plot_data <- storms %>%
   group_by(year) %>%
   summarise(wind = mean(wind))
 
-gg_line(plot_data, year, wind)
-
-## -----------------------------------------------------------------------------
-gg_boxplot(storms, year, wind)
+gg_line(plot_data, 
+        x_var = year, 
+        y_var = wind)
 
 ## ---- fig.height = 3----------------------------------------------------------
 plot_data <- ggplot2::diamonds %>%
   group_by(cut) %>%
   summarise(price = mean(price))
 
-gg_hbar(plot_data, price, cut)
+gg_hbar(plot_data, 
+        x_var = price, 
+        y_var = cut)
 
 ## -----------------------------------------------------------------------------
-gg_sf(example_sf_point, borders = nz)
+gg_density(penguins, 
+           x_var = body_mass_g)
 
 ## -----------------------------------------------------------------------------
-gg_point(penguins, bill_length_mm, body_mass_g)
+gg_boxplot(storms, 
+           x_var = year, 
+           y_var = wind)
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, sex)
+gg_sf(example_sf_point, 
+      borders = nz)
 
 ## -----------------------------------------------------------------------------
-gg_point_facet(penguins, bill_length_mm, body_mass_g, species)
+gg_point(penguins, 
+         x_var = bill_length_mm, 
+         y_var = body_mass_g)
 
 ## -----------------------------------------------------------------------------
-gg_point_col_facet(penguins, bill_length_mm, body_mass_g, sex, species)
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = sex)
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, species)
+gg_point_facet(penguins, 
+               x_var = bill_length_mm, 
+               y_var = body_mass_g, 
+               facet_var = species)
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, species, 
+gg_point_col_facet(penguins, 
+                   x_var = bill_length_mm, 
+                   y_var = body_mass_g, 
+                   col_var = sex, 
+                   facet_var = species)
+
+## -----------------------------------------------------------------------------
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = species)
+
+## -----------------------------------------------------------------------------
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = species, 
              title = "Adult penguin mass by bill length and species",
              subtitle = "Palmer station, Antarctica",
              x_title = "Bill length (mm)", 
@@ -69,40 +102,60 @@ gg_point_col(penguins, bill_length_mm, body_mass_g, species,
              caption = "Source: Gorman KB, Williams TD, Fraser WR (2014)")
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, species, 
-             col_title = "")
-
-## -----------------------------------------------------------------------------
-gg_point(iris, Sepal.Width, Sepal.Length, pal = "#e7298a")
-
+gg_point(iris, 
+         x_var = Sepal.Width, 
+         y_var = Sepal.Length, 
+         pal = "#e7298a")
 
 ## -----------------------------------------------------------------------------
 plot_data <- storms %>%
-  group_by(year) %>%
+  group_by(year, status) %>%
   summarise(wind = mean(wind))
 
-gg_line(plot_data, year, wind, 
+gg_bar_col(plot_data, 
+        x_var = year, 
+        y_var = wind, 
+        col_var = status,
+        position = "stack",
         x_pretty_n = 4,
         x_labels = function(x) stringr::str_sub(x, 3, 4),
         y_labels = scales::comma_format(accuracy = 0.1), 
         y_zero = T, 
         y_pretty_n = 10,
+        y_gridlines_minor = T,
         y_expand = ggplot2::expansion(mult = c(0.025, 0.025)))
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, sex, 
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = sex, 
              col_na = FALSE)
 
 ## -----------------------------------------------------------------------------
-gg_sf_col(example_sf_point, trend_category)
+plot_data <- penguins %>% 
+  group_by(sex, species) %>% 
+  summarise(count = n())
+
+gg_hbar_col(plot_data, 
+        x_var = count, 
+        y_var = species, 
+        col_var = sex,
+        position = "stack")
 
 ## -----------------------------------------------------------------------------
-gg_sf_col(example_sf_point, trend_category,
+gg_sf_col(example_sf_point, 
+          col_var = trend_category)
+
+## -----------------------------------------------------------------------------
+gg_sf_col(example_sf_point, 
+          col_var = trend_category,
           borders = nz)
 
 
 ## -----------------------------------------------------------------------------
-leaflet_sf_col(example_sf_point, trend_category)
+leaflet_sf_col(example_sf_point, 
+               col_var = trend_category)
 
 ## ---- message = FALSE, warning = FALSE, fig.width = 7-------------------------
 tibble::tribble(
@@ -111,36 +164,23 @@ tibble::tribble(
   "hbar", "tibble or data.frame", "Numeric", "Any*", "Categorical or numeric", "Categorical", "identity",
   "line", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical", "identity",
   "point", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical", "identity",
-  "boxplot", "tibble or data.frame", "Any*", "Numeric", "Categorical", "Categorical", "boxplot or identity",
+  "density", "tibble or data.frame", "Numeric", NA, "Categorical",  "Categorical", "density",
+  "boxplot", "tibble or data.frame", "Any*", "Numeric", "Categorical", "Categorical", "boxplot (or identity)",
   "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "identity",
   ) %>% 
   DT::datatable()
 
-## ---- eval = FALSE------------------------------------------------------------
-#  plot <- gg_point_col(penguins, bill_length_mm, body_mass_g, species)
-#  
-#  plotly::ggplotly(plot) %>%
-#    plotly_camera()
-
-## ---- eval = FALSE------------------------------------------------------------
-#  plot <- gg_point_col(penguins, bill_length_mm, body_mass_g, species)
-#  
-#  plotly::ggplotly(plot) %>%
-#    plotly_camera()
-#  
-#  plot_data <- penguins %>%
-#    mutate_text()
-#  
-#  plot <- gg_point_col(plot_data, bill_length_mm, body_mass_g, species,
-#                       text_var = text,
-#                       font_family = "Helvetica")
-#  
-#  plotly::ggplotly(plot, tooltip = "text") %>%
-#    plotly_camera()
+## -----------------------------------------------------------------------------
+penguins %>% 
+  gg_density_col(x_var = body_mass_g, 
+                 col_var = species)
 
 ## -----------------------------------------------------------------------------
-gg_point_col(penguins, bill_length_mm, body_mass_g, species) +
-  geom_smooth(aes(bill_length_mm, body_mass_g, col = species))
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = species) +
+  geom_smooth(aes(x = bill_length_mm, y = body_mass_g, col = species))
 
 
 ## ---- fig.height = 4.5--------------------------------------------------------
@@ -148,7 +188,9 @@ plot_data <- penguins %>%
   group_by(species, sex, island) %>% 
   summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE))
 
-gg_bar(plot_data, sex, body_mass_g, 
+gg_bar(plot_data, 
+       x_var = sex, 
+       y_var = body_mass_g, 
        width = 0.66, 
        x_na = FALSE, 
        y_pretty_n = 3) +
@@ -156,4 +198,35 @@ gg_bar(plot_data, sex, body_mass_g,
              cols = vars(island), 
              labeller = as_labeller(snakecase::to_sentence_case))
 
+
+## ---- eval = FALSE------------------------------------------------------------
+#  plot <- gg_point_col(penguins,
+#                       x_var = bill_length_mm,
+#                       y_var = body_mass_g,
+#                       col_var = species)
+#  
+#  plotly::ggplotly(plot) %>%
+#    plotly_camera()
+
+## ---- eval = FALSE------------------------------------------------------------
+#  plot <- gg_point_col(penguins,
+#                       x_var = bill_length_mm,
+#                       y_var = body_mass_g,
+#                       col_var = species)
+#  
+#  plotly::ggplotly(plot) %>%
+#    plotly_camera()
+#  
+#  plot_data <- penguins %>%
+#    mutate_text()
+#  
+#  plot <- gg_point_col(plot_data,
+#                       x_var = bill_length_mm,
+#                       y_var = body_mass_g,
+#                       col_var = species,
+#                       text_var = text,
+#                       font_family = "Helvetica")
+#  
+#  plotly::ggplotly(plot, tooltip = "text") %>%
+#    plotly_camera()
 

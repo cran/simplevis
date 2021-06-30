@@ -1,3 +1,49 @@
+# simplevis 4.3.0
+
+# simplevis 4.2.9
+
+* Made legend fill background white for all functions. 
+* Updated vignette and arrticles to discuss density functions, and make vars more explicit.
+* Added minor gridline arguments.
+
+# simplevis 4.2.8
+
+* Added gg_density_col_facet() function.
+* Made all gg_density* functions only support position = "identity".
+
+# simplevis 4.2.7
+
+* Added gg_density_facet() function.
+
+# simplevis 4.2.6
+
+* Added arguments to modify density stat within gg_density().
+* Added gg_density_col() function.
+
+# simplevis 4.2.5
+
+* Created first density function.
+
+# simplevis 4.2.4
+
+* Updated bar help to note that only stack and dodge positions are supported.
+
+# simplevis 4.2.3
+
+* For point, added position and alpha arguments.
+
+# simplevis 4.2.2 
+
+* Updated bar position code to provide more flexibility.
+
+# simplevis 4.2.1
+
+* Consolidated and renamed themes.
+
+# simplevis 4.2.0
+
+* Bumped version for CRAN release.
+
 # simplevis 4.1.7
 
 * For point*, fixed bug to support use of the same col_var as x or y.

@@ -4,6 +4,8 @@
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
+#' @param position Whether bars are positioned by "identity" or "jitter". Defaults to "identity".
+#' @param alpha The opacity of points. Defaults to 1.
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
 #' @param title Title string. Defaults to NULL.
@@ -12,6 +14,7 @@
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
@@ -23,6 +26,7 @@
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
@@ -43,12 +47,16 @@
 #' library(simplevis)
 #' library(palmerpenguins)
 #' 
-#' gg_point(penguins, bill_length_mm, body_mass_g)
+#' gg_point(penguins, 
+#'          x_var = bill_length_mm, 
+#'          y_var = body_mass_g)
 #' 
 gg_point <- function(data,
                      x_var,
                      y_var,
                      text_var = NULL,
+                     position = "identity", 
+                     alpha = 1,
                      size_point = 1,
                      pal = NULL,
                      title = NULL,
@@ -57,6 +65,7 @@ gg_point <- function(data,
                      subtitle_wrap = 100,
                      x_balance = FALSE,
                      x_expand = NULL,
+                     x_gridlines_minor = FALSE,
                      x_labels = NULL,
                      x_pretty_n = 6,
                      x_na = TRUE,
@@ -68,6 +77,7 @@ gg_point <- function(data,
                      x_zero_line = NULL,
                      y_balance = FALSE,
                      y_expand = NULL,
+                     y_gridlines_minor = FALSE,
                      y_labels = waiver(),
                      y_pretty_n = 5,
                      y_na = TRUE,
@@ -132,13 +142,13 @@ gg_point <- function(data,
   else pal <- pal[1]
   
   plot <- ggplot(data) +
-    theme_point(
+    theme_xy_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
     ) +
     coord_cartesian(clip = "off") +
-    geom_point(aes(!!x_var, !!y_var, text = !!text_var), col = pal[1], size = size_point)
+    geom_point(aes(!!x_var, !!y_var, text = !!text_var), col = pal[1], size = size_point, alpha = alpha, position = position)
   
   if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
     
@@ -227,6 +237,15 @@ gg_point <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
+  if (x_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.x = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+  if (y_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+
   if (mobile == FALSE) {
     plot <- plot +
       labs(
@@ -246,7 +265,7 @@ gg_point <- function(data,
         y = stringr::str_wrap(y_title, 30),
         caption = stringr::str_wrap(caption, 50)
       ) + 
-      theme_mobile_graph()
+      theme_mobile_extra()
   }
   
   return(plot)
@@ -259,6 +278,8 @@ gg_point <- function(data,
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
+#' @param position Whether bars are positioned by "identity" or "jitter". Defaults to "identity".
+#' @param alpha The opacity of points. Defaults to 1.
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
@@ -268,6 +289,7 @@ gg_point <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
@@ -279,6 +301,7 @@ gg_point <- function(data,
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
@@ -308,18 +331,24 @@ gg_point <- function(data,
 #' library(simplevis)
 #' library(palmerpenguins)
 #' 
-#' gg_point_col(penguins, bill_length_mm, body_mass_g, species)
+#' gg_point_col(penguins, 
+#'              x_var = bill_length_mm, 
+#'              y_var = body_mass_g, 
+#'              col_var = species)
 #' 
 gg_point_col <- function(data,
                          x_var,
                          y_var,
                          col_var,
                          text_var = NULL,
+                         position = "identity", 
+                         alpha = 1,
                          size_point = 1,
                          pal = NULL,
                          pal_rev = FALSE,
                          x_balance = FALSE,
                          x_expand = NULL,
+                         x_gridlines_minor = FALSE,
                          x_labels = NULL,
                          x_na = TRUE,
                          x_pretty_n = 6,
@@ -329,6 +358,7 @@ gg_point_col <- function(data,
                          x_zero_line = NULL,
                          y_balance = FALSE,
                          y_expand = NULL,
+                         y_gridlines_minor = FALSE,
                          y_labels = waiver(),
                          y_na = TRUE,
                          y_pretty_n = 5,
@@ -469,7 +499,7 @@ gg_point_col <- function(data,
   if (pal_rev == TRUE) pal <- rev(pal)
   
   plot <- ggplot(data) +
-    theme_point(
+    theme_xy_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -477,7 +507,7 @@ gg_point_col <- function(data,
     coord_cartesian(clip = "off")
   
   plot <- plot +
-    geom_point(aes(x = !!x_var, y = !!y_var, col = .data$col_var2, text = !!text_var), size = size_point)
+    geom_point(aes(x = !!x_var, y = !!y_var, col = .data$col_var2, text = !!text_var), size = size_point, alpha = alpha, position = position)
   
   if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
     
@@ -566,6 +596,15 @@ gg_point_col <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
+  if (x_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.x = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+  if (y_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+
   plot <- plot +
     scale_color_manual(
       values = pal,
@@ -595,7 +634,7 @@ gg_point_col <- function(data,
         caption = stringr::str_wrap(caption, 50)
       )  +
       guides(col = guide_legend(ncol = 1, byrow = TRUE, title = stringr::str_wrap(col_title, 20))) +
-      theme_mobile_graph()
+      theme_mobile_extra()
   }
   
   return(plot)
@@ -608,6 +647,8 @@ gg_point_col <- function(data,
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
+#' @param position Whether bars are positioned by "identity" or "jitter". Defaults to "identity".
+#' @param alpha The opacity of points. Defaults to 1.
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
 #' @param title Title string. Defaults to NULL.
@@ -616,6 +657,7 @@ gg_point_col <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
@@ -627,6 +669,7 @@ gg_point_col <- function(data,
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
@@ -651,13 +694,18 @@ gg_point_col <- function(data,
 #' library(simplevis)
 #' library(palmerpenguins)
 #' 
-#' gg_point_facet(penguins, bill_length_mm, body_mass_g, species)
+#' gg_point_facet(penguins, 
+#'                x_var = bill_length_mm, 
+#'                y_var = body_mass_g, 
+#'                facet_var = species)
 #' 
 gg_point_facet <- function(data,
                            x_var,
                            y_var,
                            facet_var,
                            text_var = NULL,
+                           position = "identity", 
+                           alpha = 1,
                            size_point = 1,
                            pal = NULL,
                            title = NULL,
@@ -666,6 +714,7 @@ gg_point_facet <- function(data,
                            subtitle_wrap = 100,
                            x_balance = FALSE,
                            x_expand = NULL,
+                           x_gridlines_minor = FALSE,
                            x_labels = NULL,
                            x_na = TRUE,
                            x_pretty_n = 3,
@@ -676,6 +725,7 @@ gg_point_facet <- function(data,
                            x_zero = FALSE,
                            x_zero_line = NULL,
                            y_balance = FALSE,
+                           y_gridlines_minor = FALSE,
                            y_expand = NULL,
                            y_labels = waiver(),
                            y_na = TRUE,
@@ -758,13 +808,13 @@ gg_point_facet <- function(data,
   else pal <- pal[1]
   
   plot <- ggplot(data) +
-    theme_point(
+    theme_xy_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
     ) +
     coord_cartesian(clip = "off") +
-    geom_point(aes(x = !!x_var, y = !!y_var, text = !!text_var), col = pal[1], size = size_point)
+    geom_point(aes(x = !!x_var, y = !!y_var, text = !!text_var), col = pal[1], size = size_point, alpha = alpha, position = position)
   
   if (facet_scales %in% c("fixed", "free_y")) {
     if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
@@ -859,6 +909,15 @@ gg_point_facet <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
+  if (x_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.x = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+  if (y_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+
   if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
   
   plot <- plot +
@@ -882,6 +941,8 @@ gg_point_facet <- function(data,
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
+#' @param position Whether bars are positioned by "identity" or "jitter". Defaults to "identity".
+#' @param alpha The opacity of points. Defaults to 1.
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
@@ -891,6 +952,7 @@ gg_point_facet <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
@@ -902,6 +964,7 @@ gg_point_facet <- function(data,
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
@@ -935,7 +998,11 @@ gg_point_facet <- function(data,
 #' library(simplevis)
 #' library(palmerpenguins)
 #' 
-#' gg_point_col_facet(penguins, bill_length_mm, body_mass_g, sex, species)
+#' gg_point_col_facet(penguins, 
+#'                    x_var = bill_length_mm, 
+#'                    y_var = body_mass_g, 
+#'                    col_var = sex, 
+#'                    facet_var = species)
 #' 
 gg_point_col_facet <-
   function(data,
@@ -944,6 +1011,8 @@ gg_point_col_facet <-
            col_var,
            facet_var,
            text_var = NULL,
+           position = "identity", 
+           alpha = 1,
            size_point = 1,
            pal = NULL,
            pal_rev = FALSE,
@@ -953,6 +1022,7 @@ gg_point_col_facet <-
            subtitle_wrap = 100,
            x_balance = FALSE,
            x_expand = NULL,
+           x_gridlines_minor = FALSE,
            x_labels = NULL,
            x_na = TRUE,
            x_pretty_n = 3,
@@ -964,6 +1034,7 @@ gg_point_col_facet <-
            x_zero_line = NULL,
            y_balance = FALSE,
            y_expand = NULL,
+           y_gridlines_minor = FALSE,
            y_labels = waiver(),
            y_na = TRUE,
            y_pretty_n = 4,
@@ -1115,13 +1186,13 @@ gg_point_col_facet <-
     if (pal_rev == TRUE) pal <- rev(pal)
     
     plot <- ggplot(data) +
-      theme_point(
+      theme_xy_gridlines(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
       ) +
       coord_cartesian(clip = "off") +
-      geom_point(aes(x = !!x_var, y = !!y_var, col = .data$col_var2, text = !!text_var), size = size_point)
+      geom_point(aes(x = !!x_var, y = !!y_var, col = .data$col_var2, text = !!text_var), size = size_point, alpha = alpha, position = position)
     
     if (facet_scales %in% c("fixed", "free_y")) {
       if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
@@ -1216,6 +1287,15 @@ gg_point_col_facet <-
         geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
     
+    if (x_gridlines_minor == TRUE) {
+      plot <- plot +
+        theme(panel.grid.minor.x = element_line(colour = "#D3D3D3", size = 0.2))
+    }
+    if (y_gridlines_minor == TRUE) {
+      plot <- plot +
+        theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+    }
+
     if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
       
     plot <- plot +

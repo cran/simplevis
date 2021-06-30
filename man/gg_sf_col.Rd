@@ -4,39 +4,16 @@
 \alias{gg_sf_col}
 \title{Simple feature ggplot map that is coloured.}
 \usage{
-gg_sf_col(
-  data,
-  col_var,
-  text_var = NULL,
-  pal = NULL,
-  pal_rev = FALSE,
-  size_point = 1,
-  size_line = 0.5,
-  alpha = 0.9,
-  borders = NULL,
-  borders_behind = TRUE,
-  borders_pal = "#7f7f7f",
-  borders_size = 0.2,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  col_cuts = NULL,
-  col_labels = NULL,
-  col_labels_dp = NULL,
-  col_legend_ncol = NULL,
-  col_legend_nrow = NULL,
-  col_na = TRUE,
-  col_method = NULL,
-  col_title = NULL,
-  col_title_wrap = 25,
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
-  mobile = FALSE
-)
+gg_sf_col(data, col_var, text_var = NULL, pal = NULL,
+  pal_rev = FALSE, size_point = 1, size_line = 0.5, alpha = 0.9,
+  borders = NULL, borders_behind = TRUE, borders_pal = "#7f7f7f",
+  borders_size = 0.2, title = NULL, title_wrap = 100,
+  subtitle = NULL, subtitle_wrap = 100, col_cuts = NULL,
+  col_labels = NULL, col_labels_dp = NULL, col_legend_ncol = NULL,
+  col_legend_nrow = NULL, col_na = TRUE, col_method = NULL,
+  col_title = NULL, col_title_wrap = 25, caption = NULL,
+  caption_wrap = 80, font_family = "", font_size_title = NULL,
+  font_size_body = NULL, mobile = FALSE)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -108,12 +85,20 @@ A ggplot object.
 Map of simple features in ggplot that is coloured, but not facetted.
 }
 \examples{
-gg_sf_col(example_sf_point, trend_category, 
+gg_sf_col(example_sf_point, 
+          col_var = trend_category, 
           borders = nz)
    
-gg_sf_col(example_sf_polygon, density, 
-     borders = nz, col_method = "bin", col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
+gg_sf_col(example_sf_polygon, 
+          col_var = density, 
+          borders = nz, 
+          col_method = "bin", 
+          col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
 
-gg_sf_col(example_sf_polygon, density, borders = nz,
-     col_method = "quantile", col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
+gg_sf_col(example_sf_polygon, 
+          col_var = density, 
+          borders = nz, 
+          col_method = "quantile", 
+          col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
+          
 }

@@ -25,6 +25,7 @@
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
@@ -46,7 +47,9 @@
 #' library(simplevis)
 #' library(palmerpenguins)
 #' 
-#' gg_boxplot(penguins, species, body_mass_g)
+#' gg_boxplot(penguins, 
+#'            x_var = species, 
+#'            y_var = body_mass_g)
 #' 
 #' plot_data <- penguins %>%
 #'   group_by(species) %>%
@@ -62,7 +65,10 @@
 #' plot_data %>% 
 #'   tidyr::unnest_wider(bill_length_mm)
 #' 
-#' gg_boxplot(plot_data, species, bill_length_mm, stat = "identity")
+#' gg_boxplot(plot_data, 
+#'            x_var = species, 
+#'            y_var = bill_length_mm, 
+#'            stat = "identity")
 #' 
 gg_boxplot <- function(data,
                        x_var,
@@ -89,6 +95,7 @@ gg_boxplot <- function(data,
                        x_zero_line = NULL,
                        y_balance = FALSE,
                        y_expand = NULL,
+                       y_gridlines_minor = FALSE,
                        y_labels = waiver(),
                        y_na = TRUE,
                        y_pretty_n = 5,
@@ -161,7 +168,7 @@ gg_boxplot <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian(clip = "off") +
-    theme_boxplot(
+    theme_y_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -287,6 +294,11 @@ gg_boxplot <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
+  if (y_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+
   if (mobile == FALSE){
     plot <- plot +
       labs(
@@ -299,7 +311,7 @@ gg_boxplot <- function(data,
   }
   else if (mobile == TRUE){
     plot <- plot +
-      theme_mobile_graph() +
+      theme_mobile_extra() +
       theme(panel.grid.major.x = element_line(colour = "#D3D3D3", size = 0.2)) +
       theme(panel.grid.major.y = element_blank()) +
       theme(axis.text.x = element_text(hjust = 1)) +  
@@ -344,6 +356,7 @@ gg_boxplot <- function(data,
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
@@ -372,9 +385,15 @@ gg_boxplot <- function(data,
 #' library(simplevis)
 #' library(palmerpenguins)
 #' 
-#' gg_boxplot_col(penguins, species, body_mass_g, sex)
+#' gg_boxplot_col(penguins, 
+#'                x_var = species, 
+#'                y_var = body_mass_g, 
+#'                col_var = sex)
 #' 
-#' plot <- gg_boxplot_col(penguins, species, body_mass_g, sex)
+#' plot <- gg_boxplot_col(penguins, 
+#'                        x_var = species, 
+#'                        y_var = body_mass_g, 
+#'                        col_var = sex)
 #' 
 #' plotly::ggplotly(plot) %>%
 #'   plotly::layout(boxmode = "group") %>%
@@ -406,6 +425,7 @@ gg_boxplot_col <- function(data,
                            x_zero_line = NULL,
                            y_balance = FALSE,
                            y_expand = NULL,
+                           y_gridlines_minor = FALSE,
                            y_labels = waiver(),
                            y_na = TRUE,
                            y_pretty_n = 5,
@@ -510,7 +530,7 @@ gg_boxplot_col <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian(clip = "off") +
-    theme_boxplot(
+    theme_y_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -637,6 +657,11 @@ gg_boxplot_col <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
+  if (y_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+
   if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
 
   plot <- plot +
@@ -666,7 +691,7 @@ gg_boxplot_col <- function(data,
   }
   else if (mobile == TRUE){
     plot <- plot +
-      theme_mobile_graph() +
+      theme_mobile_extra() +
       theme(panel.grid.major.x = element_line(colour = "#D3D3D3", size = 0.2)) +
       theme(panel.grid.major.y = element_blank()) +
       theme(axis.text.x = element_text(hjust = 1)) +  
@@ -717,6 +742,7 @@ gg_boxplot_col <- function(data,
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
@@ -742,7 +768,10 @@ gg_boxplot_col <- function(data,
 #' library(simplevis)
 #' library(palmerpenguins)
 #' 
-#' gg_boxplot_facet(penguins, sex, body_mass_g, species)
+#' gg_boxplot_facet(penguins, 
+#'                  x_var = sex, 
+#'                  y_var = body_mass_g, 
+#'                  facet_var = species)
 #'
 gg_boxplot_facet <- function(data,
                              x_var,
@@ -770,6 +799,7 @@ gg_boxplot_facet <- function(data,
                              x_zero_line = NULL,
                              y_balance = FALSE,
                              y_expand = NULL,
+                             y_gridlines_minor = FALSE,
                              y_labels = waiver(),
                              y_na = TRUE,
                              y_pretty_n = 4,
@@ -863,7 +893,7 @@ gg_boxplot_facet <- function(data,
     
     plot <- ggplot(data) +
       coord_cartesian(clip = "off") +
-      theme_boxplot(
+      theme_y_gridlines(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
@@ -885,7 +915,7 @@ gg_boxplot_facet <- function(data,
     else if (stat == "identity") {
       plot <- ggplot(data) +
         coord_cartesian(clip = "off") +
-        theme_boxplot(
+        theme_y_gridlines(
           font_family = font_family,
           font_size_body = font_size_body,
           font_size_title = font_size_title
@@ -1000,6 +1030,11 @@ gg_boxplot_facet <- function(data,
         geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
     }
     
+    if (y_gridlines_minor == TRUE) {
+      plot <- plot +
+        theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+    }
+
     if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
     
     plot <- plot +
@@ -1045,6 +1080,7 @@ gg_boxplot_facet <- function(data,
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
+#' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
@@ -1081,9 +1117,17 @@ gg_boxplot_facet <- function(data,
 #' plot_data <- penguins %>% 
 #'   mutate(year = as.character(year))
 #' 
-#' gg_boxplot_col_facet(plot_data, year, body_mass_g, sex, species)
+#' gg_boxplot_col_facet(plot_data, 
+#'                      x_var = year, 
+#'                      y_var = body_mass_g, 
+#'                      col_var = sex, 
+#'                      facet_var = species)
 #' 
-#' plot <- gg_boxplot_col_facet(plot_data, year, body_mass_g, sex, species)
+#' plot <- gg_boxplot_col_facet(plot_data, 
+#'                              x_var = year, 
+#'                              y_var = body_mass_g, 
+#'                              col_var = sex, 
+#'                              facet_var = species)
 #' 
 #' plotly::ggplotly(plot) %>%
 #'   plotly::layout(boxmode = "group") %>%
@@ -1117,6 +1161,7 @@ gg_boxplot_col_facet <- function(data,
                                  x_zero_line = NULL,
                                  y_balance = FALSE,
                                  y_expand = NULL,
+                                 y_gridlines_minor = FALSE,
                                  y_labels = waiver(),
                                  y_na = TRUE,
                                  y_pretty_n = 4,
@@ -1237,7 +1282,7 @@ gg_boxplot_col_facet <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian(clip = "off") +
-    theme_boxplot(
+    theme_y_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -1258,7 +1303,7 @@ gg_boxplot_col_facet <- function(data,
   else if (stat == "identity") {
     plot <- ggplot(data) +
       coord_cartesian(clip = "off") +
-      theme_boxplot(
+      theme_y_gridlines(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title
@@ -1373,6 +1418,11 @@ gg_boxplot_col_facet <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
+  if (y_gridlines_minor == TRUE) {
+    plot <- plot +
+      theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
+  }
+
   if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
   if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
   

@@ -4,56 +4,23 @@
 \alias{gg_point_col}
 \title{Point ggplot that is coloured.}
 \usage{
-gg_point_col(
-  data,
-  x_var,
-  y_var,
-  col_var,
-  text_var = NULL,
-  size_point = 1,
-  pal = NULL,
-  pal_rev = FALSE,
-  x_balance = FALSE,
-  x_expand = NULL,
-  x_labels = NULL,
-  x_na = TRUE,
-  x_pretty_n = 6,
-  x_rev = FALSE,
-  x_trans = "identity",
-  x_zero = FALSE,
-  x_zero_line = NULL,
-  y_balance = FALSE,
-  y_expand = NULL,
-  y_labels = waiver(),
-  y_na = TRUE,
-  y_pretty_n = 5,
-  y_trans = "identity",
-  y_zero = FALSE,
-  y_zero_line = NULL,
-  title = NULL,
-  subtitle = NULL,
-  x_title = NULL,
-  y_title = NULL,
-  col_title = NULL,
-  caption = NULL,
-  col_cuts = NULL,
-  col_labels = NULL,
-  col_labels_dp = NULL,
-  col_legend_ncol = NULL,
-  col_legend_nrow = NULL,
-  col_method = NULL,
-  col_na = TRUE,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
-  title_wrap = 100,
-  subtitle_wrap = 100,
-  x_title_wrap = 50,
-  y_title_wrap = 50,
-  col_title_wrap = 25,
-  caption_wrap = 80,
-  mobile = FALSE
-)
+gg_point_col(data, x_var, y_var, col_var, text_var = NULL,
+  position = "identity", alpha = 1, size_point = 1, pal = NULL,
+  pal_rev = FALSE, x_balance = FALSE, x_expand = NULL,
+  x_gridlines_minor = FALSE, x_labels = NULL, x_na = TRUE,
+  x_pretty_n = 6, x_rev = FALSE, x_trans = "identity",
+  x_zero = FALSE, x_zero_line = NULL, y_balance = FALSE,
+  y_expand = NULL, y_gridlines_minor = FALSE, y_labels = waiver(),
+  y_na = TRUE, y_pretty_n = 5, y_trans = "identity",
+  y_zero = FALSE, y_zero_line = NULL, title = NULL,
+  subtitle = NULL, x_title = NULL, y_title = NULL,
+  col_title = NULL, caption = NULL, col_cuts = NULL,
+  col_labels = NULL, col_labels_dp = NULL, col_legend_ncol = NULL,
+  col_legend_nrow = NULL, col_method = NULL, col_na = TRUE,
+  font_family = "", font_size_title = NULL, font_size_body = NULL,
+  title_wrap = 100, subtitle_wrap = 100, x_title_wrap = 50,
+  y_title_wrap = 50, col_title_wrap = 25, caption_wrap = 80,
+  mobile = FALSE)
 }
 \arguments{
 \item{data}{An ungrouped summarised tibble or dataframe. Required input.}
@@ -66,6 +33,10 @@ gg_point_col(
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
+\item{position}{Whether bars are positioned by "identity" or "jitter". Defaults to "identity".}
+
+\item{alpha}{The opacity of points. Defaults to 1.}
+
 \item{size_point}{Size of points. Defaults to 1.}
 
 \item{pal}{Character vector of hex codes.}
@@ -75,6 +46,8 @@ gg_point_col(
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
+
+\item{x_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.}
 
 \item{x_labels}{A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
@@ -93,6 +66,8 @@ gg_point_col(
 \item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
 
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
+
+\item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
 
 \item{y_labels}{A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
@@ -162,6 +137,9 @@ Point ggplot that is coloured, but not facetted.
 library(simplevis)
 library(palmerpenguins)
 
-gg_point_col(penguins, bill_length_mm, body_mass_g, species)
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = species)
 
 }

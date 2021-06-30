@@ -4,24 +4,11 @@
 \alias{leaflet_sf_col}
 \title{Simple feature leaflet map that is coloured.}
 \usage{
-leaflet_sf_col(
-  data,
-  col_var,
-  text_var = NULL,
-  popup_vars_vctr = NULL,
-  pal = NULL,
-  pal_rev = FALSE,
-  size_point = 2,
-  size_line = 2,
-  alpha = 0.9,
-  basemap = "light",
-  title = NULL,
-  col_cuts = NULL,
-  col_labels_dp = NULL,
-  col_method = NULL,
-  col_na = TRUE,
-  map_id = "map"
-)
+leaflet_sf_col(data, col_var, text_var = NULL, popup_vars_vctr = NULL,
+  pal = NULL, pal_rev = FALSE, size_point = 2, size_line = 2,
+  alpha = 0.9, basemap = "light", title = NULL, col_cuts = NULL,
+  col_labels_dp = NULL, col_method = NULL, col_na = TRUE,
+  map_id = "map")
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
@@ -63,14 +50,17 @@ A leaflet object.
 Map of simple features in leaflet that is coloured.
 }
 \examples{
-leaflet_sf_col(example_sf_point, trend_category)
+leaflet_sf_col(example_sf_point, 
+               col_var = trend_category)
 
-leaflet_sf_col(example_sf_polygon, density,
-     col_method = "quantile", 
-     col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
+leaflet_sf_col(example_sf_polygon, 
+               col_var = density, 
+               col_method = "quantile", 
+               col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
 
-leaflet_sf_col(example_sf_polygon, density,
-     col_method = "bin", 
-     col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
+leaflet_sf_col(example_sf_polygon, 
+               col_var = density, 
+               col_method = "bin", 
+               col_cuts = c(0, 10, 50, 100, 150, 200, Inf))
 
 }
