@@ -1,7 +1,7 @@
 Package: simplevis
 Type: Package
 Title: Simple 'ggplot2' Visualisation with Less Brainpower
-Version: 4.3.0
+Version: 4.4.0
 Authors@R: 
     c(person(given = "David", 
                family = "Hodge", 
@@ -27,9 +27,9 @@ Suggests: knitr, palmerpenguins, rgdal, rgeos, rmarkdown, s2
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-06-30 00:42:55 UTC; dhodge
+Packaged: 2021-06-30 21:03:31 UTC; dhodge
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-06-30 07:20:02 UTC
+Date/Publication: 2021-07-01 09:40:03 UTC

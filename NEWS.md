@@ -1,4 +1,18 @@
+# simplevis 4.4.0
+
+* Bumped version for CRAN.
+
+# simplevis 4.3.2
+
+* Renamed leaflet text_var to label_var.
+
+# simplevis 4.3.1
+
+* Removed col_var2 from point tooltip.
+
 # simplevis 4.3.0
+
+* Bumped release for CRAN.
 
 # simplevis 4.2.9
 
