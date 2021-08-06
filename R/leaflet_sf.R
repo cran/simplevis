@@ -10,7 +10,6 @@
 #' @param alpha The opacity of the fill within features (i.e. fillOpacity). Defaults to 0.9. 
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
 #' @param title A title string that will be wrapped into the legend. 
-#' @param col_labels_dp Select the appropriate number of decimal places for numeric variable auto legend labels. Defaults to 1.
 #' @param map_id The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".
 #' @return A leaflet object.
 #' @export
@@ -27,7 +26,6 @@ leaflet_sf <- function(data,
                        alpha = 0.9,
                        basemap = "light",
                        title = NULL,
-                       col_labels_dp = 1,
                        map_id = "map")
 {
   
@@ -109,8 +107,7 @@ leaflet_sf <- function(data,
         labels =  "Feature", 
         title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
         position = "bottomright",
-        opacity = 1,
-        labFormat = labelFormat(between = "&ndash;", digits =  col_labels_dp)
+        opacity = 1
       )
   }
   else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
@@ -150,8 +147,7 @@ leaflet_sf <- function(data,
         labels =  "Feature", 
         title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
         position = "bottomright",
-        opacity = 1,
-        labFormat = labelFormat(between = "&ndash;", digits =  col_labels_dp)
+        opacity = 1
       )
   }
   else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
@@ -190,8 +186,7 @@ leaflet_sf <- function(data,
         labels =  "Feature", 
         title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
         position = "bottomright",
-        opacity = 1,
-        labFormat = labelFormat(between = "&ndash;", digits =  col_labels_dp)
+        opacity = 1
       )
     
   }
@@ -204,6 +199,7 @@ leaflet_sf <- function(data,
 #' @param label_var Unquoted variable to label the features by. If NULL, defaults to using the colour variable.
 #' @param popup_vars_vctr Vector of quoted variable names to include in the popup. If NULL, defaults to making a leafpop::popupTable of all columns.
 #' @param pal Character vector of hex codes. 
+#' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param size_point Size of points (i.e. radius). Defaults to 2.
 #' @param size_line Size of lines around features (i.e. weight). Defaults to 2.
@@ -211,9 +207,11 @@ leaflet_sf <- function(data,
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
 #' @param title A title string that will be wrapped into the legend. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
-#' @param col_labels_dp For numeric colour variables, the number of decimal places. Defaults to 1 for "quantile" col_method, and the lowest dp within the col_cuts vector for "bin".
-#' @param col_method The method of colouring features, either "bin", "quantile" or "category." if categorical colour variable, NULL results in "category". If numeric variable, defaults to "quantile". Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).
+#' @param col_labels A vector to modify colour scale labels.  
+#' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param map_id The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".
 #' @return A leaflet object.
 #' @export
@@ -236,6 +234,7 @@ leaflet_sf_col <- function(data,
                            label_var = NULL,
                            popup_vars_vctr = NULL,
                            pal = NULL,
+                           pal_na = "#7F7F7FFF",
                            pal_rev = FALSE,
                            size_point = 2,
                            size_line = 2,
@@ -243,9 +242,11 @@ leaflet_sf_col <- function(data,
                            basemap = "light",
                            title = NULL,
                            col_cuts = NULL,
-                           col_labels_dp = NULL,
+                           col_labels = NULL,
                            col_method = NULL,
                            col_na = TRUE,
+                           col_pretty_n = 4,
+                           col_right_closed = TRUE, 
                            map_id = "map"
 ) {
   
@@ -278,12 +279,63 @@ leaflet_sf_col <- function(data,
   
   if (is.null(col_method)) {
     if (!is.numeric(col_var_vctr)) col_method <- "category"
-    else if (is.numeric(col_var_vctr)) col_method <- "quantile"
+    else if (is.numeric(col_var_vctr)) col_method <- "bin"
   }
   
-  if (col_method == "category") {
-    if (is.factor(col_var_vctr)) col_labels <- levels(col_var_vctr)
-    else if (is.character(col_var_vctr)) col_labels <- sort(unique(col_var_vctr))
+  if(col_method %in% c("quantile", "bin")) {
+    if (col_method == "bin") {
+      if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr, col_pretty_n)
+      else if (!is.null(col_cuts)) {
+        if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+        if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
+      }
+      
+      if (is.null(pal)) pal <- pal_viridis_reorder(length(col_cuts) - 1)
+      else if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
+      if (pal_rev == TRUE) pal <- rev(pal)
+      pal <- stringr::str_sub(pal, 1, 7)
+      
+      pal_fun <- colorBin(
+        palette = pal,
+        domain = col_var_vctr,
+        bins = col_cuts,
+        pretty = FALSE,
+        right = col_right_closed,
+        na.color = pal_na
+      )
+      
+      if (is.null(col_labels)) col_labels <- bin_cuts_to_interval_labels(col_cuts, right_closed = col_right_closed)  
+    }
+    else if (col_method == "quantile") {
+      if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
+      else {
+        if (dplyr::first(col_cuts) != 0) warning("The first element of the col_cuts vector generally always be 0")
+        if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
+      }  
+      if (is.null(pal)) pal <- pal_viridis_reorder(length(col_cuts) - 1)
+      else if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
+      if (pal_rev == TRUE) pal <- rev(pal)
+      pal <- stringr::str_sub(pal, 1, 7)
+      
+      col_cuts <- stats::quantile(col_var_vctr, probs = col_cuts, na.rm = TRUE)
+    }
+    if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
+    
+    pal_fun <- colorBin(
+      palette = pal,
+      domain = col_var_vctr,
+      bins = col_cuts,
+      right = col_right_closed,
+      na.color = pal_na
+    )
+    
+    if (is.null(col_labels)) col_labels <- bin_cuts_to_interval_labels(col_cuts, right_closed = col_right_closed)  
+  }
+  else if (col_method == "category") {
+    if (is.null(col_labels)) {
+      if (is.factor(col_var_vctr)) col_labels <- levels(col_var_vctr)
+      else if (is.character(col_var_vctr)) col_labels <- sort(unique(col_var_vctr))
+    }
     
     col_n <- length(col_labels)
     
@@ -295,56 +347,7 @@ leaflet_sf_col <- function(data,
     
     pal_fun <- colorFactor(palette = pal,
                            domain = col_var_vctr,
-                           na.color = pal_na())
-  }
-  else if (col_method == "bin") {
-    if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr)
-    else if (!is.null(col_cuts)) {
-      if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
-      if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
-    }
-    
-    if (is.null(pal)) pal <- pal_viridis_reorder(length(col_cuts) - 1)
-    else if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
-    if (pal_rev == TRUE) pal <- rev(pal)
-    pal <- stringr::str_sub(pal, 1, 7)
-    
-    pal_fun <- colorBin(
-      palette = pal,
-      domain = col_var_vctr,
-      bins = col_cuts,
-      pretty = FALSE,
-      right = FALSE,
-      na.color = pal_na()
-    )
-    
-    if(is.null(col_labels_dp)) col_labels_dp <- sv_max_dp(col_cuts)
-    col_labels <-  sv_numeric_bin_labels(col_cuts, col_labels_dp)
-  }
-  else if (col_method == "quantile") {
-    if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
-    else {
-      if (dplyr::first(col_cuts) != 0) warning("The first element of the col_cuts vector generally always be 0")
-      if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
-    }  
-    if (is.null(pal)) pal <- pal_viridis_reorder(length(col_cuts) - 1)
-    else if (!is.null(pal)) pal <- pal[1:(length(col_cuts) - 1)]
-    if (pal_rev == TRUE) pal <- rev(pal)
-    pal <- stringr::str_sub(pal, 1, 7)
-    
-    col_cuts <- stats::quantile(col_var_vctr, probs = col_cuts, na.rm = TRUE)
-    if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
-    
-    pal_fun <- colorBin(
-      palette = pal,
-      domain = col_var_vctr,
-      bins = col_cuts,
-      right = FALSE,
-      na.color = pal_na()
-    )
-    
-    if(is.null(col_labels_dp)) col_labels_dp <- 1
-    col_labels <-  sv_numeric_bin_labels(col_cuts, col_labels_dp)
+                           na.color = pal_na)
   }
   
   geometry_type <- unique(sf::st_geometry_type(data))
@@ -415,7 +418,7 @@ leaflet_sf_col <- function(data,
         title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
         position = "bottomright",
         opacity = 1,
-        labFormat = labelFormat(between = "&ndash;", digits =  col_labels_dp)
+        labFormat = labelFormat(between = "&ndash;")
       )
     
   }
@@ -457,9 +460,8 @@ leaflet_sf_col <- function(data,
         title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
         position = "bottomright",
         opacity = 1,
-        labFormat = labelFormat(between = "&ndash;", digits =  col_labels_dp)
+        labFormat = labelFormat(between = "&ndash;")
       )
-    
   }
   else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
     if (shiny == FALSE) {
@@ -498,7 +500,7 @@ leaflet_sf_col <- function(data,
         title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
         position = "bottomright",
         opacity = 1,
-        labFormat = labelFormat(between = "&ndash;", digits =  col_labels_dp)
+        labFormat = labelFormat(between = "&ndash;")
       )
   }
 }

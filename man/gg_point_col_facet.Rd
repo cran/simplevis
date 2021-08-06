@@ -4,24 +4,65 @@
 \alias{gg_point_col_facet}
 \title{Point ggplot that is coloured and facetted.}
 \usage{
-gg_point_col_facet(data, x_var, y_var, col_var, facet_var,
-  text_var = NULL, position = "identity", alpha = 1,
-  size_point = 1, pal = NULL, pal_rev = FALSE, title = NULL,
-  title_wrap = 100, subtitle = NULL, subtitle_wrap = 100,
-  x_balance = FALSE, x_expand = NULL, x_gridlines_minor = FALSE,
-  x_labels = NULL, x_na = TRUE, x_pretty_n = 3, x_rev = FALSE,
-  x_title = NULL, x_title_wrap = 50, x_trans = "identity",
-  x_zero = FALSE, x_zero_line = NULL, y_balance = FALSE,
-  y_expand = NULL, y_gridlines_minor = FALSE, y_labels = waiver(),
-  y_na = TRUE, y_pretty_n = 4, y_title = NULL, y_title_wrap = 50,
-  y_trans = "identity", y_zero = FALSE, y_zero_line = NULL,
-  col_cuts = NULL, col_labels = NULL, col_labels_dp = NULL,
-  col_legend_ncol = NULL, col_legend_nrow = NULL, col_method = NULL,
-  col_na = TRUE, col_title = NULL, col_title_wrap = 25,
-  facet_labels = NULL, facet_na = TRUE, facet_ncol = NULL,
-  facet_nrow = NULL, facet_scales = "fixed", caption = NULL,
-  caption_wrap = 80, font_family = "", font_size_title = NULL,
-  font_size_body = NULL)
+gg_point_col_facet(
+  data,
+  x_var,
+  y_var,
+  col_var,
+  facet_var,
+  text_var = NULL,
+  position = "identity",
+  alpha = 1,
+  size_point = 1,
+  pal = NULL,
+  pal_na = "#7F7F7FFF",
+  pal_rev = FALSE,
+  title = NULL,
+  title_wrap = 100,
+  subtitle = NULL,
+  subtitle_wrap = 100,
+  x_balance = FALSE,
+  x_expand = NULL,
+  x_gridlines_minor = FALSE,
+  x_labels = NULL,
+  x_na = TRUE,
+  x_pretty_n = 3,
+  x_rev = FALSE,
+  x_title = NULL,
+  x_title_wrap = 50,
+  x_trans = "identity",
+  x_zero = FALSE,
+  x_zero_line = NULL,
+  y_balance = FALSE,
+  y_expand = NULL,
+  y_gridlines_minor = FALSE,
+  y_labels = scales::comma,
+  y_na = TRUE,
+  y_pretty_n = 4,
+  y_title = NULL,
+  y_title_wrap = 50,
+  y_trans = "identity",
+  y_zero = FALSE,
+  y_zero_line = NULL,
+  col_cuts = NULL,
+  col_labels = NULL,
+  col_method = NULL,
+  col_na = TRUE,
+  col_pretty_n = 4,
+  col_right_closed = TRUE,
+  col_title = NULL,
+  col_title_wrap = 25,
+  facet_labels = stringr::str_to_sentence,
+  facet_na = TRUE,
+  facet_ncol = NULL,
+  facet_nrow = NULL,
+  facet_scales = "fixed",
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL
+)
 }
 \arguments{
 \item{data}{An ungrouped summarised tibble or dataframe. Required input.}
@@ -44,6 +85,8 @@ gg_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{pal}{Character vector of hex codes.}
 
+\item{pal_na}{The hex code or name of the NA colour to be used.}
+
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
 \item{title}{Title string. Defaults to NULL.}
@@ -60,7 +103,7 @@ gg_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{x_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.}
 
-\item{x_labels}{A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
+\item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
 \item{x_na}{TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.}
 
@@ -84,7 +127,7 @@ gg_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
 
-\item{y_labels}{A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
 \item{y_na}{TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.}
 
@@ -102,23 +145,21 @@ gg_point_col_facet(data, x_var, y_var, col_var, facet_var,
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_labels}{A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case, and numeric variable labels to pretty labels with an internal function. Use ggplot2::waiver() to keep colour labels untransformed.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
-\item{col_labels_dp}{For numeric colour variables and where col_labels equals NULL, the number of decimal places. Defaults to 1 for "quantile" col_method, and the lowest dp within the col_cuts vector for "bin".}
-
-\item{col_legend_ncol}{The number of columns in the legend.}
-
-\item{col_legend_nrow}{The number of rows in the legend.}
-
-\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "quantile".}
+\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
 
 \item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
+
+\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4.}
+
+\item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
 \item{col_title_wrap}{Number of characters to wrap the colour title to. Defaults to 25.}
 
-\item{facet_labels}{As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.}
+\item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
 
 \item{facet_na}{TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.}
 

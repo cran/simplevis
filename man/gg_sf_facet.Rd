@@ -4,14 +4,32 @@
 \alias{gg_sf_facet}
 \title{Simple feature ggplot map that is facetted.}
 \usage{
-gg_sf_facet(data, facet_var, text_var = NULL, size_point = 1,
-  size_line = 0.5, alpha = 0.9, pal = NULL, facet_labels = NULL,
-  facet_na = TRUE, facet_ncol = NULL, facet_nrow = NULL,
-  borders = NULL, borders_behind = TRUE, borders_pal = "#7f7f7f",
-  borders_size = 0.2, title = NULL, title_wrap = 100,
-  subtitle = NULL, subtitle_wrap = 100, caption = NULL,
-  caption_wrap = 80, font_family = "", font_size_title = NULL,
-  font_size_body = NULL)
+gg_sf_facet(
+  data,
+  facet_var,
+  text_var = NULL,
+  size_point = 1,
+  size_line = 0.5,
+  alpha = 0.9,
+  pal = NULL,
+  facet_labels = stringr::str_to_sentence,
+  facet_na = TRUE,
+  facet_ncol = NULL,
+  facet_nrow = NULL,
+  borders = NULL,
+  borders_behind = TRUE,
+  pal_borders = "#7F7F7FFF",
+  borders_size = 0.2,
+  title = NULL,
+  title_wrap = 100,
+  subtitle = NULL,
+  subtitle_wrap = 100,
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL
+)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -28,7 +46,7 @@ gg_sf_facet(data, facet_var, text_var = NULL, size_point = 1,
 
 \item{pal}{Character vector of hex codes.}
 
-\item{facet_labels}{As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.}
+\item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
 
 \item{facet_na}{TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.}
 
@@ -40,7 +58,7 @@ gg_sf_facet(data, facet_var, text_var = NULL, size_point = 1,
 
 \item{borders_behind}{TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.}
 
-\item{borders_pal}{Colour of the borders. Defaults to "#7F7F7F".}
+\item{pal_borders}{Colour of the borders. Defaults to "#7F7F7F".}
 
 \item{borders_size}{Size of the borders. Defaults to 0.2.}
 

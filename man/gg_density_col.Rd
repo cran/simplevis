@@ -4,20 +4,50 @@
 \alias{gg_density_col}
 \title{Smoothed density ggplot that is coloured.}
 \usage{
-gg_density_col(data, x_var, col_var, density_bw = "nrd0",
-  density_adjust = 1, density_kernel = "gaussian", density_n = 512,
-  density_trim = FALSE, pal = NULL, pal_rev = FALSE, alpha = 0.1,
-  size_line = 0.5, title = NULL, title_wrap = 100, subtitle = NULL,
-  subtitle_wrap = 100, x_balance = FALSE, x_expand = NULL,
-  x_labels = NULL, x_pretty_n = 6, x_title = NULL,
-  x_title_wrap = 50, x_zero = FALSE, x_zero_line = NULL,
-  y_expand = NULL, y_gridlines_minor = FALSE,
-  y_labels = scales::number, y_pretty_n = 5, y_title = NULL,
-  y_title_wrap = 50, col_labels = NULL, col_legend_ncol = NULL,
-  col_legend_nrow = NULL, col_na = TRUE, col_rev = FALSE,
-  col_title = NULL, col_title_wrap = 25, caption = NULL,
-  caption_wrap = 80, font_family = "", font_size_title = NULL,
-  font_size_body = NULL, mobile = FALSE)
+gg_density_col(
+  data,
+  x_var,
+  col_var,
+  density_bw = "nrd0",
+  density_adjust = 1,
+  density_kernel = "gaussian",
+  density_n = 512,
+  density_trim = FALSE,
+  pal = NULL,
+  pal_na = "#7F7F7FFF",
+  pal_rev = FALSE,
+  alpha = 0.1,
+  size_line = 0.5,
+  title = NULL,
+  title_wrap = 100,
+  subtitle = NULL,
+  subtitle_wrap = 100,
+  x_balance = FALSE,
+  x_expand = NULL,
+  x_labels = NULL,
+  x_pretty_n = 6,
+  x_title = NULL,
+  x_title_wrap = 50,
+  x_zero = FALSE,
+  x_zero_line = NULL,
+  y_expand = NULL,
+  y_gridlines_minor = FALSE,
+  y_labels = scales::number,
+  y_pretty_n = 5,
+  y_title = NULL,
+  y_title_wrap = 50,
+  col_labels = stringr::str_to_sentence,
+  col_na = TRUE,
+  col_rev = FALSE,
+  col_title = NULL,
+  col_title_wrap = 25,
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL,
+  mobile = FALSE
+)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -38,6 +68,8 @@ gg_density_col(data, x_var, col_var, density_bw = "nrd0",
 
 \item{pal}{Character vector of hex codes.}
 
+\item{pal_na}{The hex code or name of the NA colour to be used.}
+
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
 \item{alpha}{The alpha of the fill. Defaults to 0.1.}
@@ -56,7 +88,7 @@ gg_density_col(data, x_var, col_var, density_bw = "nrd0",
 
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{x_labels}{A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
+\item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
 \item{x_pretty_n}{For a numeric x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6.}
 
@@ -72,7 +104,7 @@ gg_density_col(data, x_var, col_var, density_bw = "nrd0",
 
 \item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
 
-\item{y_labels}{A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
 \item{y_pretty_n}{For a numeric y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 5.}
 
@@ -80,11 +112,7 @@ gg_density_col(data, x_var, col_var, density_bw = "nrd0",
 
 \item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50.}
 
-\item{col_labels}{A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
-
-\item{col_legend_ncol}{The number of columns in the legend.}
-
-\item{col_legend_nrow}{The number of rows in the legend.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Use ggplot2::waiver() to keep colour labels untransformed.}
 
 \item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
 

@@ -14,7 +14,7 @@
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
 #' @param x_reorder For a categorical x variable, TRUE or FALSE of whether the x variable variable is to be reordered by the x variable. Defaults to FALSE.
@@ -26,7 +26,7 @@
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -81,7 +81,7 @@ gg_bar <- function(data,
                     y_balance = FALSE,
                     y_expand = NULL,
                     y_gridlines_minor = FALSE,
-                    y_labels = waiver(),
+                    y_labels = scales::comma,
                     y_na = TRUE,
                     y_pretty_n = 5,
                     y_title = NULL,
@@ -213,7 +213,7 @@ gg_bar <- function(data,
   }
   else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
     if(is.null(x_expand)) x_expand <- waiver()
-    if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+    if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
     
     plot <- plot +
       scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -284,10 +284,11 @@ gg_bar <- function(data,
 #' @param data A tibble or dataframe. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). If numeric, date or datetime, variable values are bins that are mutually exclusive and equidistant. Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
-#' @param col_var Unquoted categorical variable to colour the bars. Required input.
+#' @param col_var Unquoted categorical or numeric variable to colour the bars. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
 #' @param position Whether bars are positioned by "dodge" or "stack". Defaults to "dodge".
 #' @param pal Character vector of hex codes. 
+#' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param width Width of bars. Defaults to 0.75.
 #' @param alpha The alpha of the fill. Defaults to 1. 
@@ -298,7 +299,7 @@ gg_bar <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
 #' @param x_rev For a categorical variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
@@ -309,7 +310,7 @@ gg_bar <- function(data,
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -317,13 +318,15 @@ gg_bar <- function(data,
 #' @param y_trans For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
-#' @param col_labels A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param col_legend_ncol The number of columns in the legend. 
-#' @param col_legend_nrow The number of rows in the legend.
+#' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed. 
+#' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param col_rev TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE. Defaults to FALSE.
+#' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
-#' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. 
+#' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
 #' @param caption Caption title string. 
 #' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @param font_family Font family to use. Defaults to "".
@@ -353,60 +356,63 @@ gg_bar <- function(data,
 #'            position = "stack")
 #' 
 gg_bar_col <- function(data,
-                        x_var,
-                        y_var,
-                        col_var,
-                        text_var = NULL,
-                        position = NULL,
-                        pal = NULL,
-                        pal_rev = FALSE,
-                        width = 0.75,
-                        alpha = 1,
-                        size_line = 0.5,
-                        title = NULL,
-                        title_wrap = 100,
-                        subtitle = NULL,
-                        subtitle_wrap = 100,
-                        x_balance = FALSE,
-                        x_expand = NULL,
-                        x_labels = NULL,
-                        x_na = TRUE,
-                        x_pretty_n = 6,
-                        x_rev = FALSE,
-                        x_title = NULL,
-                        x_title_wrap = 50,
-                        x_zero = FALSE,
-                        x_zero_line = NULL,
-                        y_balance = FALSE,
-                        y_expand = NULL,
-                        y_gridlines_minor = FALSE,
-                        y_labels = waiver(),
-                        y_na = TRUE,
-                        y_pretty_n = 5,
-                        y_title = NULL,
-                        y_title_wrap = 50,
-                        y_trans = "identity",
-                        y_zero = TRUE,
-                        y_zero_line = NULL,
-                        col_labels = NULL,
-                        col_legend_ncol = NULL,
-                        col_legend_nrow = NULL,
-                        col_na = TRUE,
-                        col_rev = FALSE,
-                        col_title = NULL,
-                        col_title_wrap = 25,
-                        caption = NULL,
-                        caption_wrap = 80,
-                        font_family = "",
-                        font_size_title = NULL,
-                        font_size_body = NULL,
-                        mobile = FALSE)
+                       x_var,
+                       y_var,
+                       col_var,
+                       text_var = NULL,
+                       position = NULL,
+                       pal = NULL,
+                       pal_na = "#7F7F7FFF",
+                       pal_rev = FALSE,
+                       width = 0.75,
+                       alpha = 1,
+                       size_line = 0.5,
+                       title = NULL,
+                       title_wrap = 100,
+                       subtitle = NULL,
+                       subtitle_wrap = 100,
+                       x_balance = FALSE,
+                       x_expand = NULL,
+                       x_labels = NULL,
+                       x_na = TRUE,
+                       x_pretty_n = 6,
+                       x_rev = FALSE,
+                       x_title = NULL,
+                       x_title_wrap = 50,
+                       x_zero = FALSE,
+                       x_zero_line = NULL,
+                       y_balance = FALSE,
+                       y_expand = NULL,
+                       y_gridlines_minor = FALSE,
+                       y_labels = scales::comma,
+                       y_na = TRUE,
+                       y_pretty_n = 5,
+                       y_title = NULL,
+                       y_title_wrap = 50,
+                       y_trans = "identity",
+                       y_zero = TRUE,
+                       y_zero_line = NULL,
+                       col_cuts = NULL,
+                       col_labels = NULL,
+                       col_method = NULL,
+                       col_na = TRUE,
+                       col_pretty_n = 4,
+                       col_rev = FALSE,
+                       col_right_closed = TRUE,
+                       col_title = NULL,
+                       col_title_wrap = 25,
+                       caption = NULL,
+                       caption_wrap = 80,
+                       font_family = "",
+                       font_size_title = NULL,
+                       font_size_body = NULL,
+                       mobile = FALSE)
 {
   
   data <- dplyr::ungroup(data)
   y_var <- rlang::enquo(y_var) #numeric var
   x_var <- rlang::enquo(x_var) 
-  col_var <- rlang::enquo(col_var) #categorical var
+  col_var <- rlang::enquo(col_var) 
   text_var <- rlang::enquo(text_var)
   
   if (x_na == FALSE) {
@@ -427,8 +433,7 @@ gg_bar_col <- function(data,
   col_var_vctr <- dplyr::pull(data, !!col_var)
   
   if (!is.numeric(y_var_vctr)) stop("Please use a numeric y variable for a vertical bar plot")
-  if (is.numeric(col_var_vctr)) stop("Please use a categorical colour variable for a vertical bar plot")
-  
+
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
       dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
@@ -475,13 +480,56 @@ gg_bar_col <- function(data,
   
   bar_width <- bar_unit * width
   
-  if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
-    col_n <- length(levels(col_var_vctr))
+  if (is.null(col_method)) {
+    if (!is.numeric(col_var_vctr)) col_method <- "category"
+    else if (is.numeric(col_var_vctr)) col_method <- "bin"
   }
-  else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
-  else pal <- pal[1:col_n]
+  if(col_method %in% c("quantile", "bin")) {
+    if (col_method == "quantile") {
+      if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
+      else {
+        if (dplyr::first(col_cuts) != 0) warning("The first element of the col_cuts vector generally always be 0")
+        if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
+      }  
+      col_cuts <- stats::quantile(col_var_vctr, probs = col_cuts, na.rm = TRUE)
+      if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
+    }
+    else if (col_method == "bin") {
+      if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr, col_pretty_n)
+      else({
+        if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+        if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
+      })
+    }
+
+    if (is.null(col_labels)) col_labels <- scales::comma
+    
+    data <- data %>% 
+      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                 right = col_right_closed, 
+                                                                 include.lowest = TRUE, 
+                                                                 dig.lab = 50, 
+                                                                 ordered_result = TRUE,
+                                                                 format_fun = col_labels)))
+    
+    col_labels <- sv_interval_breaks_to_interval_labels
+    
+    col_n <- length(col_cuts) - 1
+    if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+    else pal <- pal[1:col_n]
+  }
+  else if (col_method == "category") {
+    if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
+      col_n <- length(levels(col_var_vctr))
+    }
+    else col_n <- length(unique(col_var_vctr))
+    
+    if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+    else pal <- pal[1:col_n]
+    
+    if(is.null(col_labels)) col_labels <- stringr::str_to_sentence
+  }
   
   if (pal_rev == TRUE) pal <- rev(pal)
   
@@ -549,7 +597,7 @@ gg_bar_col <- function(data,
   }
   else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
     if(is.null(x_expand)) x_expand <- waiver()
-    if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+    if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
     
     plot <- plot +
       scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -597,25 +645,27 @@ gg_bar_col <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
-  if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
-  
   if (y_gridlines_minor == TRUE) {
     plot <- plot +
       theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
   }
+  
+  if (mobile == TRUE) col_title_wrap <- 20
   
   plot <- plot +
     scale_fill_manual(
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = pal_na()
+      na.value = pal_na,
+      name = stringr::str_wrap(col_title, col_title_wrap)
     ) +
     scale_colour_manual(
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = pal_na()
+      na.value = pal_na,
+      name = stringr::str_wrap(col_title, col_title_wrap)
     ) 
   
   if (mobile == FALSE) {
@@ -627,16 +677,7 @@ gg_bar_col <- function(data,
         y = stringr::str_wrap(y_title, y_title_wrap),
         caption = stringr::str_wrap(caption, caption_wrap)
       ) +
-      guides(fill = guide_legend(
-        ncol = col_legend_ncol,
-        byrow = TRUE,
-        title = stringr::str_wrap(col_title, col_title_wrap)
-      ), 
-      col = guide_legend(
-        ncol = col_legend_ncol, nrow = col_legend_nrow, 
-        byrow = TRUE,
-        title = stringr::str_wrap(col_title, col_title_wrap)
-      ))
+      guides(fill = guide_legend(byrow = TRUE), col = guide_legend(byrow = TRUE))
   }
   else if (mobile == TRUE) {
     plot <- plot +
@@ -647,10 +688,7 @@ gg_bar_col <- function(data,
         y = stringr::str_wrap(y_title, 30),
         caption = stringr::str_wrap(caption, 50)
       ) +
-      guides(
-        fill = guide_legend(ncol = 1, title = stringr::str_wrap(col_title, 20)),
-        col = guide_legend(ncol = 1, title = stringr::str_wrap(col_title, 20))
-      ) +
+      guides(fill = guide_legend(byrow = TRUE, ncol = 1), col = guide_legend(byrow = TRUE, ncol = 1)) +
       theme_mobile_extra()
   }
   
@@ -675,7 +713,7 @@ gg_bar_col <- function(data,
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
 #' @param x_rev For a categorical variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
@@ -685,7 +723,7 @@ gg_bar_col <- function(data,
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -693,7 +731,7 @@ gg_bar_col <- function(data,
 #' @param y_trans For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
+#' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
 #' @param facet_ncol The number of columns of facetted plots. 
 #' @param facet_nrow The number of rows of facetted plots.
@@ -745,7 +783,7 @@ gg_bar_facet <- function(data,
                           y_balance = FALSE,
                           y_expand = NULL,
                           y_gridlines_minor = FALSE,
-                          y_labels = waiver(),
+                          y_labels = scales::comma,
                           y_na = TRUE,
                           y_pretty_n = 4,
                           y_title = NULL,
@@ -753,7 +791,7 @@ gg_bar_facet <- function(data,
                           y_trans = "identity",
                           y_zero = TRUE,
                           y_zero_line = NULL,
-                          facet_labels = NULL,
+                          facet_labels = stringr::str_to_sentence,
                           facet_na = TRUE,
                           facet_ncol = NULL,
                           facet_nrow = NULL,
@@ -878,7 +916,7 @@ gg_bar_facet <- function(data,
     }
     else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
       if(is.null(x_expand)) x_expand <- waiver()
-      if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+      if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
       
       plot <- plot +
         scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -924,8 +962,6 @@ gg_bar_facet <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
-  if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
-  
   if (y_gridlines_minor == TRUE) {
     plot <- plot +
       theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
@@ -939,7 +975,7 @@ gg_bar_facet <- function(data,
       y = stringr::str_wrap(y_title, y_title_wrap),
       caption = stringr::str_wrap(caption, caption_wrap)
     ) +
-    facet_wrap(vars(!!facet_var), labeller = facet_labels, scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow)
+    facet_wrap(vars(!!facet_var), labeller = as_labeller(facet_labels), scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow)
   
   return(plot)
 }
@@ -949,11 +985,12 @@ gg_bar_facet <- function(data,
 #' @param data A tibble or dataframe. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). If numeric, date or datetime, variable values are bins that are mutually exclusive and equidistant. Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
-#' @param col_var Unquoted categorical variable to colour the bars. Required input.
+#' @param col_var Unquoted categorical or numeric variable to colour the bars. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
 #' @param position Whether bars are positioned by "dodge" or "stack". Defaults to "dodge".
 #' @param pal Character vector of hex codes. 
+#' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param width Width of bars. Defaults to 0.75.
 #' @param alpha The alpha of the fill. Defaults to 1. 
@@ -964,7 +1001,7 @@ gg_bar_facet <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
 #' @param x_rev For a categorical variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
@@ -975,7 +1012,7 @@ gg_bar_facet <- function(data,
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -983,14 +1020,16 @@ gg_bar_facet <- function(data,
 #' @param y_trans For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
-#' @param col_labels A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param col_legend_ncol The number of columns in the legend. 
-#' @param col_legend_nrow The number of rows in the legend.
+#' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed. 
+#' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
 #' @param col_rev TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE. Defaults to FALSE.
+#' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
-#' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25.
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation. 
+#' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
+#' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed. 
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
 #' @param facet_ncol The number of columns of facetted plots.
 #' @param facet_nrow The number of rows of facetted plots. 
@@ -1019,65 +1058,68 @@ gg_bar_facet <- function(data,
 #'                  facet_na = FALSE)
 #' 
 gg_bar_col_facet <- function(data,
-                              x_var,
-                              y_var,
-                              col_var,
-                              facet_var,
-                              text_var = NULL,
-                              position = NULL,
-                              pal = NULL,
-                              pal_rev = FALSE,
-                              width = 0.75,
-                              alpha = 1,
-                              size_line = 0.5,
-                              title = NULL,
-                              title_wrap = 100,
-                              subtitle = NULL,
-                              subtitle_wrap = 100,
-                              x_balance = FALSE,
-                              x_expand = NULL,
-                              x_labels = NULL,
-                              x_na = TRUE,
-                              x_pretty_n = 3,
-                              x_rev = FALSE,
-                              x_title = NULL,
-                              x_title_wrap = 50,
-                              x_zero = FALSE,
-                              x_zero_line = NULL,
-                              y_balance = FALSE,
-                              y_expand = NULL,
-                              y_gridlines_minor = FALSE,
-                              y_labels = waiver(),
-                              y_na = TRUE,
-                              y_pretty_n = 4,
-                              y_title = NULL,
-                              y_title_wrap = 50,
-                              y_trans = "identity",
-                              y_zero = TRUE,
-                              y_zero_line = NULL,
-                              col_labels = NULL,
-                              col_legend_ncol = NULL,
-                              col_legend_nrow = NULL,
-                              col_na = TRUE,
-                              col_rev = FALSE,
-                              col_title = NULL,
-                              col_title_wrap = 25,
-                              facet_labels = NULL,
-                              facet_na = TRUE,
-                              facet_ncol = NULL,
-                              facet_nrow = NULL,
-                              facet_scales = "fixed",
-                              caption = NULL,
-                              caption_wrap = 80,
-                              font_family = "",
-                              font_size_title = NULL,
-                              font_size_body = NULL)
+                             x_var,
+                             y_var,
+                             col_var,
+                             facet_var,
+                             text_var = NULL,
+                             position = NULL,
+                             pal = NULL,
+                             pal_na = "#7F7F7FFF",
+                             pal_rev = FALSE,
+                             width = 0.75,
+                             alpha = 1,
+                             size_line = 0.5,
+                             title = NULL,
+                             title_wrap = 100,
+                             subtitle = NULL,
+                             subtitle_wrap = 100,
+                             x_balance = FALSE,
+                             x_expand = NULL,
+                             x_labels = NULL,
+                             x_na = TRUE,
+                             x_pretty_n = 3,
+                             x_rev = FALSE,
+                             x_title = NULL,
+                             x_title_wrap = 50,
+                             x_zero = FALSE,
+                             x_zero_line = NULL,
+                             y_balance = FALSE,
+                             y_expand = NULL,
+                             y_gridlines_minor = FALSE,
+                             y_labels = scales::comma,
+                             y_na = TRUE,
+                             y_pretty_n = 4,
+                             y_title = NULL,
+                             y_title_wrap = 50,
+                             y_trans = "identity",
+                             y_zero = TRUE,
+                             y_zero_line = NULL,
+                             col_cuts = NULL,
+                             col_labels = NULL,
+                             col_method = NULL,
+                             col_na = TRUE,
+                             col_pretty_n = 4,
+                             col_rev = FALSE,
+                             col_right_closed = TRUE,
+                             col_title = NULL,
+                             col_title_wrap = 25,
+                             facet_labels = stringr::str_to_sentence,
+                             facet_na = TRUE,
+                             facet_ncol = NULL,
+                             facet_nrow = NULL,
+                             facet_scales = "fixed",
+                             caption = NULL,
+                             caption_wrap = 80,
+                             font_family = "",
+                             font_size_title = NULL,
+                             font_size_body = NULL)
 {
   
   data <- dplyr::ungroup(data)
   x_var <- rlang::enquo(x_var) 
   y_var <- rlang::enquo(y_var) #numeric var
-  col_var <- rlang::enquo(col_var) #categorical var
+  col_var <- rlang::enquo(col_var) 
   facet_var <- rlang::enquo(facet_var) #categorical var
   text_var <- rlang::enquo(text_var)
   
@@ -1104,7 +1146,6 @@ gg_bar_col_facet <- function(data,
   facet_var_vctr <- dplyr::pull(data, !!facet_var)
   
   if (!is.numeric(y_var_vctr)) stop("Please use a numeric y variable for a vertical bar plot")
-  if (is.numeric(col_var_vctr)) stop("Please use a categorical colour variable for a vertical bar plot")
   if (is.numeric(facet_var_vctr)) stop("Please use a categorical facet variable for a vertical bar plot")
   
   if(is.logical(x_var_vctr)) {
@@ -1159,13 +1200,56 @@ gg_bar_col_facet <- function(data,
   
   bar_width <- bar_unit * width
   
-  if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
-    col_n <- length(levels(col_var_vctr))
+  if (is.null(col_method)) {
+    if (!is.numeric(col_var_vctr)) col_method <- "category"
+    else if (is.numeric(col_var_vctr)) col_method <- "bin"
   }
-  else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
-  else pal <- pal[1:col_n]
+  if(col_method %in% c("quantile", "bin")) {
+    if (col_method == "quantile") {
+      if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
+      else {
+        if (dplyr::first(col_cuts) != 0) warning("The first element of the col_cuts vector generally always be 0")
+        if (dplyr::last(col_cuts) != 1) warning("The last element of the col_cuts vector should generally be 1")
+      }  
+      col_cuts <- stats::quantile(col_var_vctr, probs = col_cuts, na.rm = TRUE)
+      if (anyDuplicated(col_cuts) > 0) stop("col_cuts do not provide unique breaks")
+    }
+    else if (col_method == "bin") {
+      if (is.null(col_cuts)) col_cuts <- pretty(col_var_vctr, col_pretty_n)
+      else({
+        if (!(dplyr::first(col_cuts) %in% c(0, -Inf))) warning("The first element of the col_cuts vector should generally be 0 (or -Inf if there are negative values)")
+        if (dplyr::last(col_cuts) != Inf) warning("The last element of the col_cuts vector should generally be Inf")
+      })
+    }
+
+    if (is.null(col_labels)) col_labels <- scales::comma
+    
+    data <- data %>% 
+      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                 right = col_right_closed, 
+                                                                 include.lowest = TRUE, 
+                                                                 dig.lab = 50, 
+                                                                 ordered_result = TRUE,
+                                                                 format_fun = col_labels)))
+    
+    col_labels <- sv_interval_breaks_to_interval_labels
+    
+    col_n <- length(col_cuts) - 1
+    if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+    else pal <- pal[1:col_n]
+  }
+  else if (col_method == "category") {
+    if (is.factor(col_var_vctr) & !is.null(levels(col_var_vctr))) {
+      col_n <- length(levels(col_var_vctr))
+    }
+    else col_n <- length(unique(col_var_vctr))
+    
+    if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+    else pal <- pal[1:col_n]
+    
+    if(is.null(col_labels)) col_labels <- stringr::str_to_sentence
+  }
   
   if (pal_rev == TRUE) pal <- rev(pal)
   
@@ -1177,7 +1261,7 @@ gg_bar_col_facet <- function(data,
     position2 <- position_dodge2(preserve = "single")
   }
   else position2 <- position
-
+  
   plot <- ggplot(data) +
     coord_cartesian() +
     theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
@@ -1242,7 +1326,7 @@ gg_bar_col_facet <- function(data,
     }
     else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
       if(is.null(x_expand)) x_expand <- waiver()
-      if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+      if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
       
       plot <- plot +
         scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -1288,9 +1372,6 @@ gg_bar_col_facet <- function(data,
       geom_hline(yintercept = 0, colour = "#323232", size = 0.3)
   }
   
-  if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
-  if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
-  
   if (y_gridlines_minor == TRUE) {
     plot <- plot +
       theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
@@ -1301,13 +1382,15 @@ gg_bar_col_facet <- function(data,
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = pal_na()
+      na.value = pal_na,
+      name = stringr::str_wrap(col_title, col_title_wrap)
     ) +
     scale_colour_manual(
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = pal_na()
+      na.value = pal_na,
+      name = stringr::str_wrap(col_title, col_title_wrap)
     ) +
     labs(
       title = stringr::str_wrap(title, title_wrap),
@@ -1316,17 +1399,8 @@ gg_bar_col_facet <- function(data,
       y = stringr::str_wrap(y_title, y_title_wrap),
       caption = stringr::str_wrap(caption, caption_wrap)
     ) +
-    facet_wrap(vars(!!facet_var), labeller = facet_labels, scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow) +
-    guides(fill = guide_legend(
-      ncol = col_legend_ncol, nrow = col_legend_nrow, 
-      byrow = TRUE,
-      title = stringr::str_wrap(col_title, col_title_wrap)
-    ), 
-    col = guide_legend(
-      ncol = 1,
-      byrow = TRUE,
-      title = stringr::str_wrap(col_title, 15)
-      ))  
-    
-    return(plot)
-  }
+    facet_wrap(vars(!!facet_var), labeller = as_labeller(facet_labels), scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow) +
+    guides(fill = guide_legend(byrow = TRUE), col = guide_legend(byrow = TRUE))  
+  
+  return(plot)
+}

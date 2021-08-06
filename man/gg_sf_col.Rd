@@ -4,16 +4,39 @@
 \alias{gg_sf_col}
 \title{Simple feature ggplot map that is coloured.}
 \usage{
-gg_sf_col(data, col_var, text_var = NULL, pal = NULL,
-  pal_rev = FALSE, size_point = 1, size_line = 0.5, alpha = 0.9,
-  borders = NULL, borders_behind = TRUE, borders_pal = "#7f7f7f",
-  borders_size = 0.2, title = NULL, title_wrap = 100,
-  subtitle = NULL, subtitle_wrap = 100, col_cuts = NULL,
-  col_labels = NULL, col_labels_dp = NULL, col_legend_ncol = NULL,
-  col_legend_nrow = NULL, col_na = TRUE, col_method = NULL,
-  col_title = NULL, col_title_wrap = 25, caption = NULL,
-  caption_wrap = 80, font_family = "", font_size_title = NULL,
-  font_size_body = NULL, mobile = FALSE)
+gg_sf_col(
+  data,
+  col_var,
+  text_var = NULL,
+  pal = NULL,
+  pal_na = "#7F7F7FFF",
+  pal_rev = FALSE,
+  size_point = 1,
+  size_line = 0.5,
+  alpha = 0.9,
+  borders = NULL,
+  borders_behind = TRUE,
+  pal_borders = "#7F7F7FFF",
+  borders_size = 0.2,
+  title = NULL,
+  title_wrap = 100,
+  subtitle = NULL,
+  subtitle_wrap = 100,
+  col_cuts = NULL,
+  col_labels = NULL,
+  col_na = TRUE,
+  col_pretty_n = 4,
+  col_method = NULL,
+  col_right_closed = TRUE,
+  col_title = NULL,
+  col_title_wrap = 25,
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL,
+  mobile = FALSE
+)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -23,6 +46,8 @@ gg_sf_col(data, col_var, text_var = NULL, pal = NULL,
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.}
+
+\item{pal_na}{The hex code or name of the NA colour to be used.}
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
@@ -36,7 +61,7 @@ gg_sf_col(data, col_var, text_var = NULL, pal = NULL,
 
 \item{borders_behind}{TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.}
 
-\item{borders_pal}{Colour of the borders. Defaults to "#7F7F7F".}
+\item{pal_borders}{Colour of the borders. Defaults to "#7F7F7F".}
 
 \item{borders_size}{Size of the borders. Defaults to 0.2.}
 
@@ -50,17 +75,15 @@ gg_sf_col(data, col_var, text_var = NULL, pal = NULL,
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_labels}{A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case, and numeric variable labels to pretty labels with an internal function. Use ggplot2::waiver() to keep colour labels untransformed.}
-
-\item{col_labels_dp}{For numeric colour variables and where col_labels equals NULL, the number of decimal places. Defaults to 1 for "quantile" col_method, and the lowest dp within the col_cuts vector for "bin".}
-
-\item{col_legend_ncol}{The number of columns in the legend.}
-
-\item{col_legend_nrow}{The number of rows in the legend.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
 \item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
 
-\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." NULL results in "category", if categorical or "quantile" if numeric col_var. Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).}
+\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4.}
+
+\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
+
+\item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 

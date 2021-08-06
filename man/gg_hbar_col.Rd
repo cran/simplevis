@@ -4,21 +4,61 @@
 \alias{gg_hbar_col}
 \title{Horizontal bar ggplot that is coloured.}
 \usage{
-gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
-  position = NULL, pal = NULL, pal_rev = FALSE, width = 0.75,
-  alpha = 1, size_line = 0.5, title = NULL, title_wrap = 80,
-  subtitle = NULL, subtitle_wrap = 80, x_balance = FALSE,
-  x_expand = NULL, x_gridlines_minor = FALSE, x_labels = waiver(),
-  x_na = TRUE, x_pretty_n = 5, x_title = NULL, x_title_wrap = 50,
-  x_trans = "identity", x_zero = TRUE, x_zero_line = NULL,
-  y_balance = FALSE, y_expand = NULL, y_labels = NULL, y_na = TRUE,
-  y_pretty_n = 6, y_reorder = FALSE, y_rev = FALSE, y_title = NULL,
-  y_title_wrap = 50, y_zero = FALSE, y_zero_line = NULL,
-  col_labels = NULL, col_legend_ncol = NULL, col_legend_nrow = NULL,
-  col_na = TRUE, col_rev = FALSE, col_title = NULL,
-  col_title_wrap = 25, caption = NULL, caption_wrap = 80,
-  font_family = "", font_size_title = NULL, font_size_body = NULL,
-  mobile = FALSE)
+gg_hbar_col(
+  data,
+  x_var,
+  y_var,
+  col_var,
+  text_var = NULL,
+  position = NULL,
+  pal = NULL,
+  pal_na = "#7F7F7FFF",
+  pal_rev = FALSE,
+  width = 0.75,
+  alpha = 1,
+  size_line = 0.5,
+  title = NULL,
+  title_wrap = 80,
+  subtitle = NULL,
+  subtitle_wrap = 80,
+  x_balance = FALSE,
+  x_expand = NULL,
+  x_gridlines_minor = FALSE,
+  x_labels = waiver(),
+  x_na = TRUE,
+  x_pretty_n = 5,
+  x_title = NULL,
+  x_title_wrap = 50,
+  x_trans = "identity",
+  x_zero = TRUE,
+  x_zero_line = NULL,
+  y_balance = FALSE,
+  y_expand = NULL,
+  y_labels = NULL,
+  y_na = TRUE,
+  y_pretty_n = 6,
+  y_reorder = FALSE,
+  y_rev = FALSE,
+  y_title = NULL,
+  y_title_wrap = 50,
+  y_zero = FALSE,
+  y_zero_line = NULL,
+  col_cuts = NULL,
+  col_labels = NULL,
+  col_method = NULL,
+  col_na = TRUE,
+  col_pretty_n = 4,
+  col_rev = FALSE,
+  col_right_closed = TRUE,
+  col_title = NULL,
+  col_title_wrap = 25,
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL,
+  mobile = FALSE
+)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -27,13 +67,15 @@ gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{y_var}{Unquoted variable to be on the y scale (i.e. character, factor, logical, numeric, date or datetime). If numeric, date or datetime, variable values are bins that are mutually exclusive and equidistant. Required input.}
 
-\item{col_var}{Unquoted categorical variable to colour the bars. Required input.}
+\item{col_var}{Unquoted categorical or numeric variable to colour the bars. Required input.}
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
 \item{position}{Whether bars are positioned by "dodge" or "stack". Defaults to "dodge".}
 
 \item{pal}{Character vector of hex codes.}
+
+\item{pal_na}{The hex code or name of the NA colour to be used.}
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
@@ -57,7 +99,7 @@ gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{x_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.}
 
-\item{x_labels}{A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
+\item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
 \item{x_na}{TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.}
 
@@ -77,7 +119,7 @@ gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{y_labels}{A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
 \item{y_na}{TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.}
 
@@ -95,19 +137,23 @@ gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{y_zero_line}{For a numeric y variable, TRUE or FALSE of whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
-\item{col_labels}{A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_legend_ncol}{The number of columns in the legend.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
-\item{col_legend_nrow}{The number of rows in the legend.}
+\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
 
 \item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
 
+\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4.}
+
 \item{col_rev}{TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE. Defaults to FALSE.}
+
+\item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
-\item{col_title_wrap}{Number of characters to wrap the colour title to. Defaults to 25.}
+\item{col_title_wrap}{Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.}
 
 \item{caption}{Caption title string.}
 

@@ -15,7 +15,7 @@
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
@@ -26,7 +26,7 @@
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -53,7 +53,7 @@
 #' 
 #' plot_data <- penguins %>%
 #'   group_by(species) %>%
-#'   summarise(across(bill_length_mm, ~ list(
+#'   summarise(across(body_mass_g, ~ list(
 #'     rlang::set_names(
 #'       boxplot.stats(.x)$stats,
 #'       c('min', 'lower', 'middle', 'upper', 'max')
@@ -63,12 +63,13 @@
 #' plot_data
 #' 
 #' plot_data %>% 
-#'   tidyr::unnest_wider(bill_length_mm)
+#'   tidyr::unnest_wider(body_mass_g)
 #' 
 #' gg_boxplot(plot_data, 
 #'            x_var = species, 
-#'            y_var = bill_length_mm, 
-#'            stat = "identity")
+#'            y_var = body_mass_g, 
+#'            stat = "identity",
+#'            y_pretty_n = 4)
 #' 
 gg_boxplot <- function(data,
                        x_var,
@@ -96,7 +97,7 @@ gg_boxplot <- function(data,
                        y_balance = FALSE,
                        y_expand = NULL,
                        y_gridlines_minor = FALSE,
-                       y_labels = waiver(),
+                       y_labels = scales::comma,
                        y_na = TRUE,
                        y_pretty_n = 5,
                        y_title = NULL,
@@ -258,7 +259,7 @@ gg_boxplot <- function(data,
   }
   else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
     if(is.null(x_expand)) x_expand <- waiver()
-    if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+    if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
     
     plot <- plot +
       scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -335,6 +336,7 @@ gg_boxplot <- function(data,
 #' @param col_var Unquoted categorical variable to colour the fill of the boxes. Required input.
 #' @param stat String of "boxplot" or "identity". Defaults to "boxplot". 
 #' @param pal Character vector of hex codes. 
+#' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE. 
 #' @param width Width of the box. Defaults to 0.5.
 #' @param alpha The alpha of the fill. Defaults to 1. 
@@ -346,7 +348,7 @@ gg_boxplot <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
@@ -357,7 +359,7 @@ gg_boxplot <- function(data,
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -365,9 +367,7 @@ gg_boxplot <- function(data,
 #' @param y_trans For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
-#' @param col_labels A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param col_legend_ncol The number of columns in the legend. Defaults to 1.
-#' @param col_legend_nrow The number of rows in the legend.
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence. Use ggplot2::waiver() to keep colour labels untransformed. 
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
@@ -405,6 +405,7 @@ gg_boxplot_col <- function(data,
                            col_var,
                            stat = "boxplot",
                            pal = NULL,
+                           pal_na = "#7F7F7FFF",
                            pal_rev = FALSE,
                            width = 0.5,
                            alpha = 1,
@@ -426,7 +427,7 @@ gg_boxplot_col <- function(data,
                            y_balance = FALSE,
                            y_expand = NULL,
                            y_gridlines_minor = FALSE,
-                           y_labels = waiver(),
+                           y_labels = scales::comma,
                            y_na = TRUE,
                            y_pretty_n = 5,
                            x_rev = FALSE,
@@ -435,9 +436,7 @@ gg_boxplot_col <- function(data,
                            y_trans = "identity",
                            y_zero = FALSE,
                            y_zero_line = NULL,
-                           col_labels = NULL,
-                           col_legend_ncol = NULL,
-                           col_legend_nrow = NULL,
+                           col_labels = stringr::str_to_sentence,
                            col_na = TRUE,
                            col_title = NULL,
                            col_title_wrap = 25,
@@ -621,7 +620,7 @@ gg_boxplot_col <- function(data,
   }
   else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
     if(is.null(x_expand)) x_expand <- waiver()
-    if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+    if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
     
     plot <- plot +
       scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -662,14 +661,15 @@ gg_boxplot_col <- function(data,
       theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
   }
 
-  if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
-
+  if (mobile == TRUE) col_title_wrap <- 20
+  
   plot <- plot +
     scale_fill_manual(
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = pal_na()
+      na.value = pal_na,
+      name = stringr::str_wrap(col_title, col_title_wrap)
     ) 
   
   if (mobile == FALSE){
@@ -681,13 +681,7 @@ gg_boxplot_col <- function(data,
         y = stringr::str_wrap(y_title, y_title_wrap),
         caption = stringr::str_wrap(caption, caption_wrap)
       ) +
-      guides(fill = guide_legend(
-        ncol = col_legend_ncol,
-        nrow = col_legend_nrow,
-        byrow = TRUE,
-        title = stringr::str_wrap(col_title, col_title_wrap)
-      )) 
-    
+      guides(fill = guide_legend(byrow = TRUE)) 
   }
   else if (mobile == TRUE){
     plot <- plot +
@@ -702,13 +696,7 @@ gg_boxplot_col <- function(data,
         y = stringr::str_wrap(y_title, 30),
         caption = stringr::str_wrap(caption, 50)
       ) +
-      guides(fill = guide_legend(
-        ncol = col_legend_ncol, 
-        nrow = col_legend_nrow, 
-        byrow = TRUE,
-        reverse = TRUE,
-        title = stringr::str_wrap(col_title, 20)
-      )) 
+      guides(fill = guide_legend(ncol = 1)) 
   }
   
   return(plot)
@@ -732,7 +720,7 @@ gg_boxplot_col <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
@@ -743,7 +731,7 @@ gg_boxplot_col <- function(data,
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -751,7 +739,7 @@ gg_boxplot_col <- function(data,
 #' @param y_trans For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
+#' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
 #' @param facet_ncol The number of columns of facetted plots. 
 #' @param facet_nrow The number of rows of facetted plots. 
@@ -800,7 +788,7 @@ gg_boxplot_facet <- function(data,
                              y_balance = FALSE,
                              y_expand = NULL,
                              y_gridlines_minor = FALSE,
-                             y_labels = waiver(),
+                             y_labels = scales::comma,
                              y_na = TRUE,
                              y_pretty_n = 4,
                              y_title = NULL,
@@ -808,7 +796,7 @@ gg_boxplot_facet <- function(data,
                              y_trans = "identity",
                              y_zero = FALSE,
                              y_zero_line = NULL,
-                             facet_labels = NULL,
+                             facet_labels = stringr::str_to_sentence,
                              facet_na = TRUE,
                              facet_ncol = NULL,
                              facet_nrow = NULL,
@@ -984,7 +972,7 @@ gg_boxplot_facet <- function(data,
       }
       else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
         if(is.null(x_expand)) x_expand <- waiver()
-        if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+        if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
         
         plot <- plot +
           scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -1035,8 +1023,6 @@ gg_boxplot_facet <- function(data,
         theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
     }
 
-    if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
-    
     plot <- plot +
       labs(
         title = stringr::str_wrap(title, title_wrap),
@@ -1045,7 +1031,7 @@ gg_boxplot_facet <- function(data,
         y = stringr::str_wrap(y_title, y_title_wrap),
         caption = stringr::str_wrap(caption, caption_wrap)
       ) +
-      facet_wrap(vars(!!facet_var), labeller = facet_labels, scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow)
+      facet_wrap(vars(!!facet_var), labeller = as_labeller(facet_labels), scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow)
 
     return(plot)
 }
@@ -1059,6 +1045,7 @@ gg_boxplot_facet <- function(data,
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param stat String of "boxplot" or "identity". Defaults to "boxplot".  
 #' @param pal Character vector of hex codes. 
+#' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE. 
 #' @param width Width of the box. Defaults to 0.5.
 #' @param alpha The alpha of the fill. Defaults to 1. 
@@ -1070,7 +1057,7 @@ gg_boxplot_facet <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
-#' @param x_labels A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
+#' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
@@ -1081,7 +1068,7 @@ gg_boxplot_facet <- function(data,
 #' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
-#' @param y_labels A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
+#' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
 #' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -1089,13 +1076,11 @@ gg_boxplot_facet <- function(data,
 #' @param y_trans For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
-#' @param col_labels A function or vector to modify colour scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param col_legend_ncol The number of columns in the legend. Defaults to 1.
-#' @param col_legend_nrow The number of rows in the legend.
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence. Use ggplot2::waiver() to keep colour labels untransformed. 
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
-#' @param facet_labels As per the ggplot2 labeller argument within the ggplot facet_wrap function. If NULL, defaults to ggplot2::as_labeller(stringr::str_to_sentence). Use facet_labels = ggplot2::label_value to turn off default sentence case transformation.
+#' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
 #' @param facet_ncol The number of columns of facetted plots. 
 #' @param facet_nrow The number of rows of facetted plots. 
@@ -1140,6 +1125,7 @@ gg_boxplot_col_facet <- function(data,
                                  facet_var,
                                  stat = "boxplot",
                                  pal = NULL,
+                                 pal_na = "#7F7F7FFF",
                                  pal_rev = FALSE,
                                  width = 0.5,
                                  alpha = 1,
@@ -1162,7 +1148,7 @@ gg_boxplot_col_facet <- function(data,
                                  y_balance = FALSE,
                                  y_expand = NULL,
                                  y_gridlines_minor = FALSE,
-                                 y_labels = waiver(),
+                                 y_labels = scales::comma,
                                  y_na = TRUE,
                                  y_pretty_n = 4,
                                  y_title = NULL,
@@ -1170,13 +1156,11 @@ gg_boxplot_col_facet <- function(data,
                                  y_trans = "identity",
                                  y_zero = FALSE,
                                  y_zero_line = NULL,
-                                 col_labels = NULL,
-                                 col_legend_ncol = NULL,
-                                 col_legend_nrow = NULL,
+                                 col_labels = stringr::str_to_sentence,
                                  col_na = TRUE,
                                  col_title = NULL,
                                  col_title_wrap = 25,
-                                 facet_labels = NULL,
+                                 facet_labels = stringr::str_to_sentence,
                                  facet_na = TRUE,
                                  facet_ncol = NULL,
                                  facet_nrow = NULL,
@@ -1372,7 +1356,7 @@ gg_boxplot_col_facet <- function(data,
     }
     else if (is.character(x_var_vctr) | is.factor(x_var_vctr)){
       if(is.null(x_expand)) x_expand <- waiver()
-      if(is.null(x_labels)) x_labels <- function(x) stringr::str_to_sentence(x)
+      if(is.null(x_labels)) x_labels <- stringr::str_to_sentence
       
       plot <- plot +
         scale_x_discrete(expand = x_expand, labels = x_labels)
@@ -1423,15 +1407,13 @@ gg_boxplot_col_facet <- function(data,
       theme(panel.grid.minor.y = element_line(colour = "#D3D3D3", size = 0.2))
   }
 
-  if(is.null(col_labels)) col_labels <- function(x) stringr::str_to_sentence(x)
-  if(is.null(facet_labels)) facet_labels <- as_labeller(stringr::str_to_sentence)
-  
   plot <- plot +
     scale_fill_manual(
       values = pal,
       drop = FALSE,
       labels = col_labels,
-      na.value = pal_na()
+      na.value = pal_na,
+      name = stringr::str_wrap(col_title, col_title_wrap)
     ) +
     labs(
       title = stringr::str_wrap(title, title_wrap),
@@ -1440,13 +1422,8 @@ gg_boxplot_col_facet <- function(data,
       y = stringr::str_wrap(y_title, y_title_wrap),
       caption = stringr::str_wrap(caption, caption_wrap)
     ) +
-    facet_wrap(vars(!!facet_var), labeller = facet_labels, scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow) +
-    guides(fill = guide_legend(
-      ncol = col_legend_ncol,
-      nrow = col_legend_nrow,
-      byrow = TRUE,
-        title = stringr::str_wrap(col_title, col_title_wrap)
-      )) 
+    facet_wrap(vars(!!facet_var), labeller = as_labeller(facet_labels), scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow) +
+    guides(fill = guide_legend(byrow = TRUE)) 
     
     return(plot)
   }

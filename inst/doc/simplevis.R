@@ -60,6 +60,18 @@ gg_sf(example_sf_point,
       borders = nz)
 
 ## -----------------------------------------------------------------------------
+plot_data <- penguins %>% 
+  group_by(species, sex) %>% 
+  summarise(bill_length_mm = round(mean(bill_length_mm, na.rm = TRUE), 0)) %>% 
+  mutate(label = glue::glue("{bill_length_mm} mm"))
+
+gg_tile_col(plot_data, 
+            x_var = sex, 
+            y_var = species, 
+            col_var = bill_length_mm, 
+            label_var = label) 
+
+## -----------------------------------------------------------------------------
 gg_point(penguins, 
          x_var = bill_length_mm, 
          y_var = body_mass_g)
@@ -98,8 +110,7 @@ gg_point_col(penguins,
              subtitle = "Palmer station, Antarctica",
              x_title = "Bill length (mm)", 
              y_title = "Body mass (g)",
-             col_title = "Penguin species",
-             caption = "Source: Gorman KB, Williams TD, Fraser WR (2014)")
+             col_title = "Penguin species")
 
 ## -----------------------------------------------------------------------------
 gg_point(iris, 
@@ -119,7 +130,7 @@ gg_bar_col(plot_data,
         position = "stack",
         x_pretty_n = 4,
         x_labels = function(x) stringr::str_sub(x, 3, 4),
-        y_labels = scales::comma_format(accuracy = 0.1), 
+        y_labels = function(x) scales::comma(x, accuracy = 0.1), 
         y_zero = T, 
         y_pretty_n = 10,
         y_gridlines_minor = T,
@@ -157,16 +168,17 @@ gg_sf_col(example_sf_point,
 leaflet_sf_col(example_sf_point, 
                col_var = trend_category)
 
-## ---- message = FALSE, warning = FALSE, fig.width = 7-------------------------
+## ---- echo = FALSE, message = FALSE, warning = FALSE, fig.width = 7-----------
 tibble::tribble(
   ~family, ~data, ~x_var, ~y_var, ~col_var, ~facet_var, ~stat,
   "bar", "tibble or data.frame", "Any*", "Numeric", "Categorical or numeric", "Categorical", "identity",
   "hbar", "tibble or data.frame", "Numeric", "Any*", "Categorical or numeric", "Categorical", "identity",
-  "line", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical", "identity",
+  "line", "tibble or data.frame", "Any", "Numeric", "Categorical", "Categorical", "identity",
   "point", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical", "identity",
   "density", "tibble or data.frame", "Numeric", NA, "Categorical",  "Categorical", "density",
   "boxplot", "tibble or data.frame", "Any*", "Numeric", "Categorical", "Categorical", "boxplot (or identity)",
-  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "identity",
+  "tile",  "tibble or data.frame", "Categorical", "Categorical", "Categorical or numeric", "Categorical", "identity",
+  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "identity"
   ) %>% 
   DT::datatable()
 

@@ -4,11 +4,27 @@
 \alias{leaflet_sf_col}
 \title{Simple feature leaflet map that is coloured.}
 \usage{
-leaflet_sf_col(data, col_var, label_var = NULL, popup_vars_vctr = NULL,
-  pal = NULL, pal_rev = FALSE, size_point = 2, size_line = 2,
-  alpha = 0.9, basemap = "light", title = NULL, col_cuts = NULL,
-  col_labels_dp = NULL, col_method = NULL, col_na = TRUE,
-  map_id = "map")
+leaflet_sf_col(
+  data,
+  col_var,
+  label_var = NULL,
+  popup_vars_vctr = NULL,
+  pal = NULL,
+  pal_na = "#7F7F7FFF",
+  pal_rev = FALSE,
+  size_point = 2,
+  size_line = 2,
+  alpha = 0.9,
+  basemap = "light",
+  title = NULL,
+  col_cuts = NULL,
+  col_labels = NULL,
+  col_method = NULL,
+  col_na = TRUE,
+  col_pretty_n = 4,
+  col_right_closed = TRUE,
+  map_id = "map"
+)
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
@@ -20,6 +36,8 @@ leaflet_sf_col(data, col_var, label_var = NULL, popup_vars_vctr = NULL,
 \item{popup_vars_vctr}{Vector of quoted variable names to include in the popup. If NULL, defaults to making a leafpop::popupTable of all columns.}
 
 \item{pal}{Character vector of hex codes.}
+
+\item{pal_na}{The hex code or name of the NA colour to be used.}
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
@@ -35,11 +53,15 @@ leaflet_sf_col(data, col_var, label_var = NULL, popup_vars_vctr = NULL,
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_labels_dp}{For numeric colour variables, the number of decimal places. Defaults to 1 for "quantile" col_method, and the lowest dp within the col_cuts vector for "bin".}
+\item{col_labels}{A vector to modify colour scale labels.}
 
-\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." if categorical colour variable, NULL results in "category". If numeric variable, defaults to "quantile". Note all numeric variables are cut to be inclusive of the min in the range, and exclusive of the max in the range (except for the final bucket which includes the highest value).}
+\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
 
 \item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
+
+\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4.}
+
+\item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
 \item{map_id}{The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".}
 }

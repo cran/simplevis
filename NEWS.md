@@ -1,3 +1,19 @@
+# simplevis 4.5.0 
+
+* Breaking: removed col_legend_ncol and col_legend_nrow
+* Breaking: updated facet_labels method for consistency with other labels arguments.
+* Breaking: Removed col_labels_dp from all functions.
+* Added tile family
+* Added support for colouring numeric variables for bar and hbar.
+* Added col_pretty_n argument for functions with numeric colour variables.
+* Changed interval default to be right closed, but allowed this to be modified for functions with numeric colour variables. 
+* Changed numeric col_method default to "bin".
+* Added pal_na argument to allow the user to specify the NA colour.
+* Added stringr::str_to_sentence default for all categorical variables.
+* Added scales::comma default for all numeric x, y and colour variables.
+* Added theme_no_gridlines.
+* Updated themes to be complete.
+
 # simplevis 4.4.0
 
 * Bumped version for CRAN.

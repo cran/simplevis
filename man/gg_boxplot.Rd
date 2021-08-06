@@ -4,18 +4,48 @@
 \alias{gg_boxplot}
 \title{Boxplot ggplot.}
 \usage{
-gg_boxplot(data, x_var, y_var = NULL, stat = "boxplot", pal = NULL,
-  width = 0.5, alpha = 1, size_line = 0.5, size_point = 1,
-  title = NULL, title_wrap = 100, subtitle = NULL,
-  subtitle_wrap = 100, x_balance = FALSE, x_labels = NULL,
-  x_na = TRUE, x_pretty_n = 6, x_expand = NULL, x_rev = FALSE,
-  x_title = NULL, x_title_wrap = 50, x_zero = FALSE,
-  x_zero_line = NULL, y_balance = FALSE, y_expand = NULL,
-  y_gridlines_minor = FALSE, y_labels = waiver(), y_na = TRUE,
-  y_pretty_n = 5, y_title = NULL, y_title_wrap = 50,
-  y_trans = "identity", y_zero = FALSE, y_zero_line = NULL,
-  caption = NULL, caption_wrap = 80, font_family = "",
-  font_size_title = NULL, font_size_body = NULL, mobile = FALSE)
+gg_boxplot(
+  data,
+  x_var,
+  y_var = NULL,
+  stat = "boxplot",
+  pal = NULL,
+  width = 0.5,
+  alpha = 1,
+  size_line = 0.5,
+  size_point = 1,
+  title = NULL,
+  title_wrap = 100,
+  subtitle = NULL,
+  subtitle_wrap = 100,
+  x_balance = FALSE,
+  x_labels = NULL,
+  x_na = TRUE,
+  x_pretty_n = 6,
+  x_expand = NULL,
+  x_rev = FALSE,
+  x_title = NULL,
+  x_title_wrap = 50,
+  x_zero = FALSE,
+  x_zero_line = NULL,
+  y_balance = FALSE,
+  y_expand = NULL,
+  y_gridlines_minor = FALSE,
+  y_labels = scales::comma,
+  y_na = TRUE,
+  y_pretty_n = 5,
+  y_title = NULL,
+  y_title_wrap = 50,
+  y_trans = "identity",
+  y_zero = FALSE,
+  y_zero_line = NULL,
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL,
+  mobile = FALSE
+)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -46,7 +76,7 @@ gg_boxplot(data, x_var, y_var = NULL, stat = "boxplot", pal = NULL,
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 
-\item{x_labels}{A function or vector to modify x scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
+\item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
 \item{x_na}{TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.}
 
@@ -70,7 +100,7 @@ gg_boxplot(data, x_var, y_var = NULL, stat = "boxplot", pal = NULL,
 
 \item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
 
-\item{y_labels}{A function or vector to modify y scale labels, as per the ggplot2 labels argument in ggplot2 scales functions. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
 \item{y_na}{TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.}
 
@@ -115,7 +145,7 @@ gg_boxplot(penguins,
 
 plot_data <- penguins \%>\%
   group_by(species) \%>\%
-  summarise(across(bill_length_mm, ~ list(
+  summarise(across(body_mass_g, ~ list(
     rlang::set_names(
       boxplot.stats(.x)$stats,
       c('min', 'lower', 'middle', 'upper', 'max')
@@ -125,11 +155,12 @@ plot_data <- penguins \%>\%
 plot_data
 
 plot_data \%>\% 
-  tidyr::unnest_wider(bill_length_mm)
+  tidyr::unnest_wider(body_mass_g)
 
 gg_boxplot(plot_data, 
            x_var = species, 
-           y_var = bill_length_mm, 
-           stat = "identity")
+           y_var = body_mass_g, 
+           stat = "identity",
+           y_pretty_n = 4)
 
 }
