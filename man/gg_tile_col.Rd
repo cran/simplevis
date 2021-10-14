@@ -4,52 +4,20 @@
 \alias{gg_tile_col}
 \title{Tile ggplot that is coloured.}
 \usage{
-gg_tile_col(
-  data,
-  x_var,
-  y_var,
-  col_var,
-  label_var = NULL,
-  text_var = NULL,
-  pal = NULL,
-  pal_label = NULL,
-  pal_na = "#7F7F7FFF",
-  pal_rev = FALSE,
-  width = 1,
-  alpha = 1,
-  size_line = 0.5,
-  size_label = 3.5,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  x_expand = waiver(),
-  x_labels = stringr::str_to_sentence,
-  x_na = TRUE,
-  x_rev = FALSE,
-  x_title = NULL,
-  x_title_wrap = 50,
-  y_expand = waiver(),
-  y_labels = stringr::str_to_sentence,
-  y_na = TRUE,
-  y_rev = FALSE,
-  y_title = NULL,
-  y_title_wrap = 50,
-  col_cuts = NULL,
-  col_labels = NULL,
-  col_method = NULL,
-  col_na = TRUE,
-  col_pretty_n = 4,
-  col_right_closed = TRUE,
-  col_title = NULL,
-  col_title_wrap = 25,
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
-  mobile = FALSE
-)
+gg_tile_col(data, x_var, y_var, col_var, label_var = NULL,
+  text_var = NULL, pal = NULL, pal_label = "#323232",
+  pal_na = "#7F7F7F", pal_rev = FALSE, width = NULL, alpha = 1,
+  size_line = 0.5, size_label = 3.5, title = NULL, title_wrap = 75,
+  subtitle = NULL, subtitle_wrap = 75, x_expand = c(0, 0),
+  x_labels = stringr::str_to_sentence, x_na = TRUE, x_rev = FALSE,
+  x_title = NULL, x_title_wrap = 50, y_expand = c(0, 0),
+  y_labels = stringr::str_to_sentence, y_na = TRUE, y_rev = FALSE,
+  y_title = NULL, y_title_wrap = 50, col_cuts = NULL,
+  col_labels = NULL, col_method = NULL, col_na = TRUE,
+  col_pretty_n = 5, col_right_closed = TRUE, col_title = NULL,
+  col_title_wrap = 25, caption = NULL, caption_wrap = 75,
+  font_family = "", font_size_title = NULL, font_size_body = NULL,
+  mobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -66,7 +34,7 @@ gg_tile_col(
 
 \item{pal}{Character vector of hex codes.}
 
-\item{pal_label}{Hex code for the label font colour.}
+\item{pal_label}{Hex code for the label font colour. Defaults to "#323232".}
 
 \item{pal_na}{The hex code or name of the NA colour to be used.}
 
@@ -80,13 +48,13 @@ gg_tile_col(
 
 \item{size_label}{The size of the of labels. Defaults to 3.5.}
 
-\item{title}{Title string. Defaults to NULL.}
+\item{title}{Title string.}
 
-\item{title_wrap}{Number of characters to wrap the title to. Defaults to 100.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 60.}
 
 \item{subtitle}{Subtitle string.}
 
-\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 100.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 60.}
 
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
@@ -114,13 +82,13 @@ gg_tile_col(
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
 
 \item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
 
-\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4.}
+\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
@@ -130,7 +98,7 @@ gg_tile_col(
 
 \item{caption}{Caption title string.}
 
-\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 75.}
 
 \item{font_family}{Font family to use. Defaults to "".}
 

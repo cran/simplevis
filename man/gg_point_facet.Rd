@@ -4,54 +4,20 @@
 \alias{gg_point_facet}
 \title{Point ggplot that is facetted.}
 \usage{
-gg_point_facet(
-  data,
-  x_var,
-  y_var,
-  facet_var,
-  text_var = NULL,
-  position = "identity",
-  alpha = 1,
-  size_point = 1,
-  pal = NULL,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  x_balance = FALSE,
-  x_expand = NULL,
-  x_gridlines_minor = FALSE,
-  x_labels = NULL,
-  x_na = TRUE,
-  x_pretty_n = 3,
-  x_rev = FALSE,
-  x_title = NULL,
-  x_title_wrap = 50,
-  x_trans = "identity",
-  x_zero = FALSE,
-  x_zero_line = NULL,
-  y_balance = FALSE,
-  y_gridlines_minor = FALSE,
-  y_expand = NULL,
-  y_labels = scales::comma,
-  y_na = TRUE,
-  y_pretty_n = 4,
-  y_title = NULL,
-  y_title_wrap = 50,
-  y_trans = "identity",
-  y_zero = FALSE,
-  y_zero_line = NULL,
-  facet_labels = stringr::str_to_sentence,
-  facet_na = TRUE,
-  facet_ncol = NULL,
-  facet_nrow = NULL,
-  facet_scales = "fixed",
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
-)
+gg_point_facet(data, x_var, y_var, facet_var, text_var = NULL,
+  position = "identity", alpha = 1, size_point = 1, pal = NULL,
+  title = NULL, title_wrap = 80, subtitle = NULL,
+  subtitle_wrap = 80, x_balance = FALSE, x_expand = NULL,
+  x_gridlines_minor = FALSE, x_labels = NULL, x_pretty_n = 3,
+  x_rev = FALSE, x_title = NULL, x_title_wrap = 50,
+  x_trans = "identity", x_zero = FALSE, x_zero_line = NULL,
+  y_balance = FALSE, y_gridlines_minor = FALSE, y_expand = NULL,
+  y_labels = scales::comma, y_pretty_n = 4, y_title = NULL,
+  y_title_wrap = 50, y_trans = "identity", y_zero = FALSE,
+  y_zero_line = NULL, facet_labels = stringr::str_to_sentence,
+  facet_na = TRUE, facet_ncol = NULL, facet_nrow = NULL,
+  facet_scales = "fixed", caption = NULL, caption_wrap = 80,
+  font_family = "", font_size_title = NULL, font_size_body = NULL)
 }
 \arguments{
 \item{data}{An ungrouped summarised tibble or dataframe. Required input.}
@@ -72,7 +38,7 @@ gg_point_facet(
 
 \item{pal}{Character vector of hex codes.}
 
-\item{title}{Title string. Defaults to NULL.}
+\item{title}{Title string.}
 
 \item{title_wrap}{Number of characters to wrap the title to. Defaults to 100.}
 
@@ -87,8 +53,6 @@ gg_point_facet(
 \item{x_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.}
 
 \item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
-
-\item{x_na}{TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.}
 
 \item{x_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3.}
 
@@ -111,8 +75,6 @@ gg_point_facet(
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
 \item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
-
-\item{y_na}{TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.}
 
 \item{y_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4.}
 

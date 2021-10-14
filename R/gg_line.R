@@ -7,8 +7,8 @@
 #' @param pal Character vector of hex codes. 
 #' @param size_point Size of points. Defaults to 1. 
 #' @param size_line Size of lines. Defaults to 0.5. 
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
@@ -33,7 +33,7 @@
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -62,9 +62,9 @@ gg_line <- function(data,
                     size_point = 1,
                     size_line = 0.5,
                     title = NULL,
-                    title_wrap = 100,
+                    title_wrap = 80,
                     subtitle = NULL,
-                    subtitle_wrap = 100,
+                    subtitle_wrap = 80,
                     x_balance = FALSE,
                     x_expand = NULL,
                     x_labels = NULL,
@@ -115,7 +115,7 @@ gg_line <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
@@ -143,7 +143,7 @@ gg_line <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian(clip = "off") +
-    theme_y_gridlines(
+    theme_h_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -281,8 +281,8 @@ gg_line <- function(data,
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param size_point Size of points. Defaults to 1. 
 #' @param size_line Size of lines. Defaults to 0.5. 
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
@@ -311,7 +311,7 @@ gg_line <- function(data,
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -339,14 +339,14 @@ gg_line_col <- function(data,
                         col_var,
                         text_var = NULL,
                         pal = NULL,
-                        pal_na = "#7F7F7FFF",
+                        pal_na = "#7F7F7F",
                         pal_rev = FALSE,
                         size_point = 1,
                         size_line = 0.5,
                         title = NULL,
-                        title_wrap = 100,
+                        title_wrap = 80,
                         subtitle = NULL,
-                        subtitle_wrap = 100,
+                        subtitle_wrap = 80,
                         x_balance = FALSE,
                         x_expand = NULL,
                         x_labels = NULL,
@@ -411,13 +411,13 @@ gg_line_col <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -452,7 +452,7 @@ gg_line_col <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian(clip = "off") +
-    theme_y_gridlines(
+    theme_h_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -602,7 +602,7 @@ gg_line_col <- function(data,
 #' @param pal Character vector of hex codes. 
 #' @param size_point Size of points. Defaults to 1. 
 #' @param size_line Size of lines. Defaults to 0.5. 
-#' @param title Title string. Defaults to NULL.
+#' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
@@ -663,9 +663,9 @@ gg_line_facet <- function(data,
                           size_point = 1,
                           size_line = 0.5,
                           title = NULL,
-                          title_wrap = 100,
+                          title_wrap = 80,
                           subtitle = NULL,
-                          subtitle_wrap = 100,
+                          subtitle_wrap = 80,
                           x_balance = FALSE,
                           x_expand = NULL,
                           x_labels = NULL,
@@ -727,13 +727,13 @@ gg_line_facet <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
@@ -761,7 +761,7 @@ gg_line_facet <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian(clip = "off") +
-    theme_y_gridlines(
+    theme_h_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -894,7 +894,7 @@ gg_line_facet <- function(data,
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param size_point Size of points. Defaults to 1. 
 #' @param size_line Size of lines. Defaults to 0.5. 
-#' @param title Title string. Defaults to NULL.
+#' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
@@ -958,14 +958,14 @@ gg_line_col_facet <- function(data,
                               facet_var,
                               text_var = NULL,
                               pal = NULL,
-                              pal_na = "#7F7F7FFF",
+                              pal_na = "#7F7F7F",
                               pal_rev = FALSE,
                               size_point = 1,
                               size_line = 0.5,
                               title = NULL,
-                              title_wrap = 100,
+                              title_wrap = 80,
                               subtitle = NULL,
-                              subtitle_wrap = 100,
+                              subtitle_wrap = 80,
                               x_balance = FALSE,
                               x_expand = NULL,
                               x_labels = NULL,
@@ -1041,19 +1041,19 @@ gg_line_col_facet <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
@@ -1089,7 +1089,7 @@ gg_line_col_facet <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian(clip = "off") +
-    theme_y_gridlines(
+    theme_h_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title

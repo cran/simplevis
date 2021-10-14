@@ -11,10 +11,10 @@
 #' @param pal Character vector of hex codes. 
 #' @param alpha The alpha of the fill. Defaults to 1. 
 #' @param size_line The size of the outlines of density areas.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 75. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -55,9 +55,9 @@ gg_density <- function(data,
                     alpha = 0.1,
                     size_line = 0.5,
                     title = NULL,
-                    title_wrap = 100,
+                    title_wrap = 80,
                     subtitle = NULL,
-                    subtitle_wrap = 100,
+                    subtitle_wrap = 80,
                     x_balance = FALSE,
                     x_expand = NULL,
                     x_labels = NULL,
@@ -97,7 +97,7 @@ gg_density <- function(data,
   else pal <- pal[1]
   
   plot <- ggplot(data) +
-    theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
+    theme_h_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     stat_density(aes(x = !!x_var, y = .data$..density..), 
                  bw = density_bw, adjust = density_adjust, kernel = density_kernel, n = density_n, trim = density_trim,
                  col = pal, 
@@ -205,10 +205,10 @@ gg_density <- function(data,
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param alpha The alpha of the fill. Defaults to 0.1. 
 #' @param size_line The size of the outlines of density areas.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 75. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -253,14 +253,14 @@ gg_density_col <- function(data,
                            density_n = 512,
                            density_trim = FALSE,
                            pal = NULL,
-                           pal_na = "#7F7F7FFF",
+                           pal_na = "#7F7F7F",
                            pal_rev = FALSE,
                            alpha = 0.1,
                            size_line = 0.5,
                            title = NULL,
-                           title_wrap = 100,
+                           title_wrap = 80,
                            subtitle = NULL,
-                           subtitle_wrap = 100,
+                           subtitle_wrap = 80,
                            x_balance = FALSE,
                            x_expand = NULL,
                            x_labels = NULL,
@@ -309,7 +309,7 @@ gg_density_col <- function(data,
     
   if (is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -349,7 +349,7 @@ gg_density_col <- function(data,
   # }
 
   plot <- ggplot(data) +
-    theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
+    theme_h_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     stat_density(aes(x = !!x_var, y = .data$..density.., col = !!col_var, fill = !!col_var), 
                  position = "identity",
                  bw = density_bw, adjust = density_adjust, kernel = density_kernel, n = density_n, trim = density_trim,
@@ -478,10 +478,10 @@ gg_density_col <- function(data,
 #' @param pal Character vector of hex codes. 
 #' @param alpha The alpha of the fill. Defaults to 1. 
 #' @param size_line The size of the outlines of density areas.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 75. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -529,9 +529,9 @@ gg_density_facet <- function(data,
                              alpha = 0.1,
                              size_line = 0.5,
                              title = NULL,
-                             title_wrap = 100,
+                             title_wrap = 80,
                              subtitle = NULL,
-                             subtitle_wrap = 100,
+                             subtitle_wrap = 80,
                              x_balance = FALSE,
                              x_expand = NULL,
                              x_labels = NULL,
@@ -583,7 +583,7 @@ gg_density_facet <- function(data,
   else pal <- pal[1]
   
   plot <- ggplot(data) +
-    theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
+    theme_h_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     stat_density(aes(x = !!x_var, y = .data$..density..), 
                  bw = density_bw, adjust = density_adjust, kernel = density_kernel, n = density_n, trim = density_trim,
                  col = pal, 
@@ -685,10 +685,10 @@ gg_density_facet <- function(data,
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param alpha The alpha of the fill. Defaults to 0.1. 
 #' @param size_line The size of the outlines of density areas.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 75. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
@@ -741,14 +741,14 @@ gg_density_col_facet <- function(data,
                                  density_n = 512,
                                  density_trim = FALSE,
                                  pal = NULL,
-                                 pal_na = "#7F7F7FFF",
+                                 pal_na = "#7F7F7F",
                                  pal_rev = FALSE,
                                  alpha = 0.1,
                                  size_line = 0.5,
                                  title = NULL,
-                                 title_wrap = 100,
+                                 title_wrap = 80,
                                  subtitle = NULL,
-                                 subtitle_wrap = 100,
+                                 subtitle_wrap = 80,
                                  x_balance = FALSE,
                                  x_expand = NULL,
                                  x_labels = NULL,
@@ -807,7 +807,7 @@ gg_density_col_facet <- function(data,
   
   if (is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -847,7 +847,7 @@ gg_density_col_facet <- function(data,
   # }
   
   plot <- ggplot(data) +
-    theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
+    theme_h_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     stat_density(aes(x = !!x_var, y = .data$..density.., col = !!col_var, fill = !!col_var), 
                  position = "identity",
                  bw = density_bw, adjust = density_adjust, kernel = density_kernel, n = density_n, trim = density_trim,

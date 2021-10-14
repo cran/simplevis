@@ -8,8 +8,8 @@
 #' @param width Width of bars. Defaults to 0.75.
 #' @param alpha The alpha of the fill. Defaults to 1. 
 #' @param size_line The size of the outlines of bars.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
@@ -60,13 +60,13 @@ gg_bar <- function(data,
                     y_var,
                     text_var = NULL,
                     pal = NULL,
-                    width = 0.75,
+                    width = NULL,
                     alpha = 1,
                     size_line = 0.5,
                     title = NULL,
-                    title_wrap = 100,
+                    title_wrap = 80,
                     subtitle = NULL,
-                    subtitle_wrap = 100,
+                    subtitle_wrap = 80,
                     x_balance = FALSE,
                     x_expand = NULL,
                     x_labels = NULL,
@@ -118,7 +118,7 @@ gg_bar <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
@@ -126,24 +126,23 @@ gg_bar <- function(data,
   if (is.null(x_title)) x_title <- snakecase::to_sentence_case(rlang::as_name(x_var))
   if (is.null(y_title)) y_title <- snakecase::to_sentence_case(rlang::as_name(y_var))
   
-  if (is.character(y_var_vctr) | is.factor(y_var_vctr) | is.logical(y_var_vctr)) {
+  if (is.character(x_var_vctr) | is.factor(x_var_vctr)) {
+    if (x_reorder == FALSE) {
+      if(x_rev == TRUE) {
+        data <- data %>%
+          dplyr::mutate(dplyr::across(!!x_var, ~forcats::fct_rev(.x)))
+      } 
+    } 
     if (x_reorder == TRUE) {
-      if(x_rev == FALSE) {
+      if (x_rev == FALSE) {
         data <- data %>%
           dplyr::mutate(dplyr::across(!!x_var, ~forcats::fct_reorder(.x, !!y_var, .desc = TRUE)))
-      } 
-      else if(x_rev == TRUE) {
+      } else {
         data <- data %>%
           dplyr::mutate(dplyr::across(!!x_var, ~forcats::fct_reorder(.x, !!y_var, .desc = FALSE)))
-      } 
-      x_var_vctr <- dplyr::pull(data, !!x_var)
+      }
     } 
-    else if (x_rev == TRUE) {
-      data <- data %>%
-        dplyr::mutate(dplyr::across(!!x_var, ~forcats::fct_rev(.x)))
-      
-      x_var_vctr <- dplyr::pull(data, !!x_var)
-    }
+    x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = mobile)
@@ -152,19 +151,20 @@ gg_bar <- function(data,
   if (is.null(pal)) pal <- pal_viridis_reorder(1)
   else pal <- pal[1]
   
-  if (lubridate::is.Date(x_var_vctr)) bar_unit <- 365
-  else bar_unit <- 1
-  
-  bar_width <- bar_unit * width
-  
+  if(is.null(width)) {
+    if(lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
+      width <- NULL
+    } else width <- 0.75
+  }
+
   plot <- ggplot(data) +
-    theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
+    theme_h_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     geom_col(aes(x = !!x_var, y = !!y_var, text = !!text_var), 
              col = pal, 
              fill = pal, 
              alpha = alpha, 
              size = size_line, 
-             width = bar_width)
+             width = width)
   
   if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
     
@@ -293,8 +293,8 @@ gg_bar <- function(data,
 #' @param width Width of bars. Defaults to 0.75.
 #' @param alpha The alpha of the fill. Defaults to 1. 
 #' @param size_line The size of the outlines of bars.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
@@ -319,10 +319,10 @@ gg_bar <- function(data,
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed. 
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_rev TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE. Defaults to FALSE.
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -362,15 +362,15 @@ gg_bar_col <- function(data,
                        text_var = NULL,
                        position = NULL,
                        pal = NULL,
-                       pal_na = "#7F7F7FFF",
+                       pal_na = "#7F7F7F",
                        pal_rev = FALSE,
-                       width = 0.75,
+                       width = NULL,
                        alpha = 1,
                        size_line = 0.5,
                        title = NULL,
-                       title_wrap = 100,
+                       title_wrap = 80,
                        subtitle = NULL,
-                       subtitle_wrap = 100,
+                       subtitle_wrap = 80,
                        x_balance = FALSE,
                        x_expand = NULL,
                        x_labels = NULL,
@@ -396,7 +396,7 @@ gg_bar_col <- function(data,
                        col_labels = NULL,
                        col_method = NULL,
                        col_na = TRUE,
-                       col_pretty_n = 4,
+                       col_pretty_n = 5,
                        col_rev = FALSE,
                        col_right_closed = TRUE,
                        col_title = NULL,
@@ -436,13 +436,13 @@ gg_bar_col <- function(data,
 
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -452,12 +452,11 @@ gg_bar_col <- function(data,
   if (is.null(col_title)) col_title <- snakecase::to_sentence_case(rlang::as_name(col_var))
   
   if (is.character(x_var_vctr) | is.factor(x_var_vctr)) {
-    if (x_rev == TRUE) {
+    if(x_rev == TRUE) {
       data <- data %>%
         dplyr::mutate(dplyr::across(!!x_var, ~forcats::fct_rev(.x)))
-      
-      x_var_vctr <- dplyr::pull(data, !!x_var)
-    }
+    } 
+    x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   
   if (col_rev == TRUE){
@@ -475,10 +474,11 @@ gg_bar_col <- function(data,
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = mobile)
   if(is.null(font_size_body)) font_size_body <- sv_font_size_body(mobile = mobile)
   
-  if (lubridate::is.Date(x_var_vctr)) bar_unit <- 365
-  else bar_unit <- 1
-  
-  bar_width <- bar_unit * width
+  if(is.null(width)) {
+    if(lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
+      width <- NULL
+    } else width <- 0.75
+  }
   
   if (is.null(col_method)) {
     if (!is.numeric(col_var_vctr)) col_method <- "category"
@@ -505,15 +505,24 @@ gg_bar_col <- function(data,
 
     if (is.null(col_labels)) col_labels <- scales::comma
     
-    data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                 right = col_right_closed, 
-                                                                 include.lowest = TRUE, 
-                                                                 dig.lab = 50, 
-                                                                 ordered_result = TRUE,
-                                                                 format_fun = col_labels)))
-    
-    col_labels <- sv_interval_breaks_to_interval_labels
+    if (is.function(col_labels)) {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                   right = col_right_closed, 
+                                                                   include.lowest = TRUE, 
+                                                                   dig.lab = 50, 
+                                                                   ordered_result = TRUE, 
+                                                                   format_fun = col_labels)))
+      
+      col_labels <- sv_interval_labels_chr
+    } else {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                    right = col_right_closed, 
+                                                    include.lowest = TRUE, 
+                                                    dig.lab = 50, 
+                                                    ordered_result = TRUE)))
+    }
     
     col_n <- length(col_cuts) - 1
     if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
@@ -534,7 +543,7 @@ gg_bar_col <- function(data,
   if (pal_rev == TRUE) pal <- rev(pal)
   
   if(!is.null(position)) {
-    if (!position %in% c("dodge", "stack")) stop("Please use a position of either 'stack' or 'fill'")
+    if (!position %in% c("dodge", "stack")) stop("Please use a position of either 'dodge' or 'stack'")
   }
   
   if (is.null(position)) {
@@ -543,11 +552,11 @@ gg_bar_col <- function(data,
   else position2 <- position
   
   plot <- ggplot(data) +
-    theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
+    theme_h_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     geom_col(aes(x = !!x_var, y = !!y_var, col = !!col_var, fill = !!col_var, text = !!text_var), 
              alpha = alpha, 
              size = size_line, 
-             width = bar_width, 
+             width = width, 
              position = position2)
   
   if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
@@ -706,8 +715,8 @@ gg_bar_col <- function(data,
 #' @param width Width of bars. Defaults to 0.75.
 #' @param alpha The alpha of the fill. Defaults to 1.
 #' @param size_line The size of the outlines of bars. 
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
@@ -763,13 +772,13 @@ gg_bar_facet <- function(data,
                           facet_var,
                           text_var = NULL,
                           pal = NULL,
-                          width = 0.75,
+                          width = NULL,
                           alpha = 1,
                           size_line = 0.5,
                           title = NULL,
-                          title_wrap = 100,
+                          title_wrap = 80,
                           subtitle = NULL,
-                          subtitle_wrap = 100,
+                          subtitle_wrap = 80,
                           x_balance = FALSE,
                           x_expand = NULL,
                           x_labels = NULL,
@@ -834,24 +843,23 @@ gg_bar_facet <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
   
   if (is.character(x_var_vctr) | is.factor(x_var_vctr)) {
-    if (x_rev == TRUE) {
+    if(x_rev == TRUE) {
       data <- data %>%
         dplyr::mutate(dplyr::across(!!x_var, ~forcats::fct_rev(.x)))
-      
-      x_var_vctr <- dplyr::pull(data, !!x_var)
-    }
+    } 
+    x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = FALSE)
@@ -860,18 +868,19 @@ gg_bar_facet <- function(data,
   if (is.null(pal)) pal <- pal_viridis_reorder(1)
   else pal <- pal[1]
   
-  if (lubridate::is.Date(x_var_vctr)) bar_unit <- 365
-  else bar_unit <- 1
-  
-  bar_width <- bar_unit * width
+  if(is.null(width)) {
+    if(lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
+      width <- NULL
+    } else width <- 0.75
+  }
   
   plot <- ggplot(data) +
-    theme_y_gridlines(
+    theme_h_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
     ) +
-    geom_col(aes(x = !!x_var, y = !!y_var, text = !!text_var), col = pal, fill = pal, alpha = alpha, size = size_line, width = bar_width)
+    geom_col(aes(x = !!x_var, y = !!y_var, text = !!text_var), col = pal, fill = pal, alpha = alpha, size = size_line, width = width)
   
   if (facet_scales %in% c("fixed", "free_y")) {
     if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
@@ -995,8 +1004,8 @@ gg_bar_facet <- function(data,
 #' @param width Width of bars. Defaults to 0.75.
 #' @param alpha The alpha of the fill. Defaults to 1. 
 #' @param size_line The size of the outlines of bars.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
@@ -1021,9 +1030,9 @@ gg_bar_facet <- function(data,
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed. 
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
 #' @param col_rev TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE. Defaults to FALSE.
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
@@ -1065,15 +1074,15 @@ gg_bar_col_facet <- function(data,
                              text_var = NULL,
                              position = NULL,
                              pal = NULL,
-                             pal_na = "#7F7F7FFF",
+                             pal_na = "#7F7F7F",
                              pal_rev = FALSE,
-                             width = 0.75,
+                             width = NULL,
                              alpha = 1,
                              size_line = 0.5,
                              title = NULL,
-                             title_wrap = 100,
+                             title_wrap = 80,
                              subtitle = NULL,
-                             subtitle_wrap = 100,
+                             subtitle_wrap = 80,
                              x_balance = FALSE,
                              x_expand = NULL,
                              x_labels = NULL,
@@ -1099,7 +1108,7 @@ gg_bar_col_facet <- function(data,
                              col_labels = NULL,
                              col_method = NULL,
                              col_na = TRUE,
-                             col_pretty_n = 4,
+                             col_pretty_n = 5,
                              col_rev = FALSE,
                              col_right_closed = TRUE,
                              col_title = NULL,
@@ -1150,19 +1159,19 @@ gg_bar_col_facet <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
@@ -1172,12 +1181,11 @@ gg_bar_col_facet <- function(data,
   if (is.null(col_title)) col_title <- snakecase::to_sentence_case(rlang::as_name(col_var))
   
   if (is.character(x_var_vctr) | is.factor(x_var_vctr)) {
-    if (x_rev == TRUE) {
+    if(x_rev == TRUE) {
       data <- data %>%
         dplyr::mutate(dplyr::across(!!x_var, ~forcats::fct_rev(.x)))
-      
-      x_var_vctr <- dplyr::pull(data, !!x_var)
-    }
+    } 
+    x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   
   if (col_rev == TRUE){
@@ -1195,10 +1203,11 @@ gg_bar_col_facet <- function(data,
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = FALSE)
   if(is.null(font_size_body)) font_size_body <- sv_font_size_body(mobile = FALSE)
   
-  if (lubridate::is.Date(x_var_vctr)) bar_unit <- 365
-  else bar_unit <- 1
-  
-  bar_width <- bar_unit * width
+  if(is.null(width)) {
+    if(lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
+      width <- NULL
+    } else width <- 0.75
+  }
   
   if (is.null(col_method)) {
     if (!is.numeric(col_var_vctr)) col_method <- "category"
@@ -1225,16 +1234,25 @@ gg_bar_col_facet <- function(data,
 
     if (is.null(col_labels)) col_labels <- scales::comma
     
-    data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                 right = col_right_closed, 
-                                                                 include.lowest = TRUE, 
-                                                                 dig.lab = 50, 
-                                                                 ordered_result = TRUE,
-                                                                 format_fun = col_labels)))
-    
-    col_labels <- sv_interval_breaks_to_interval_labels
-    
+    if (is.function(col_labels)) {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                   right = col_right_closed, 
+                                                                   include.lowest = TRUE, 
+                                                                   dig.lab = 50, 
+                                                                   ordered_result = TRUE, 
+                                                                   format_fun = col_labels)))
+      
+      col_labels <- sv_interval_labels_chr
+    } else {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                    right = col_right_closed, 
+                                                    include.lowest = TRUE, 
+                                                    dig.lab = 50, 
+                                                    ordered_result = TRUE)))
+    }
+
     col_n <- length(col_cuts) - 1
     if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
     else pal <- pal[1:col_n]
@@ -1254,7 +1272,7 @@ gg_bar_col_facet <- function(data,
   if (pal_rev == TRUE) pal <- rev(pal)
   
   if(!is.null(position)) {
-    if (!position %in% c("dodge", "stack")) stop("Please use a position of either 'stack' or 'fill'")
+    if (!position %in% c("dodge", "stack")) stop("Please use a position of either 'dodge' or 'stack'")
   }
   
   if (is.null(position)) {
@@ -1264,11 +1282,11 @@ gg_bar_col_facet <- function(data,
   
   plot <- ggplot(data) +
     coord_cartesian() +
-    theme_y_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
+    theme_h_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     geom_col(aes(x = !!x_var, y = !!y_var, col = !!col_var, fill = !!col_var, text = !!text_var), 
              alpha = alpha, 
              size = size_line, 
-             width = bar_width, 
+             width = width, 
              position = position2)
   
   if (!is.null(position)) {

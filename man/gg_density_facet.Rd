@@ -4,47 +4,19 @@
 \alias{gg_density_facet}
 \title{Smoothed density ggplot that is facetted.}
 \usage{
-gg_density_facet(
-  data,
-  x_var,
-  facet_var,
-  density_bw = "nrd0",
-  density_adjust = 1,
-  density_kernel = "gaussian",
-  density_n = 512,
-  density_trim = FALSE,
-  pal = NULL,
-  alpha = 0.1,
-  size_line = 0.5,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  x_balance = FALSE,
-  x_expand = NULL,
-  x_labels = NULL,
-  x_pretty_n = 3,
-  x_title = NULL,
-  x_title_wrap = 50,
-  x_zero = FALSE,
-  x_zero_line = NULL,
-  y_expand = NULL,
-  y_gridlines_minor = FALSE,
-  y_labels = scales::number,
-  y_pretty_n = 4,
-  y_title = NULL,
-  y_title_wrap = 50,
-  facet_labels = stringr::str_to_sentence,
-  facet_na = TRUE,
-  facet_ncol = NULL,
-  facet_nrow = NULL,
-  facet_scales = "fixed",
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
-)
+gg_density_facet(data, x_var, facet_var, density_bw = "nrd0",
+  density_adjust = 1, density_kernel = "gaussian", density_n = 512,
+  density_trim = FALSE, pal = NULL, alpha = 0.1, size_line = 0.5,
+  title = NULL, title_wrap = 80, subtitle = NULL,
+  subtitle_wrap = 80, x_balance = FALSE, x_expand = NULL,
+  x_labels = NULL, x_pretty_n = 3, x_title = NULL,
+  x_title_wrap = 50, x_zero = FALSE, x_zero_line = NULL,
+  y_expand = NULL, y_gridlines_minor = FALSE,
+  y_labels = scales::number, y_pretty_n = 4, y_title = NULL,
+  y_title_wrap = 50, facet_labels = stringr::str_to_sentence,
+  facet_na = TRUE, facet_ncol = NULL, facet_nrow = NULL,
+  facet_scales = "fixed", caption = NULL, caption_wrap = 80,
+  font_family = "", font_size_title = NULL, font_size_body = NULL)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -69,13 +41,13 @@ gg_density_facet(
 
 \item{size_line}{The size of the outlines of density areas.}
 
-\item{title}{Title string. Defaults to NULL.}
+\item{title}{Title string.}
 
-\item{title_wrap}{Number of characters to wrap the title to. Defaults to 100.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 75.}
 
 \item{subtitle}{Subtitle string.}
 
-\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 100.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 75.}
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 

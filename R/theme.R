@@ -1,16 +1,20 @@
-#' @title Theme for graphs with horizontal y gridlines.
+#' @title Theme for graphs with horizontal gridlines.
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
 #' @export
 #' @examples
+#' library(simplevis)
 #' library(ggplot2)
-#'
+#' 
 #' ggplot() +
-#'   theme_y_gridlines("Courier", 9, 7) +
-#'   ggtitle("This is a title of a font family and size")
-theme_y_gridlines <-
+#'   scale_x_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   scale_y_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   ggtitle("This is a title with a specified font family and size") +
+#'   theme_h_gridlines("Courier", 9, 7) 
+#'   
+theme_h_gridlines <-
   function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
@@ -49,19 +53,23 @@ theme_y_gridlines <-
     )
   }
 
-#' @title Theme for graphs with vertical x gridlines.
+#' @title Theme for graphs with vertical gridlines.
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
 #' @export
 #' @examples
+#' library(simplevis)
 #' library(ggplot2)
-#'
+#' 
 #' ggplot() +
-#'   theme_x_gridlines("Courier", 9, 7) +
-#'   ggtitle("This is a title of a font family and size")
-theme_x_gridlines <-
+#'   scale_x_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   scale_y_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   ggtitle("This is a title of a font family and size") +
+#'   theme_v_gridlines("Courier", 9, 7) 
+#'   
+theme_v_gridlines <-
   function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
@@ -100,19 +108,23 @@ theme_x_gridlines <-
     )
   }
 
-#' @title Theme for graphs with x and y gridlines.
+#' @title Theme for graphs with horizontal and vertical gridlines.
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
 #' @return A ggplot theme.
 #' @export
 #' @examples
+#' library(simplevis)
 #' library(ggplot2)
-#'
+#' 
 #' ggplot() +
-#'   theme_xy_gridlines("Courier", 9, 7) +
-#'   ggtitle("This is a title of a font family and size")
-theme_xy_gridlines <-
+#'   scale_x_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   scale_y_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   ggtitle("This is a title with a specified font family and size") +
+#'   theme_hv_gridlines("Courier", 9, 7) 
+#'   
+theme_hv_gridlines <-
   function(font_family = "",
            font_size_title = 11,
            font_size_body = 10) {
@@ -158,11 +170,15 @@ theme_xy_gridlines <-
 #' @return A ggplot theme.
 #' @export
 #' @examples
+#' library(simplevis)
 #' library(ggplot2)
-#'
+#' 
 #' ggplot() +
-#'   theme_no_gridlines("Courier", 9, 7) +
-#'   ggtitle("This is a title of a font family and size")
+#'   scale_x_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   scale_y_continuous(breaks = seq(0, 10, 2), limits = c(0, 10), expand = c(0, 0)) +
+#'   ggtitle("This is a title with a specified font family and size") +
+#'   theme_no_gridlines("Courier", 9, 7) 
+#'   
 theme_no_gridlines <-
   function(font_family = "",
            font_size_title = 11,
@@ -208,11 +224,14 @@ theme_no_gridlines <-
 #' @return A ggplot theme.
 #' @export
 #' @examples
+#' library(simplevis)
 #' library(ggplot2)
 #'
-#' ggplot() +
+#' ggplot(nz) +
+#'   geom_sf() +
 #'   theme_map("Courier", 9, 7) +
-#'   ggtitle("This is a title of a font family and size")
+#'   ggtitle("This is a title with a specified font family and size") 
+#'   
 theme_map <-
   function(font_family = "",
            font_size_title = 11,

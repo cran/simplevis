@@ -8,15 +8,14 @@
 #' @param alpha The opacity of points. Defaults to 1.
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
-#' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
 #' @param x_title X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -28,7 +27,6 @@
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
@@ -36,7 +34,7 @@
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -60,15 +58,14 @@ gg_point <- function(data,
                      size_point = 1,
                      pal = NULL,
                      title = NULL,
-                     title_wrap = 100,
+                     title_wrap = 80,
                      subtitle = NULL,
-                     subtitle_wrap = 100,
+                     subtitle_wrap = 80,
                      x_balance = FALSE,
                      x_expand = NULL,
                      x_gridlines_minor = FALSE,
                      x_labels = NULL,
                      x_pretty_n = 6,
-                     x_na = TRUE,
                      x_rev = FALSE,
                      x_title = NULL,
                      x_title_wrap = 50,
@@ -80,7 +77,6 @@ gg_point <- function(data,
                      y_gridlines_minor = FALSE,
                      y_labels = scales::comma,
                      y_pretty_n = 5,
-                     y_na = TRUE,
                      y_title = NULL,
                      y_title_wrap = 50,
                      y_trans = "identity",
@@ -99,15 +95,6 @@ gg_point <- function(data,
   y_var <- rlang::enquo(y_var) #numeric var
   text_var <- rlang::enquo(text_var)
   
-  if (x_na == FALSE) {
-    data <- data %>% 
-      dplyr::filter(!is.na(!!x_var))
-  }
-  if (y_na == FALSE) {
-    data <- data %>% 
-      dplyr::filter(!is.na(!!y_var))
-  }
-  
   x_var_vctr <- dplyr::pull(data, !!x_var)
   y_var_vctr <- dplyr::pull(data, !!y_var)
   
@@ -115,7 +102,7 @@ gg_point <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
@@ -142,7 +129,7 @@ gg_point <- function(data,
   else pal <- pal[1]
   
   plot <- ggplot(data) +
-    theme_xy_gridlines(
+    theme_hv_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -284,15 +271,14 @@ gg_point <- function(data,
 #' @param pal Character vector of hex codes. 
 #' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
-#' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
 #' @param x_title X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -304,7 +290,6 @@ gg_point <- function(data,
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
@@ -312,15 +297,15 @@ gg_point <- function(data,
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.   
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -345,13 +330,12 @@ gg_point_col <- function(data,
                          alpha = 1,
                          size_point = 1,
                          pal = NULL,
-                         pal_na = "#7F7F7FFF",
+                         pal_na = "#7F7F7F",
                          pal_rev = FALSE,
                          x_balance = FALSE,
                          x_expand = NULL,
                          x_gridlines_minor = FALSE,
                          x_labels = NULL,
-                         x_na = TRUE,
                          x_pretty_n = 6,
                          x_rev = FALSE,
                          x_trans = "identity",
@@ -361,7 +345,6 @@ gg_point_col <- function(data,
                          y_expand = NULL,
                          y_gridlines_minor = FALSE,
                          y_labels = scales::comma,
-                         y_na = TRUE,
                          y_pretty_n = 5,
                          y_trans = "identity",
                          y_zero = FALSE,
@@ -376,13 +359,13 @@ gg_point_col <- function(data,
                          col_labels = NULL,
                          col_method = NULL,
                          col_na = TRUE,
-                         col_pretty_n = 4,
+                         col_pretty_n = 5,
                          col_right_closed = TRUE,
                          font_family = "",
                          font_size_title = NULL,
                          font_size_body = NULL,
-                         title_wrap = 100,
-                         subtitle_wrap = 100,
+                         title_wrap = 80,
+                         subtitle_wrap = 80,
                          x_title_wrap = 50,
                          y_title_wrap = 50,
                          col_title_wrap = 25,
@@ -396,14 +379,6 @@ gg_point_col <- function(data,
   col_var <- rlang::enquo(col_var)
   text_var <- rlang::enquo(text_var)
   
-  if (x_na == FALSE) {
-    data <- data %>% 
-      dplyr::filter(!is.na(!!x_var))
-  }
-  if (y_na == FALSE) {
-    data <- data %>% 
-      dplyr::filter(!is.na(!!y_var))
-  }
   if (col_na == FALSE) {
     data <- data %>% 
       dplyr::filter(!is.na(!!col_var))
@@ -417,13 +392,13 @@ gg_point_col <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -472,15 +447,24 @@ gg_point_col <- function(data,
     
     if (is.null(col_labels)) col_labels <- scales::comma
     
-    data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                 right = col_right_closed, 
-                                                                 include.lowest = TRUE, 
-                                                                 dig.lab = 50, 
-                                                                 ordered_result = TRUE,
-                                                                 format_fun = col_labels)))
-    
-    col_labels <- sv_interval_breaks_to_interval_labels
+    if (is.function(col_labels)) {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                   right = col_right_closed, 
+                                                                   include.lowest = TRUE, 
+                                                                   dig.lab = 50, 
+                                                                   ordered_result = TRUE, 
+                                                                   format_fun = col_labels)))
+      
+      col_labels <- sv_interval_labels_chr
+    } else {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                    right = col_right_closed, 
+                                                    include.lowest = TRUE, 
+                                                    dig.lab = 50, 
+                                                    ordered_result = TRUE)))
+    }
     
     col_n <- length(col_cuts) - 1
     if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
@@ -501,7 +485,7 @@ gg_point_col <- function(data,
   if (pal_rev == TRUE) pal <- rev(pal)
   
   plot <- ggplot(data) +
-    theme_xy_gridlines(
+    theme_hv_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -656,7 +640,7 @@ gg_point_col <- function(data,
 #' @param alpha The opacity of points. Defaults to 1.
 #' @param size_point Size of points. Defaults to 1.
 #' @param pal Character vector of hex codes. 
-#' @param title Title string. Defaults to NULL.
+#' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
@@ -664,7 +648,6 @@ gg_point_col <- function(data,
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
-#' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
 #' @param x_title X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -676,7 +659,6 @@ gg_point_col <- function(data,
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
@@ -714,14 +696,13 @@ gg_point_facet <- function(data,
                            size_point = 1,
                            pal = NULL,
                            title = NULL,
-                           title_wrap = 100,
+                           title_wrap = 80,
                            subtitle = NULL,
-                           subtitle_wrap = 100,
+                           subtitle_wrap = 80,
                            x_balance = FALSE,
                            x_expand = NULL,
                            x_gridlines_minor = FALSE,
                            x_labels = NULL,
-                           x_na = TRUE,
                            x_pretty_n = 3,
                            x_rev = FALSE,
                            x_title = NULL,
@@ -733,7 +714,6 @@ gg_point_facet <- function(data,
                            y_gridlines_minor = FALSE,
                            y_expand = NULL,
                            y_labels = scales::comma,
-                           y_na = TRUE,
                            y_pretty_n = 4,
                            y_title = NULL,
                            y_title_wrap = 50,
@@ -758,14 +738,6 @@ gg_point_facet <- function(data,
   facet_var <- rlang::enquo(facet_var) #categorical var
   text_var <- rlang::enquo(text_var)
   
-  if (x_na == FALSE) {
-    data <- data %>% 
-      dplyr::filter(!is.na(!!x_var))
-  }
-  if (y_na == FALSE) {
-    data <- data %>% 
-      dplyr::filter(!is.na(!!y_var))
-  }
   if (facet_na == FALSE) {
     data <- data %>% 
       dplyr::filter(!is.na(!!facet_var))
@@ -780,13 +752,13 @@ gg_point_facet <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
@@ -813,7 +785,7 @@ gg_point_facet <- function(data,
   else pal <- pal[1]
   
   plot <- ggplot(data) +
-    theme_xy_gridlines(
+    theme_hv_gridlines(
       font_family = font_family,
       font_size_body = font_size_body,
       font_size_title = font_size_title
@@ -950,7 +922,7 @@ gg_point_facet <- function(data,
 #' @param pal Character vector of hex codes. 
 #' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
-#' @param title Title string. Defaults to NULL.
+#' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
@@ -958,7 +930,6 @@ gg_point_facet <- function(data,
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
-#' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
 #' @param x_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3. 
 #' @param x_rev For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.
 #' @param x_title X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -970,7 +941,6 @@ gg_point_facet <- function(data,
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_gridlines_minor TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.
 #' @param y_labels A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.
-#' @param y_na TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.
 #' @param y_pretty_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
@@ -978,10 +948,10 @@ gg_point_facet <- function(data,
 #' @param y_zero For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.   
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. 
@@ -1018,17 +988,16 @@ gg_point_col_facet <-
            alpha = 1,
            size_point = 1,
            pal = NULL,
-           pal_na = "#7F7F7FFF",
+           pal_na = "#7F7F7F",
            pal_rev = FALSE,
            title = NULL,
-           title_wrap = 100,
+           title_wrap = 80,
            subtitle = NULL,
-           subtitle_wrap = 100,
+           subtitle_wrap = 80,
            x_balance = FALSE,
            x_expand = NULL,
            x_gridlines_minor = FALSE,
            x_labels = NULL,
-           x_na = TRUE,
            x_pretty_n = 3,
            x_rev = FALSE,
            x_title = NULL,
@@ -1040,7 +1009,6 @@ gg_point_col_facet <-
            y_expand = NULL,
            y_gridlines_minor = FALSE,
            y_labels = scales::comma,
-           y_na = TRUE,
            y_pretty_n = 4,
            y_title = NULL,
            y_title_wrap = 50,
@@ -1051,7 +1019,7 @@ gg_point_col_facet <-
            col_labels = NULL,
            col_method = NULL,
            col_na = TRUE,
-           col_pretty_n = 4,
+           col_pretty_n = 5,
            col_right_closed = TRUE,
            col_title = NULL,
            col_title_wrap = 25,
@@ -1074,14 +1042,6 @@ gg_point_col_facet <-
     facet_var <- rlang::enquo(facet_var) #categorical var
     text_var <- rlang::enquo(text_var)
     
-    if (x_na == FALSE) {
-      data <- data %>% 
-        dplyr::filter(!is.na(!!x_var))
-    }
-    if (y_na == FALSE) {
-      data <- data %>% 
-        dplyr::filter(!is.na(!!y_var))
-    }
     if (col_na == FALSE) {
       data <- data %>% 
         dplyr::filter(!is.na(!!col_var))
@@ -1101,19 +1061,19 @@ gg_point_col_facet <-
     
     if(is.logical(x_var_vctr)) {
       data <- data %>% 
-        dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+        dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
       
       x_var_vctr <- dplyr::pull(data, !!x_var)
     }
     if(is.logical(col_var_vctr)) {
       data <- data %>% 
-        dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+        dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
       
       col_var_vctr <- dplyr::pull(data, !!col_var)
     }
     if(is.logical(facet_var_vctr)) {
       data <- data %>% 
-        dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+        dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
       
       facet_var_vctr <- dplyr::pull(data, !!facet_var)
     }
@@ -1162,15 +1122,24 @@ gg_point_col_facet <-
 
       if (is.null(col_labels)) col_labels <- scales::comma
       
-      data <- data %>% 
-        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                   right = col_right_closed, 
-                                                                   include.lowest = TRUE, 
-                                                                   dig.lab = 50, 
-                                                                   ordered_result = TRUE,
-                                                                   format_fun = col_labels)))
-      
-      col_labels <- sv_interval_breaks_to_interval_labels
+      if (is.function(col_labels)) {
+        data <- data %>% 
+          dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                     right = col_right_closed, 
+                                                                     include.lowest = TRUE, 
+                                                                     dig.lab = 50, 
+                                                                     ordered_result = TRUE, 
+                                                                     format_fun = col_labels)))
+        
+        col_labels <- sv_interval_labels_chr
+      } else {
+        data <- data %>% 
+          dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                      right = col_right_closed, 
+                                                      include.lowest = TRUE, 
+                                                      dig.lab = 50, 
+                                                      ordered_result = TRUE)))
+      }
       
       col_n <- length(col_cuts) - 1
       if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
@@ -1191,7 +1160,7 @@ gg_point_col_facet <-
     if (pal_rev == TRUE) pal <- rev(pal)
     
     plot <- ggplot(data) +
-      theme_xy_gridlines(
+      theme_hv_gridlines(
         font_family = font_family,
         font_size_body = font_size_body,
         font_size_title = font_size_title

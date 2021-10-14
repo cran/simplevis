@@ -4,7 +4,8 @@
 \alias{theme_map}
 \title{Theme for maps.}
 \usage{
-theme_map(font_family = "", font_size_title = 11, font_size_body = 10)
+theme_map(font_family = "", font_size_title = 11,
+  font_size_body = 10)
 }
 \arguments{
 \item{font_family}{Font family to use. Defaults to "".}
@@ -20,9 +21,12 @@ A ggplot theme.
 Theme for maps.
 }
 \examples{
+library(simplevis)
 library(ggplot2)
 
-ggplot() +
+ggplot(nz) +
+  geom_sf() +
   theme_map("Courier", 9, 7) +
-  ggtitle("This is a title of a font family and size")
+  ggtitle("This is a title with a specified font family and size") 
+  
 }

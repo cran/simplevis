@@ -7,7 +7,7 @@
 #' @param pal Character vector of hex codes. 
 #' @param size_point Size of points (i.e. radius). Defaults to 2.
 #' @param size_line Size of lines around features (i.e. weight). Defaults to 2.
-#' @param alpha The opacity of the fill within features (i.e. fillOpacity). Defaults to 0.9. 
+#' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.75 for polygons.
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
 #' @param title A title string that will be wrapped into the legend. 
 #' @param map_id The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".
@@ -23,7 +23,7 @@ leaflet_sf <- function(data,
                        pal = NULL,
                        size_point = 2,
                        size_line = 2,
-                       alpha = 0.9,
+                       alpha = NULL,
                        basemap = "light",
                        title = NULL,
                        map_id = "map")
@@ -55,20 +55,21 @@ leaflet_sf <- function(data,
   }
   
   if(is.null(popup_vars_vctr)){
-    popup_data <- data %>% 
-      sf::st_drop_geometry() %>% 
-      rlang::set_names(~snakecase::to_sentence_case(.))
+    popup_data <- data %>%
+      dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
+      janitor::clean_names(case = "sentence") 
   }
   else {
-    popup_data <- data %>% 
-      dplyr::select(popup_vars_vctr) %>% 
-      sf::st_drop_geometry() %>% 
-      rlang::set_names(~snakecase::to_sentence_case(.))
+    popup_data <- data %>%
+      dplyr::select(popup_vars_vctr) %>%
+      dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
+      janitor::clean_names(case = "sentence") 
   }
   
-  popup <- leafpop::popupTable(popup_data, row.numbers = FALSE, feature.id = FALSE)
+  popup <- leafpop::popupTable(popup_data, zcol = 1:ncol(popup_data) - 1, row.numbers = FALSE, feature.id = FALSE)
   
   if (geometry_type %in% c("POINT", "MULTIPOINT")) {
+    if (is.null(alpha)) alpha <- 1
     
     if (shiny == FALSE) {
       
@@ -80,7 +81,7 @@ leaflet_sf <- function(data,
           color = pal[1],
           radius = size_point,
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
@@ -95,22 +96,13 @@ leaflet_sf <- function(data,
           color = pal[1],
           radius = size_point,
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
-    
-    map %>% 
-      addLegend(
-        layerId = col_id,
-        colors = pal[1],
-        labels =  "Feature", 
-        title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
-        position = "bottomright",
-        opacity = 1
-      )
   }
   else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
+    if (is.null(alpha)) alpha <- 1
     
     if (shiny == FALSE) {
       
@@ -121,7 +113,7 @@ leaflet_sf <- function(data,
           popup = ~ popup,
           color = pal[1],
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
@@ -135,22 +127,13 @@ leaflet_sf <- function(data,
           popup = ~ popup,
           color = pal[1],
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
-    
-    map %>% 
-      addLegend(
-        layerId = col_id,
-        colors = pal[1],
-        labels =  "Feature", 
-        title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
-        position = "bottomright",
-        opacity = 1
-      )
   }
   else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
+    if (is.null(alpha)) alpha <- 0.75
     
     if (shiny == FALSE) {
       
@@ -161,7 +144,7 @@ leaflet_sf <- function(data,
           popup = ~ popup,
           color = pal[1],
           fillOpacity = alpha, 
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
@@ -174,22 +157,23 @@ leaflet_sf <- function(data,
           popup = ~ popup,
           color = pal[1],
           fillOpacity = alpha, 
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         )
     }
-    
-    map %>% 
-      addLegend(
-        layerId = col_id,
-        colors = pal[1],
-        labels =  "Feature", 
-        title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
-        position = "bottomright",
-        opacity = 1
-      )
-    
   }
+  
+  map <- map %>% 
+    addLegend(
+      layerId = col_id,
+      colors = pal[1],
+      labels =  "Feature", 
+      title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
+      position = "bottomright",
+      opacity = alpha
+    )
+  
+  return(map)
 }
 
 #' @title Simple feature leaflet map that is coloured.
@@ -203,7 +187,7 @@ leaflet_sf <- function(data,
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param size_point Size of points (i.e. radius). Defaults to 2.
 #' @param size_line Size of lines around features (i.e. weight). Defaults to 2.
-#' @param alpha The opacity of the fill within features (i.e. fillOpacity). Defaults to 0.1. 
+#' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.95 for polygons.
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
 #' @param title A title string that will be wrapped into the legend. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
@@ -234,11 +218,11 @@ leaflet_sf_col <- function(data,
                            label_var = NULL,
                            popup_vars_vctr = NULL,
                            pal = NULL,
-                           pal_na = "#7F7F7FFF",
+                           pal_na = "#7F7F7F",
                            pal_rev = FALSE,
                            size_point = 2,
                            size_line = 2,
-                           alpha = 0.9,
+                           alpha = NULL,
                            basemap = "light",
                            title = NULL,
                            col_cuts = NULL,
@@ -272,7 +256,7 @@ leaflet_sf_col <- function(data,
   
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -304,7 +288,7 @@ leaflet_sf_col <- function(data,
         na.color = pal_na
       )
       
-      if (is.null(col_labels)) col_labels <- bin_cuts_to_interval_labels(col_cuts, right_closed = col_right_closed)  
+      if (is.null(col_labels)) col_labels <- sv_interval_labels_num(col_cuts, right_closed = col_right_closed)  
     }
     else if (col_method == "quantile") {
       if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
@@ -329,7 +313,7 @@ leaflet_sf_col <- function(data,
       na.color = pal_na
     )
     
-    if (is.null(col_labels)) col_labels <- bin_cuts_to_interval_labels(col_cuts, right_closed = col_right_closed)  
+    if (is.null(col_labels)) col_labels <- sv_interval_labels_num(col_cuts, right_closed = col_right_closed)  
   }
   else if (col_method == "category") {
     if (is.null(col_labels)) {
@@ -365,20 +349,22 @@ leaflet_sf_col <- function(data,
   }
   
   if(is.null(popup_vars_vctr)){
-    popup_data <- data %>% 
-      sf::st_drop_geometry() %>% 
-      rlang::set_names(~snakecase::to_sentence_case(.))
+    popup_data <- data %>%
+      dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
+      janitor::clean_names(case = "sentence") 
   }
   else {
-    popup_data <- data %>% 
-      dplyr::select(popup_vars_vctr) %>% 
-      sf::st_drop_geometry() %>% 
-      rlang::set_names(~snakecase::to_sentence_case(.))
+    popup_data <- data %>%
+      dplyr::select(popup_vars_vctr) %>%
+      dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
+      janitor::clean_names(case = "sentence") 
   }
   
-  popup <- leafpop::popupTable(popup_data, row.numbers = FALSE, feature.id = FALSE)
+  popup <- leafpop::popupTable(popup_data, zcol = 1:ncol(popup_data) - 1, row.numbers = FALSE, feature.id = FALSE)
   
   if (geometry_type %in% c("POINT", "MULTIPOINT")) {
+    if (is.null(alpha)) alpha <- 1
+        
     if (shiny == FALSE) {
       
       map <- leaflet() %>%
@@ -390,7 +376,7 @@ leaflet_sf_col <- function(data,
           popup = ~ popup,
           radius = size_point,
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         )
     }
@@ -405,24 +391,14 @@ leaflet_sf_col <- function(data,
           popup = ~ popup,
           radius = size_point,
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
-    
-    map %>% 
-      addLegend(
-        layerId = col_id,
-        colors = pal,
-        labels = col_labels,
-        title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
-        position = "bottomright",
-        opacity = 1,
-        labFormat = labelFormat(between = "&ndash;")
-      )
-    
   }
   else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
+    if (is.null(alpha)) alpha <- 1
+    
     if (shiny == FALSE) {
       
       map <- leaflet() %>%
@@ -433,7 +409,7 @@ leaflet_sf_col <- function(data,
           popup = ~ popup,
           label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
@@ -447,23 +423,14 @@ leaflet_sf_col <- function(data,
           popup = ~ popup,
           label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = alpha,
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
-    
-    map %>% 
-      addLegend(
-        layerId = col_id,
-        colors = pal,
-        labels = col_labels,
-        title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
-        position = "bottomright",
-        opacity = 1,
-        labFormat = labelFormat(between = "&ndash;")
-      )
   }
   else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
+    if (is.null(alpha)) alpha <- 0.95
+    
     if (shiny == FALSE) {
       map <- leaflet() %>%
         addProviderTiles(basemap_name) %>%
@@ -473,7 +440,7 @@ leaflet_sf_col <- function(data,
           popup = ~ popup,
           label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = alpha, 
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
@@ -487,21 +454,21 @@ leaflet_sf_col <- function(data,
           popup = ~ popup,
           label = ~ htmltools::htmlEscape(label_var_vctr),
           fillOpacity = alpha, 
-          opacity = 1,
+          opacity = alpha,
           weight = size_line
         ) 
     }
-    
-    map %>% 
-      addLegend(
-        layerId = col_id,
-        colors = pal,
-        labels = col_labels,
-        title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
-        position = "bottomright",
-        opacity = 1,
-        labFormat = labelFormat(between = "&ndash;")
-      )
   }
+  
+  map <- map %>% 
+    addLegend(
+      layerId = col_id,
+      colors = pal,
+      labels = col_labels,
+      title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
+      position = "bottomright",
+      opacity = alpha)
+  
+  return(map)
 }
 

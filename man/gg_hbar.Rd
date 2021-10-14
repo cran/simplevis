@@ -4,48 +4,18 @@
 \alias{gg_hbar}
 \title{Horizontal bar ggplot.}
 \usage{
-gg_hbar(
-  data,
-  x_var,
-  y_var,
-  text_var = NULL,
-  pal = NULL,
-  width = 0.75,
-  alpha = 1,
-  size_line = 0.5,
-  title = NULL,
-  title_wrap = 80,
-  subtitle = NULL,
-  subtitle_wrap = 80,
-  x_balance = FALSE,
-  x_expand = NULL,
-  x_gridlines_minor = FALSE,
-  x_labels = waiver(),
-  x_na = TRUE,
-  x_pretty_n = 5,
-  x_title = NULL,
-  x_title_wrap = 50,
-  x_trans = "identity",
-  x_zero = TRUE,
-  x_zero_line = NULL,
-  y_balance = FALSE,
-  y_expand = NULL,
-  y_labels = NULL,
-  y_na = TRUE,
-  y_pretty_n = 6,
-  y_reorder = FALSE,
-  y_rev = FALSE,
-  y_title = NULL,
-  y_title_wrap = 50,
-  y_zero = FALSE,
-  y_zero_line = NULL,
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
-  mobile = FALSE
-)
+gg_hbar(data, x_var, y_var, text_var = NULL, pal = NULL,
+  width = NULL, alpha = 1, size_line = 0.5, title = NULL,
+  title_wrap = 75, subtitle = NULL, subtitle_wrap = 75,
+  x_balance = FALSE, x_expand = NULL, x_gridlines_minor = FALSE,
+  x_labels = scales::comma, x_na = TRUE, x_pretty_n = 5,
+  x_title = NULL, x_title_wrap = 50, x_trans = "identity",
+  x_zero = TRUE, x_zero_line = NULL, y_balance = FALSE,
+  y_expand = NULL, y_labels = NULL, y_na = TRUE, y_pretty_n = 6,
+  y_reorder = FALSE, y_rev = FALSE, y_title = NULL,
+  y_title_wrap = 50, y_zero = FALSE, y_zero_line = NULL,
+  caption = NULL, caption_wrap = 75, font_family = "",
+  font_size_title = NULL, font_size_body = NULL, mobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -64,13 +34,13 @@ gg_hbar(
 
 \item{size_line}{The size of the outlines of bars.}
 
-\item{title}{Title string. Defaults to NULL.}
+\item{title}{Title string.}
 
-\item{title_wrap}{Number of characters to wrap the title to. Defaults to 80.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 60.}
 
 \item{subtitle}{Subtitle string.}
 
-\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 80.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 60.}
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
 
@@ -118,7 +88,7 @@ gg_hbar(
 
 \item{caption}{Caption title string.}
 
-\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 75.}
 
 \item{font_family}{Font family to use. Defaults to "".}
 

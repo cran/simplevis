@@ -4,48 +4,18 @@
 \alias{gg_boxplot}
 \title{Boxplot ggplot.}
 \usage{
-gg_boxplot(
-  data,
-  x_var,
-  y_var = NULL,
-  stat = "boxplot",
-  pal = NULL,
-  width = 0.5,
-  alpha = 1,
-  size_line = 0.5,
-  size_point = 1,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  x_balance = FALSE,
-  x_labels = NULL,
-  x_na = TRUE,
-  x_pretty_n = 6,
-  x_expand = NULL,
-  x_rev = FALSE,
-  x_title = NULL,
-  x_title_wrap = 50,
-  x_zero = FALSE,
-  x_zero_line = NULL,
-  y_balance = FALSE,
-  y_expand = NULL,
-  y_gridlines_minor = FALSE,
-  y_labels = scales::comma,
-  y_na = TRUE,
-  y_pretty_n = 5,
-  y_title = NULL,
-  y_title_wrap = 50,
-  y_trans = "identity",
-  y_zero = FALSE,
-  y_zero_line = NULL,
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
-  mobile = FALSE
-)
+gg_boxplot(data, x_var, y_var = NULL, stat = "boxplot", pal = NULL,
+  width = 0.5, alpha = 1, size_line = 0.5, size_point = 1,
+  title = NULL, title_wrap = 80, subtitle = NULL,
+  subtitle_wrap = 80, x_balance = FALSE, x_labels = NULL,
+  x_na = TRUE, x_pretty_n = 6, x_expand = NULL, x_rev = FALSE,
+  x_title = NULL, x_title_wrap = 50, x_zero = FALSE,
+  x_zero_line = NULL, y_balance = FALSE, y_expand = NULL,
+  y_gridlines_minor = FALSE, y_labels = scales::comma,
+  y_pretty_n = 5, y_title = NULL, y_title_wrap = 50,
+  y_trans = "identity", y_zero = FALSE, y_zero_line = NULL,
+  caption = NULL, caption_wrap = 80, font_family = "",
+  font_size_title = NULL, font_size_body = NULL, mobile = FALSE)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -66,13 +36,13 @@ gg_boxplot(
 
 \item{size_point}{The size of the outliers. Defaults to 1.}
 
-\item{title}{Title string. Defaults to NULL.}
+\item{title}{Title string.}
 
-\item{title_wrap}{Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 75.}
 
 \item{subtitle}{Subtitle string.}
 
-\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.}
+\item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 75.}
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 
@@ -102,8 +72,6 @@ gg_boxplot(
 
 \item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
-\item{y_na}{TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.}
-
 \item{y_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{y_title}{y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
@@ -118,7 +86,7 @@ gg_boxplot(
 
 \item{caption}{Caption title string.}
 
-\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
 \item{font_family}{Font family to use. Defaults to "".}
 

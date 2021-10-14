@@ -1,7 +1,7 @@
 Package: simplevis
 Type: Package
 Title: Simple 'ggplot2' Visualisation with Less Brainpower
-Version: 4.5.0
+Version: 4.6.0
 Authors@R: 
     c(person(given = "David", 
                family = "Hodge", 
@@ -19,17 +19,17 @@ Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
 Imports: dplyr (>= 1.0.0), DT, forcats, ggplot2 (>= 3.0.0), htmltools,
-        leaflet (>= 2.0.0), kimisc, leafpop, leaflet.extras, jsonlite,
+        janitor, kimisc, leaflet (>= 2.0.0), leaflet.extras, leafpop,
         lubridate, magrittr, plotly, purrr, readr, rlang (>= 0.4.0),
         scales, sf, shiny, shinycssloaders, snakecase, stringr, tibble,
-        tidyr (>= 1.0.0), viridis
+        tidyr (>= 1.0.0), tidyselect, viridis
 Suggests: knitr, glue, palmerpenguins, rgdal, rgeos, rmarkdown, s2
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-08-06 03:09:46 UTC; dhodge
+Packaged: 2021-10-14 03:58:23 UTC; dhodge
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-08-06 05:00:03 UTC
+Date/Publication: 2021-10-14 09:00:02 UTC

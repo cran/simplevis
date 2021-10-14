@@ -9,7 +9,10 @@ library(simplevis)
 data <- ggplot2::diamonds %>%
   slice_sample(prop = 0.1)
 
-# add helper vectors (if required)
-color_vector <- sort(unique(data$color))
+# add reference
+data_source <- "Diamonds Association"
 
-# choose a basemap (if required)
+# add other helpers as required
+color_vector <- sort(unique(data$color))
+title_wrap <- 50
+

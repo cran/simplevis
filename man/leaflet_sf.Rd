@@ -4,17 +4,9 @@
 \alias{leaflet_sf}
 \title{Simple feature leaflet map.}
 \usage{
-leaflet_sf(
-  data,
-  popup_vars_vctr = NULL,
-  pal = NULL,
-  size_point = 2,
-  size_line = 2,
-  alpha = 0.9,
-  basemap = "light",
-  title = NULL,
-  map_id = "map"
-)
+leaflet_sf(data, popup_vars_vctr = NULL, pal = NULL, size_point = 2,
+  size_line = 2, alpha = NULL, basemap = "light", title = NULL,
+  map_id = "map")
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
@@ -27,7 +19,7 @@ leaflet_sf(
 
 \item{size_line}{Size of lines around features (i.e. weight). Defaults to 2.}
 
-\item{alpha}{The opacity of the fill within features (i.e. fillOpacity). Defaults to 0.9.}
+\item{alpha}{The opacity of features. Defaults to 1 for points/lines, or 0.75 for polygons.}
 
 \item{basemap}{The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.}
 

@@ -4,18 +4,18 @@
 #' @param data A sf object with defined coordinate reference system. Required input.
 #' @param size_point Size of points. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param alpha The alpha of the fill. Defaults to 0.9. 
+#' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.5 for polygons.
 #' @param pal Character vector of hex codes. 
 #' @param borders A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.
 #' @param borders_behind TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.
 #' @param pal_borders Colour of the borders. Defaults to "#7F7F7F".
 #' @param borders_size Size of the borders. Defaults to 0.2.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -30,16 +30,16 @@ gg_sf <- function(data,
                   text_var = NULL,
                   size_point = 1,
                   size_line = 0.5,
-                  alpha = 0.9,
+                  alpha = NULL,
                   pal = NULL,
                   borders = NULL,
                   borders_behind = TRUE,
-                  pal_borders = "#7F7F7FFF",
+                  pal_borders = "#7F7F7F",
                   borders_size = 0.2,
                   title = NULL,
-                  title_wrap = 100,
+                  title_wrap = 80,
                   subtitle = NULL,
-                  subtitle_wrap = 100,
+                  subtitle_wrap = 80,
                   caption = NULL,
                   caption_wrap = 80,
                   font_family = "",
@@ -81,14 +81,20 @@ gg_sf <- function(data,
   else pal <- pal[1]
   
   if (unique(sf::st_geometry_type(data)) %in% c("POINT", "MULTIPOINT")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
-      geom_sf(aes(text = !!text_var), size = size_point, col = pal)
+      geom_sf(aes(text = !!text_var), size = size_point, col = pal, alpha = alpha)
   }
-  else if (unique(sf::st_geometry_type(data)) %in% c("POINT", "MULTIPOINT")) {
+  else if (unique(sf::st_geometry_type(data)) %in% c("LINESTRING", "MULTILINESTRING")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
-      geom_sf(aes(text = !!text_var), size = size_line, col = pal)
+      geom_sf(aes(text = !!text_var), size = size_line, col = pal, alpha = alpha)
   }
   else if (unique(sf::st_geometry_type(data)) %in% c("POLYGON", "MULTIPOLYGON")) {
+    if(is.null(alpha)) alpha <- 0.5
+    
     plot <- plot +
       geom_sf(aes(text = !!text_var), 
         size = size_line,
@@ -141,25 +147,25 @@ gg_sf <- function(data,
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param size_point Size of points. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param alpha The opacity of polygons. Defaults to 0.9.
+#' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.95 for polygons.
 #' @param borders A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.
 #' @param borders_behind TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.
 #' @param pal_borders Colour of the borders. Defaults to "#7F7F7F".
 #' @param borders_size Size of the borders. Defaults to 0.2.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.   
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -187,23 +193,23 @@ gg_sf_col <- function(data,
                       col_var,
                       text_var = NULL,
                       pal = NULL,
-                      pal_na = "#7F7F7FFF",
+                      pal_na = "#7F7F7F",
                       pal_rev = FALSE,
                       size_point = 1,
                       size_line = 0.5,
-                      alpha = 0.9,
+                      alpha = NULL,
                       borders = NULL,
                       borders_behind = TRUE,
-                      pal_borders = "#7F7F7FFF",
+                      pal_borders = "#7F7F7F",
                       borders_size = 0.2,
                       title = NULL,
-                      title_wrap = 100,
+                      title_wrap = 80,
                       subtitle = NULL,
-                      subtitle_wrap = 100,
+                      subtitle_wrap = 80,
                       col_cuts = NULL,
                       col_labels = NULL,
                       col_na = TRUE,
-                      col_pretty_n = 4,
+                      col_pretty_n = 5,
                       col_method = NULL,
                       col_right_closed = TRUE,
                       col_title = NULL,
@@ -232,7 +238,7 @@ gg_sf_col <- function(data,
   
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -289,15 +295,24 @@ gg_sf_col <- function(data,
 
     if (is.null(col_labels)) col_labels <- scales::comma
     
-    data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                 right = col_right_closed, 
-                                                                 include.lowest = TRUE, 
-                                                                 dig.lab = 50, 
-                                                                 ordered_result = TRUE,
-                                                                 format_fun = col_labels)))
-    
-    col_labels <- sv_interval_breaks_to_interval_labels
+    if (is.function(col_labels)) {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                   right = col_right_closed, 
+                                                                   include.lowest = TRUE, 
+                                                                   dig.lab = 50, 
+                                                                   ordered_result = TRUE, 
+                                                                   format_fun = col_labels)))
+      
+      col_labels <- sv_interval_labels_chr
+    } else {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                    right = col_right_closed, 
+                                                    include.lowest = TRUE, 
+                                                    dig.lab = 50, 
+                                                    ordered_result = TRUE)))
+    }
     
     col_n <- length(col_cuts) - 1
     if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
@@ -318,25 +333,34 @@ gg_sf_col <- function(data,
   if (pal_rev == TRUE) pal <- rev(pal)
 
   if (geometry_type %in% c("POINT", "MULTIPOINT")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
       geom_sf( 
         aes(col = !!col_var, text = !!text_var),
+        alpha = alpha,
         size = size_point,
         data = data
       )
   }
   else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
       geom_sf( 
         aes(col = !!col_var, text = !!text_var),
+        alpha = alpha,
         size = size_line,
         data = data
       )
   }
   else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
+    if(is.null(alpha)) alpha <- 0.95
+    
     plot <- plot +
       geom_sf( 
         aes(col = !!col_var, fill = !!col_var, text = !!text_var),
+        alpha = alpha,
         size = size_line,
         alpha = alpha,
         data = data
@@ -354,7 +378,7 @@ gg_sf_col <- function(data,
       name = stringr::str_wrap(col_title, col_title_wrap)
     )
   
-    if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
+  if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
     plot <- plot +
       scale_fill_manual(
         values = pal,
@@ -409,7 +433,7 @@ gg_sf_col <- function(data,
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
 #' @param size_point Size of points. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param alpha The alpha of the fill. Defaults to 0.9. 
+#' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.5 for polygons.
 #' @param pal Character vector of hex codes. 
 #' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.
 #' @param facet_na TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.
@@ -419,7 +443,7 @@ gg_sf_col <- function(data,
 #' @param borders_behind TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.
 #' @param pal_borders Colour of the borders. Defaults to "#7F7F7F".
 #' @param borders_size Size of the borders. Defaults to 0.2.
-#' @param title Title string. Defaults to NULL.
+#' @param title Title string. 
 #' @param subtitle Subtitle string. 
 #' @param caption Caption title string. 
 #' @param font_family Font family to use. Defaults to "".
@@ -440,7 +464,7 @@ gg_sf_facet <- function(data,
                         text_var = NULL,
                         size_point = 1,
                         size_line = 0.5,
-                        alpha = 0.9,
+                        alpha = NULL,
                         pal = NULL,
                         facet_labels = stringr::str_to_sentence,
                         facet_na = TRUE,
@@ -448,12 +472,12 @@ gg_sf_facet <- function(data,
                         facet_nrow = NULL,
                         borders = NULL,
                         borders_behind = TRUE,
-                        pal_borders = "#7F7F7FFF",
+                        pal_borders = "#7F7F7F",
                         borders_size = 0.2,
                         title = NULL,
-                        title_wrap = 100,
+                        title_wrap = 80,
                         subtitle = NULL,
-                        subtitle_wrap = 100,
+                        subtitle_wrap = 80,
                         caption = NULL,
                         caption_wrap = 80,
                         font_family = "",
@@ -479,7 +503,7 @@ gg_sf_facet <- function(data,
   
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
@@ -513,29 +537,38 @@ gg_sf_facet <- function(data,
   else pal <- pal[1]
 
   if (geometry_type %in% c("POINT", "MULTIPOINT")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
       geom_sf(
         aes(text = !!text_var), 
         col = pal,
+        alpha = alpha,
         size = size_point,
         data = data
       )
   }
   else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
       geom_sf(
         aes(text = !!text_var), 
         col = pal,
+        alpha = alpha,
         size = size_line,
         data = data
       )
   }
   else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
+    if(is.null(alpha)) alpha <- 0.5
+    
     plot <- plot +
       geom_sf(
         aes(text = !!text_var), 
         col = pal,
         fill = pal,
+        alpha = alpha,
         size = size_line,
         alpha = alpha,
         data = data
@@ -577,19 +610,19 @@ gg_sf_facet <- function(data,
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param size_point Size of points. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param alpha The opacity of polygons. Defaults to 0.9.
+#' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.95 for polygons.
 #' @param borders A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.
 #' @param borders_behind TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.
 #' @param borders_size Size of the borders. Defaults to 0.2.
-#' @param title Title string. Defaults to NULL.
+#' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
 #' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.   
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
@@ -615,24 +648,24 @@ gg_sf_col_facet <- function(data,
                             facet_var,
                             text_var = NULL,
                             pal = NULL,
-                            pal_borders = "#7F7F7FFF",
-                            pal_na = "#7F7F7FFF",
+                            pal_borders = "#7F7F7F",
+                            pal_na = "#7F7F7F",
                             pal_rev = FALSE,
                             size_point = 1,
                             size_line = 0.5,
-                            alpha = 0.9,
+                            alpha = NULL,
                             borders = NULL,
                             borders_behind = TRUE,
                             borders_size = 0.2,
                             title = NULL,
-                            title_wrap = 100,
+                            title_wrap = 80,
                             subtitle = NULL,
-                            subtitle_wrap = 100,
+                            subtitle_wrap = 80,
                             col_cuts = NULL,
                             col_labels = NULL,
                             col_method = NULL,
                             col_na = TRUE,
-                            col_pretty_n = 4,
+                            col_pretty_n = 5,
                             col_right_closed = TRUE,
                             col_title = NULL,
                             col_title_wrap = 25,
@@ -670,13 +703,13 @@ gg_sf_col_facet <- function(data,
   
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
@@ -733,15 +766,24 @@ gg_sf_col_facet <- function(data,
 
     if (is.null(col_labels)) col_labels <- scales::comma
     
-    data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                 right = col_right_closed, 
-                                                                 include.lowest = TRUE, 
-                                                                 dig.lab = 50, 
-                                                                 ordered_result = TRUE,
-                                                                 format_fun = col_labels)))
-    
-    col_labels <- sv_interval_breaks_to_interval_labels
+    if (is.function(col_labels)) {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                   right = col_right_closed, 
+                                                                   include.lowest = TRUE, 
+                                                                   dig.lab = 50, 
+                                                                   ordered_result = TRUE, 
+                                                                   format_fun = col_labels)))
+      
+      col_labels <- sv_interval_labels_chr
+    } else {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                    right = col_right_closed, 
+                                                    include.lowest = TRUE, 
+                                                    dig.lab = 50, 
+                                                    ordered_result = TRUE)))
+    }
     
     col_n <- length(col_cuts) - 1
     if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
@@ -762,27 +804,35 @@ gg_sf_col_facet <- function(data,
   if (pal_rev == TRUE) pal <- rev(pal)
   
   if (geometry_type %in% c("POINT", "MULTIPOINT")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
       geom_sf(
         aes(col = !!col_var, text = !!text_var),
+        alpha = alpha,
         size = size_point,
         data = data
       )
   }
   else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
+    if(is.null(alpha)) alpha <- 1
+    
     plot <- plot +
       geom_sf( 
         aes(col = !!col_var, text = !!text_var),
+        alpha = alpha,
         size = size_line,
         data = data
       )
   }
   else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
+    if(is.null(alpha)) alpha <- 0.95
+    
     plot <- plot +
       geom_sf(
         aes(col = !!col_var, fill = !!col_var, text = !!text_var),
-        size = size_line,
         alpha = alpha,
+        size = size_line,
         data = data
       )
   }

@@ -7,17 +7,17 @@
 #' @param label_var Unquoted variable to label the tiles. 
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
 #' @param pal Character vector of hex codes. 
-#' @param pal_label Hex code for the label font colour.
+#' @param pal_label Hex code for the label font colour. Defaults to "#323232".
 #' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param width Width of tiles. Defaults to 1.
 #' @param alpha The alpha of the fill. Defaults to 1. 
 #' @param size_line The size of the outlines of tiles.
 #' @param size_label The size of the of labels. Defaults to 3.5.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 60. 
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
@@ -31,15 +31,15 @@
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 75. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -69,24 +69,24 @@ gg_tile_col <- function(data,
                        label_var = NULL,
                        text_var = NULL,
                        pal = NULL,
-                       pal_label = NULL,
-                       pal_na = "#7F7F7FFF",
+                       pal_label = "#323232",
+                       pal_na = "#7F7F7F",
                        pal_rev = FALSE,
-                       width = 1,
+                       width = NULL,
                        alpha = 1,
                        size_line = 0.5,
                        size_label = 3.5,
                        title = NULL,
-                       title_wrap = 100,
+                       title_wrap = 75,
                        subtitle = NULL,
-                       subtitle_wrap = 100,
-                       x_expand = waiver(),
+                       subtitle_wrap = 75,
+                       x_expand = c(0, 0),
                        x_labels = stringr::str_to_sentence,
                        x_na = TRUE,
                        x_rev = FALSE,
                        x_title = NULL,
                        x_title_wrap = 50,
-                       y_expand = waiver(),
+                       y_expand = c(0, 0),
                        y_labels = stringr::str_to_sentence,
                        y_na = TRUE,
                        y_rev = FALSE,
@@ -96,12 +96,12 @@ gg_tile_col <- function(data,
                        col_labels = NULL,
                        col_method = NULL,
                        col_na = TRUE,
-                       col_pretty_n = 4,
+                       col_pretty_n = 5,
                        col_right_closed = TRUE,
                        col_title = NULL,
                        col_title_wrap = 25,
                        caption = NULL,
-                       caption_wrap = 80,
+                       caption_wrap = 75,
                        font_family = "",
                        font_size_title = NULL,
                        font_size_body = NULL,
@@ -137,19 +137,19 @@ gg_tile_col <- function(data,
 
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(y_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!y_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!y_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     y_var_vctr <- dplyr::pull(data, !!y_var)
   }
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
@@ -164,7 +164,7 @@ gg_tile_col <- function(data,
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
-  if (y_rev == TRUE) {
+  if (y_rev == FALSE) {
     data <- data %>%
       dplyr::mutate(dplyr::across(!!y_var, ~forcats::fct_rev(.x)))
     
@@ -174,10 +174,11 @@ gg_tile_col <- function(data,
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = mobile)
   if(is.null(font_size_body)) font_size_body <- sv_font_size_body(mobile = mobile)
   
-  if (lubridate::is.Date(x_var_vctr)) bar_unit <- 365
-  else bar_unit <- 1
-  
-  bar_width <- bar_unit * width
+  if(is.null(width)) {
+    if(lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
+      width <- NULL
+    } else width <- 1
+  }
   
   if(!rlang::quo_is_null(label_var)) {
     data <- data %>% 
@@ -209,18 +210,27 @@ gg_tile_col <- function(data,
     
     if (is.null(col_labels)) col_labels <- scales::comma
     
-    data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                 right = col_right_closed, 
-                                                                 include.lowest = TRUE, 
-                                                                 dig.lab = 50, 
-                                                                 ordered_result = TRUE,
-                                                                 format_fun = col_labels)))
-    
-    col_labels <- sv_interval_breaks_to_interval_labels
+    if (is.function(col_labels)) {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                   right = col_right_closed, 
+                                                                   include.lowest = TRUE, 
+                                                                   dig.lab = 50, 
+                                                                   ordered_result = TRUE, 
+                                                                   format_fun = col_labels)))
+      
+      col_labels <- sv_interval_labels_chr
+    } else {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                    right = col_right_closed, 
+                                                    include.lowest = TRUE, 
+                                                    dig.lab = 50, 
+                                                    ordered_result = TRUE)))
+    }
     
     col_n <- length(col_cuts) - 1
-    if (is.null(pal)) pal <- pal_viridis_reorder(col_n + 1)[1:col_n]
+    if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
     else pal <- pal[1:col_n]
   }
   else if (col_method == "category") {
@@ -237,16 +247,12 @@ gg_tile_col <- function(data,
   
   if (pal_rev == TRUE) pal <- rev(pal)
   
-  if(is.null(pal_label)) pal_label <- "#FFFFFF"
-
   plot <- ggplot(data) +
     theme_no_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     geom_tile(aes(x = !!x_var, y = !!y_var, col = !!col_var, fill = !!col_var, text = !!text_var), 
              alpha = alpha, 
              size = size_line, 
-             width = bar_width) +
-    theme(axis.line = element_blank()) +
-    theme(axis.ticks = element_blank())
+             width = width) 
     
   if(!rlang::quo_is_null(label_var)) {
     plot <- plot + 
@@ -314,17 +320,17 @@ gg_tile_col <- function(data,
 #' @param label_var Unquoted variable to label the tiles. 
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
 #' @param pal Character vector of hex codes. 
-#' @param pal_label Hex code for the label font colour.
+#' @param pal_label Hex code for the label font colour. Defaults to "#323232".
 #' @param pal_na The hex code or name of the NA colour to be used.
 #' @param pal_rev Reverses the palette. Defaults to FALSE.
 #' @param width Width of tiles. Defaults to 1.
 #' @param alpha The alpha of the fill. Defaults to 1. 
 #' @param size_line The size of the outlines of tiles.
 #' @param size_label The size of the of labels. Defaults to 3.5.
-#' @param title Title string. Defaults to NULL.
-#' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
+#' @param title Title string. 
+#' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
-#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
+#' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 60. 
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_na TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.
@@ -338,10 +344,10 @@ gg_tile_col <- function(data,
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
+#' @param col_labels A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.  
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
 #' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
-#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
+#' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
@@ -351,7 +357,7 @@ gg_tile_col <- function(data,
 #' @param facet_nrow The number of rows of facetted plots. 
 #' @param facet_scales Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".
 #' @param caption Caption title string. 
-#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 80. 
+#' @param caption_wrap Number of characters to wrap the caption to. Defaults to 75. 
 #' @param font_family Font family to use. Defaults to "".
 #' @param font_size_title Font size for the title text. Defaults to 11.
 #' @param font_size_body Font size for all text other than the title. Defaults to 10.
@@ -385,24 +391,24 @@ gg_tile_col_facet <- function(data,
                               label_var = NULL,
                               text_var = NULL,
                               pal = NULL,
-                              pal_label = NULL,
-                              pal_na = "#7F7F7FFF",
+                              pal_label = "#323232",
+                              pal_na = "#7F7F7F",
                               pal_rev = FALSE,
-                              width = 1,
+                              width = NULL,
                               alpha = 1,
                               size_line = 0.5,
                               size_label = 3.5,
                               title = NULL,
-                              title_wrap = 100,
+                              title_wrap = 75,
                               subtitle = NULL,
-                              subtitle_wrap = 100,
-                              x_expand = waiver(),
+                              subtitle_wrap = 75,
+                              x_expand = c(0, 0),
                               x_labels = stringr::str_to_sentence,
                               x_na = TRUE,
                               x_rev = FALSE,
                               x_title = NULL,
                               x_title_wrap = 50,
-                              y_expand = waiver(),
+                              y_expand = c(0, 0),
                               y_labels = stringr::str_to_sentence,
                               y_na = TRUE,
                               y_rev = FALSE,
@@ -412,7 +418,7 @@ gg_tile_col_facet <- function(data,
                               col_labels = NULL,
                               col_method = NULL,
                               col_na = TRUE,
-                              col_pretty_n = 4,
+                              col_pretty_n = 5,
                               col_right_closed = TRUE,
                               col_title = NULL,
                               col_title_wrap = 25,
@@ -422,7 +428,7 @@ gg_tile_col_facet <- function(data,
                               facet_nrow = NULL,
                               facet_scales = "fixed",
                               caption = NULL,
-                              caption_wrap = 80,
+                              caption_wrap = 75,
                               font_family = "",
                               font_size_title = NULL,
                               font_size_body = NULL,
@@ -465,25 +471,25 @@ gg_tile_col_facet <- function(data,
   
   if(is.logical(x_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!x_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!x_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
   if(is.logical(y_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!y_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!y_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     y_var_vctr <- dplyr::pull(data, !!y_var)
   }
   if(is.logical(col_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!col_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     col_var_vctr <- dplyr::pull(data, !!col_var)
   }
   if(is.logical(facet_var_vctr)) {
     data <- data %>% 
-      dplyr::mutate(dplyr::across(!!facet_var, ~factor(., levels = c("TRUE", "FALSE"))))
+      dplyr::mutate(dplyr::across(!!facet_var, ~factor(.x, levels = c("TRUE", "FALSE"))))
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
@@ -498,7 +504,7 @@ gg_tile_col_facet <- function(data,
     
     x_var_vctr <- dplyr::pull(data, !!x_var)
   }
-  if (y_rev == TRUE) {
+  if (y_rev == FALSE) {
     data <- data %>%
       dplyr::mutate(dplyr::across(!!y_var, ~forcats::fct_rev(.x)))
     
@@ -508,10 +514,11 @@ gg_tile_col_facet <- function(data,
   if(is.null(font_size_title)) font_size_title <- sv_font_size_title(mobile = mobile)
   if(is.null(font_size_body)) font_size_body <- sv_font_size_body(mobile = mobile)
   
-  if (lubridate::is.Date(x_var_vctr)) bar_unit <- 365
-  else bar_unit <- 1
-  
-  bar_width <- bar_unit * width
+  if(is.null(width)) {
+    if(lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr) | lubridate::is.POSIXct(x_var_vctr) | lubridate::is.POSIXlt(x_var_vctr)) {
+      width <- NULL
+    } else width <- 1
+  }
   
   if(!rlang::quo_is_null(label_var)) {
     data <- data %>% 
@@ -543,18 +550,27 @@ gg_tile_col_facet <- function(data,
 
     if (is.null(col_labels)) col_labels <- scales::comma
     
-    data <- data %>% 
-      dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
-                                                                 right = col_right_closed, 
-                                                                 include.lowest = TRUE, 
-                                                                 dig.lab = 50, 
-                                                                 ordered_result = TRUE,
-                                                                 format_fun = col_labels)))
-    
-    col_labels <- sv_interval_breaks_to_interval_labels
+    if (is.function(col_labels)) {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~kimisc::cut_format(.x, col_cuts, 
+                                                                   right = col_right_closed, 
+                                                                   include.lowest = TRUE, 
+                                                                   dig.lab = 50, 
+                                                                   ordered_result = TRUE, 
+                                                                   format_fun = col_labels)))
+      
+      col_labels <- sv_interval_labels_chr
+    } else {
+      data <- data %>% 
+        dplyr::mutate(dplyr::across(!!col_var, ~cut(.x, col_cuts, 
+                                                    right = col_right_closed, 
+                                                    include.lowest = TRUE, 
+                                                    dig.lab = 50, 
+                                                    ordered_result = TRUE)))
+    }
     
     col_n <- length(col_cuts) - 1
-    if (is.null(pal)) pal <- pal_viridis_reorder(col_n + 1)[1:col_n]
+    if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
     else pal <- pal[1:col_n]
   }
   else if (col_method == "category") {
@@ -571,17 +587,13 @@ gg_tile_col_facet <- function(data,
   
   if (pal_rev == TRUE) pal <- rev(pal)
   
-  if(is.null(pal_label)) pal_label <- "#FFFFFF"
-  
   plot <- ggplot(data) +
     theme_no_gridlines(font_family = font_family, font_size_body = font_size_body, font_size_title = font_size_title) +
     geom_tile(aes(x = !!x_var, y = !!y_var, col = !!col_var, fill = !!col_var, text = !!text_var), 
               alpha = alpha, 
               size = size_line, 
-              width = bar_width) +
-    theme(axis.line = element_blank()) +
-    theme(axis.ticks = element_blank())
-  
+              width = width) 
+
   if(!rlang::quo_is_null(label_var)) {
     plot <- plot + 
       geom_text(aes(x = !!x_var, y = !!y_var, label = .data$label_var2), size = size_label, col = pal_label)

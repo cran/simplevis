@@ -4,39 +4,16 @@
 \alias{gg_sf_col}
 \title{Simple feature ggplot map that is coloured.}
 \usage{
-gg_sf_col(
-  data,
-  col_var,
-  text_var = NULL,
-  pal = NULL,
-  pal_na = "#7F7F7FFF",
-  pal_rev = FALSE,
-  size_point = 1,
-  size_line = 0.5,
-  alpha = 0.9,
-  borders = NULL,
-  borders_behind = TRUE,
-  pal_borders = "#7F7F7FFF",
-  borders_size = 0.2,
-  title = NULL,
-  title_wrap = 100,
-  subtitle = NULL,
-  subtitle_wrap = 100,
-  col_cuts = NULL,
-  col_labels = NULL,
-  col_na = TRUE,
-  col_pretty_n = 4,
-  col_method = NULL,
-  col_right_closed = TRUE,
-  col_title = NULL,
-  col_title_wrap = 25,
-  caption = NULL,
-  caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
-  mobile = FALSE
-)
+gg_sf_col(data, col_var, text_var = NULL, pal = NULL,
+  pal_na = "#7F7F7F", pal_rev = FALSE, size_point = 1,
+  size_line = 0.5, alpha = NULL, borders = NULL,
+  borders_behind = TRUE, pal_borders = "#7F7F7F", borders_size = 0.2,
+  title = NULL, title_wrap = 80, subtitle = NULL,
+  subtitle_wrap = 80, col_cuts = NULL, col_labels = NULL,
+  col_na = TRUE, col_pretty_n = 5, col_method = NULL,
+  col_right_closed = TRUE, col_title = NULL, col_title_wrap = 25,
+  caption = NULL, caption_wrap = 80, font_family = "",
+  font_size_title = NULL, font_size_body = NULL, mobile = FALSE)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -55,7 +32,7 @@ gg_sf_col(
 
 \item{size_line}{Size of lines. Defaults to 0.5.}
 
-\item{alpha}{The opacity of polygons. Defaults to 0.9.}
+\item{alpha}{The opacity of features. Defaults to 1 for points/lines, or 0.95 for polygons.}
 
 \item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
 
@@ -65,9 +42,9 @@ gg_sf_col(
 
 \item{borders_size}{Size of the borders. Defaults to 0.2.}
 
-\item{title}{Title string. Defaults to NULL.}
+\item{title}{Title string.}
 
-\item{title_wrap}{Number of characters to wrap the title to. Defaults to 100. Not applicable where mobile equals TRUE.}
+\item{title_wrap}{Number of characters to wrap the title to. Defaults to 75.}
 
 \item{subtitle}{Subtitle string.}
 
@@ -75,11 +52,11 @@ gg_sf_col(
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and an internal function for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
 \item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
 
-\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4.}
+\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
 
@@ -91,7 +68,7 @@ gg_sf_col(
 
 \item{caption}{Caption title string.}
 
-\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80. Not applicable where mobile equals TRUE.}
+\item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
 \item{font_family}{Font family to use. Defaults to "".}
 
