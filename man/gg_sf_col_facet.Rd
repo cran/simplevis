@@ -4,18 +4,44 @@
 \alias{gg_sf_col_facet}
 \title{Simple feature ggplot map that is coloured and facetted.}
 \usage{
-gg_sf_col_facet(data, col_var, facet_var, text_var = NULL, pal = NULL,
-  pal_borders = "#7F7F7F", pal_na = "#7F7F7F", pal_rev = FALSE,
-  size_point = 1, size_line = 0.5, alpha = NULL, borders = NULL,
-  borders_behind = TRUE, borders_size = 0.2, title = NULL,
-  title_wrap = 80, subtitle = NULL, subtitle_wrap = 80,
-  col_cuts = NULL, col_labels = NULL, col_method = NULL,
-  col_na = TRUE, col_pretty_n = 5, col_right_closed = TRUE,
-  col_title = NULL, col_title_wrap = 25,
-  facet_labels = stringr::str_to_sentence, facet_na = TRUE,
-  facet_ncol = NULL, facet_nrow = NULL, caption = NULL,
-  caption_wrap = 80, font_family = "", font_size_title = NULL,
-  font_size_body = NULL)
+gg_sf_col_facet(
+  data,
+  col_var,
+  facet_var,
+  text_var = NULL,
+  pal = NULL,
+  pal_na = "#7F7F7F",
+  pal_rev = FALSE,
+  size_point = 1,
+  size_line = 0.5,
+  alpha = NULL,
+  borders = NULL,
+  borders_on_top = NULL,
+  borders_pal = "#7F7F7F",
+  borders_size = 0.2,
+  title = NULL,
+  title_wrap = 80,
+  subtitle = NULL,
+  subtitle_wrap = 80,
+  col_cuts = NULL,
+  col_label_digits = NULL,
+  col_labels = NULL,
+  col_method = NULL,
+  col_na_rm = FALSE,
+  col_pretty_n = 5,
+  col_right_closed = TRUE,
+  col_title = NULL,
+  col_title_wrap = 25,
+  facet_labels = stringr::str_to_sentence,
+  facet_na_rm = FALSE,
+  facet_ncol = NULL,
+  facet_nrow = NULL,
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL
+)
 }
 \arguments{
 \item{data}{A sf object with defined coordinate reference system. Required input.}
@@ -27,8 +53,6 @@ gg_sf_col_facet(data, col_var, facet_var, text_var = NULL, pal = NULL,
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.}
-
-\item{pal_borders}{Colour of the borders. Defaults to "#7F7F7F".}
 
 \item{pal_na}{The hex code or name of the NA colour to be used.}
 
@@ -42,7 +66,9 @@ gg_sf_col_facet(data, col_var, facet_var, text_var = NULL, pal = NULL,
 
 \item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
 
-\item{borders_behind}{TRUE or FALSE  as to whether the borders is to be behind the sf object defined in the data argument. Defaults to TRUE.}
+\item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the sf object supplied to the data argument. Defaults to TRUE for points and lines, but FALSE for polygons..}
+
+\item{borders_pal}{Colour of the borders. Defaults to "#7F7F7F".}
 
 \item{borders_size}{Size of the borders. Defaults to 0.2.}
 
@@ -56,11 +82,13 @@ gg_sf_col_facet(data, col_var, facet_var, text_var = NULL, pal = NULL,
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
+\item{col_label_digits}{If numeric colour method, the number of digits to round the labels to. Only applicable where col_labels equals NULL.}
+
 \item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
 
-\item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
+\item{col_na_rm}{TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.}
 
 \item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5.}
 
@@ -72,7 +100,7 @@ gg_sf_col_facet(data, col_var, facet_var, text_var = NULL, pal = NULL,
 
 \item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
 
-\item{facet_na}{TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.}
+\item{facet_na_rm}{TRUE or FALSE of whether to include facet_var NA values. Defaults to FALSE.}
 
 \item{facet_ncol}{The number of columns of facetted plots.}
 

@@ -37,7 +37,7 @@ gg_line(plot_data,
         x_var = year, 
         y_var = wind)
 
-## ---- fig.height = 3----------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot_data <- ggplot2::diamonds %>%
   group_by(cut) %>%
   summarise(price = mean(price))
@@ -47,8 +47,15 @@ gg_hbar(plot_data,
         y_var = cut)
 
 ## -----------------------------------------------------------------------------
-gg_density(penguins, 
-           x_var = body_mass_g)
+plot_data <- penguins %>% 
+  group_by(species, sex) %>% 
+  summarise(bill_length_mm = round(mean(bill_length_mm, na.rm = TRUE), 1))
+
+gg_tile_col(plot_data, 
+            x_var = sex, 
+            y_var = species, 
+            col_var = bill_length_mm, 
+            label_var = bill_length_mm) 
 
 ## -----------------------------------------------------------------------------
 gg_boxplot(storms, 
@@ -56,20 +63,21 @@ gg_boxplot(storms,
            y_var = wind)
 
 ## -----------------------------------------------------------------------------
-gg_sf(example_sf_point, 
-      borders = nz)
+gg_density(penguins, 
+           x_var = body_mass_g)
 
 ## -----------------------------------------------------------------------------
-plot_data <- penguins %>% 
-  group_by(species, sex) %>% 
-  summarise(bill_length_mm = round(mean(bill_length_mm, na.rm = TRUE), 0)) %>% 
-  mutate(label = glue::glue("{bill_length_mm} mm"))
+gg_sf_col(example_sf_point, 
+          col_var = trend_category, 
+          borders = nz)
 
-gg_tile_col(plot_data, 
-            x_var = sex, 
-            y_var = species, 
-            col_var = bill_length_mm, 
-            label_var = label) 
+## -----------------------------------------------------------------------------
+library(stars)
+
+gg_stars_col(example_stars,
+             col_var = nitrate,
+             col_na_rm = TRUE,
+             borders = nz)
 
 ## -----------------------------------------------------------------------------
 gg_point(penguins, 
@@ -141,7 +149,7 @@ gg_point_col(penguins,
              x_var = bill_length_mm, 
              y_var = body_mass_g, 
              col_var = sex, 
-             col_na = FALSE)
+             col_na_rm = TRUE)
 
 ## -----------------------------------------------------------------------------
 plot_data <- penguins %>% 
@@ -156,17 +164,32 @@ gg_hbar_col(plot_data,
 
 ## -----------------------------------------------------------------------------
 gg_sf_col(example_sf_point, 
-          col_var = trend_category)
-
-## -----------------------------------------------------------------------------
-gg_sf_col(example_sf_point, 
-          col_var = trend_category,
+          col_var = median, 
+          col_method = "quantile",
+          col_cuts = c(0, 0.25, 0.5, 0.75, 1),
           borders = nz)
 
+## -----------------------------------------------------------------------------
+gg_stars_col(example_stars,
+             col_var = nitrate,
+             col_method = "quantile",
+             col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
+             col_na_rm = TRUE,
+             borders = nz)
 
 ## -----------------------------------------------------------------------------
 leaflet_sf_col(example_sf_point, 
                col_var = trend_category)
+
+## -----------------------------------------------------------------------------
+library(stars)
+
+leaflet_stars_col(example_stars, 
+                  col_var = nitrate, 
+                  col_method = "quantile", 
+                  col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
+                  col_na_rm = TRUE)
+
 
 ## ---- echo = FALSE, message = FALSE, warning = FALSE, fig.width = 7-----------
 tibble::tribble(
@@ -178,7 +201,8 @@ tibble::tribble(
   "density", "tibble or data.frame", "Numeric", NA, "Categorical",  "Categorical", "density",
   "boxplot", "tibble or data.frame", "Any*", "Numeric", "Categorical", "Categorical", "boxplot (or identity)",
   "tile",  "tibble or data.frame", "Categorical", "Categorical", "Categorical or numeric", "Categorical", "identity",
-  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "identity"
+  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "identity",
+  "stars", "stars", NA, NA, "Categorical or numeric", NA, "identity",
   ) %>% 
   DT::datatable()
 
@@ -204,7 +228,7 @@ gg_bar(plot_data,
        x_var = sex, 
        y_var = body_mass_g, 
        width = 0.66, 
-       x_na = FALSE, 
+       x_na_rm = TRUE, 
        y_pretty_n = 3) +
   facet_grid(rows = vars(species), 
              cols = vars(island), 

@@ -4,9 +4,16 @@
 \alias{leaflet_sf}
 \title{Simple feature leaflet map.}
 \usage{
-leaflet_sf(data, popup_vars_vctr = NULL, pal = NULL, size_point = 2,
-  size_line = 2, alpha = NULL, basemap = "light", title = NULL,
-  map_id = "map")
+leaflet_sf(
+  data,
+  popup_vars_vctr = NULL,
+  pal = NULL,
+  size_point = 2,
+  size_line = 2,
+  alpha = NULL,
+  basemap = "light",
+  map_id = "map"
+)
 }
 \arguments{
 \item{data}{An sf object of geometry type point/multipoint, linestring/multilinestring or polygon/multipolygon geometry type. Required input.}
@@ -22,8 +29,6 @@ leaflet_sf(data, popup_vars_vctr = NULL, pal = NULL, size_point = 2,
 \item{alpha}{The opacity of features. Defaults to 1 for points/lines, or 0.75 for polygons.}
 
 \item{basemap}{The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.}
-
-\item{title}{A title string that will be wrapped into the legend.}
 
 \item{map_id}{The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".}
 }

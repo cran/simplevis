@@ -4,22 +4,62 @@
 \alias{gg_hbar_col}
 \title{Horizontal bar ggplot that is coloured.}
 \usage{
-gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
-  position = NULL, pal = NULL, pal_na = "#7F7F7F", pal_rev = FALSE,
-  width = NULL, alpha = 1, size_line = 0.5, title = NULL,
-  title_wrap = 75, subtitle = NULL, subtitle_wrap = 75,
-  x_balance = FALSE, x_expand = NULL, x_gridlines_minor = FALSE,
-  x_labels = scales::comma, x_na = TRUE, x_pretty_n = 5,
-  x_title = NULL, x_title_wrap = 50, x_trans = "identity",
-  x_zero = TRUE, x_zero_line = NULL, y_balance = FALSE,
-  y_expand = NULL, y_labels = NULL, y_na = TRUE, y_pretty_n = 6,
-  y_reorder = FALSE, y_rev = FALSE, y_title = NULL,
-  y_title_wrap = 50, y_zero = FALSE, y_zero_line = NULL,
-  col_cuts = NULL, col_labels = NULL, col_method = NULL,
-  col_na = TRUE, col_pretty_n = 5, col_rev = FALSE,
-  col_right_closed = TRUE, col_title = NULL, col_title_wrap = 25,
-  caption = NULL, caption_wrap = 75, font_family = "",
-  font_size_title = NULL, font_size_body = NULL, mobile = FALSE)
+gg_hbar_col(
+  data,
+  x_var,
+  y_var,
+  col_var,
+  text_var = NULL,
+  position = NULL,
+  pal = NULL,
+  pal_na = "#7F7F7F",
+  pal_rev = FALSE,
+  width = NULL,
+  alpha = 1,
+  size_line = 0.5,
+  title = NULL,
+  title_wrap = 75,
+  subtitle = NULL,
+  subtitle_wrap = 75,
+  x_balance = FALSE,
+  x_expand = NULL,
+  x_gridlines_minor = FALSE,
+  x_labels = scales::comma,
+  x_na_rm = FALSE,
+  x_pretty_n = 5,
+  x_title = NULL,
+  x_title_wrap = 50,
+  x_trans = "identity",
+  x_zero = TRUE,
+  x_zero_line = NULL,
+  y_balance = FALSE,
+  y_expand = NULL,
+  y_labels = NULL,
+  y_na_rm = FALSE,
+  y_pretty_n = 6,
+  y_reorder = FALSE,
+  y_rev = FALSE,
+  y_title = NULL,
+  y_title_wrap = 50,
+  y_zero = FALSE,
+  y_zero_line = NULL,
+  col_cuts = NULL,
+  col_label_digits = NULL,
+  col_labels = NULL,
+  col_method = NULL,
+  col_na_rm = FALSE,
+  col_pretty_n = 5,
+  col_rev = FALSE,
+  col_right_closed = TRUE,
+  col_title = NULL,
+  col_title_wrap = 25,
+  caption = NULL,
+  caption_wrap = 75,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL,
+  mobile = FALSE
+)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -62,7 +102,7 @@ gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
-\item{x_na}{TRUE or FALSE of whether to include x_var NA values. Defaults to TRUE.}
+\item{x_na_rm}{TRUE or FALSE of whether to include x_var NA values. Defaults to FALSE.}
 
 \item{x_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3.}
 
@@ -82,7 +122,7 @@ gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
 
-\item{y_na}{TRUE or FALSE of whether to include y_var NA values. Defaults to TRUE.}
+\item{y_na_rm}{TRUE or FALSE of whether to include y_var NA values. Defaults to FALSE.}
 
 \item{y_pretty_n}{For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4.}
 
@@ -100,11 +140,13 @@ gg_hbar_col(data, x_var, y_var, col_var, text_var = NULL,
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
+\item{col_label_digits}{If numeric colour method, the number of digits to round the labels to. Only applicable where col_labels equals NULL.}
+
 \item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
 \item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
 
-\item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
+\item{col_na_rm}{TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.}
 
 \item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5.}
 

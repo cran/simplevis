@@ -9,7 +9,6 @@
 #' @param size_line Size of lines around features (i.e. weight). Defaults to 2.
 #' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.75 for polygons.
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
-#' @param title A title string that will be wrapped into the legend. 
 #' @param map_id The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".
 #' @return A leaflet object.
 #' @export
@@ -25,7 +24,6 @@ leaflet_sf <- function(data,
                        size_line = 2,
                        alpha = NULL,
                        basemap = "light",
-                       title = NULL,
                        map_id = "map")
 {
   
@@ -33,7 +31,7 @@ leaflet_sf <- function(data,
   shiny <- shiny::isRunning()
   
   if (class(data)[1] != "sf") stop("Please use an sf object as data input")
-  if (is.na(sf::st_crs(data))) stop("Please assign a coordinate reference system")
+  if (is.na(sf::st_crs(data)$proj4string)) stop("Please assign a coordinate reference system")
   
   if (sf::st_is_longlat(data) == FALSE) data <- sf::st_transform(data, 4326)
   
@@ -57,13 +55,13 @@ leaflet_sf <- function(data,
   if(is.null(popup_vars_vctr)){
     popup_data <- data %>%
       dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
-      janitor::clean_names(case = "sentence") 
+      dplyr::rename_with(snakecase::to_sentence_case) 
   }
   else {
     popup_data <- data %>%
       dplyr::select(popup_vars_vctr) %>%
       dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
-      janitor::clean_names(case = "sentence") 
+      dplyr::rename_with(snakecase::to_sentence_case) 
   }
   
   popup <- leafpop::popupTable(popup_data, zcol = 1:ncol(popup_data) - 1, row.numbers = FALSE, feature.id = FALSE)
@@ -74,6 +72,10 @@ leaflet_sf <- function(data,
     if (shiny == FALSE) {
       
       map <- leaflet() %>%
+        leaflet::addEasyButton(leaflet::easyButton(icon = "ion-arrow-shrink", 
+                                                   title = "Reset View", 
+                                                   onClick = htmlwidgets::JS("function(btn, map){ map.setView(map._initialCenter, map._initialZoom); }"))) %>% 
+        htmlwidgets::onRender(htmlwidgets::JS("function(el, x){ var map = this; map._initialCenter = map.getCenter(); map._initialZoom = map.getZoom();}")) %>% 
         addProviderTiles(basemap_name) %>%
         addCircleMarkers(
           data = data,
@@ -107,6 +109,10 @@ leaflet_sf <- function(data,
     if (shiny == FALSE) {
       
       map <- leaflet() %>%
+        leaflet::addEasyButton(leaflet::easyButton(icon = "ion-arrow-shrink", 
+                                                   title = "Reset View", 
+                                                   onClick = htmlwidgets::JS("function(btn, map){ map.setView(map._initialCenter, map._initialZoom); }"))) %>% 
+        htmlwidgets::onRender(htmlwidgets::JS("function(el, x){ var map = this; map._initialCenter = map.getCenter(); map._initialZoom = map.getZoom();}")) %>% 
         addProviderTiles(basemap_name) %>%
         addPolylines(
           data = data,
@@ -138,6 +144,10 @@ leaflet_sf <- function(data,
     if (shiny == FALSE) {
       
       map <- leaflet() %>%
+        leaflet::addEasyButton(leaflet::easyButton(icon = "ion-arrow-shrink", 
+                                                   title = "Reset View", 
+                                                   onClick = htmlwidgets::JS("function(btn, map){ map.setView(map._initialCenter, map._initialZoom); }"))) %>% 
+        htmlwidgets::onRender(htmlwidgets::JS("function(el, x){ var map = this; map._initialCenter = map.getCenter(); map._initialZoom = map.getZoom();}")) %>% 
         addProviderTiles(basemap_name) %>%
         addPolygons(
           data = data,
@@ -163,16 +173,6 @@ leaflet_sf <- function(data,
     }
   }
   
-  map <- map %>% 
-    addLegend(
-      layerId = col_id,
-      colors = pal[1],
-      labels =  "Feature", 
-      title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
-      position = "bottomright",
-      opacity = alpha
-    )
-  
   return(map)
 }
 
@@ -189,13 +189,14 @@ leaflet_sf <- function(data,
 #' @param size_line Size of lines around features (i.e. weight). Defaults to 2.
 #' @param alpha The opacity of features. Defaults to 1 for points/lines, or 0.95 for polygons.
 #' @param basemap The underlying basemap. Either "light", "dark", "satellite", "street", or "ocean". Defaults to "light". Only applicable where shiny equals FALSE.
-#' @param title A title string that will be wrapped into the legend. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
+#' @param col_label_digits If numeric colour method, the number of digits to round the labels to.
 #' @param col_labels A vector to modify colour scale labels.  
 #' @param col_method The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".
-#' @param col_na TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.
+#' @param col_na_rm TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.
 #' @param col_pretty_n For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param col_right_closed For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_title A title string that will be wrapped into the legend. 
 #' @param map_id The shiny map id for a leaflet map within a shiny app. For standard single-map apps, id "map" should be used. For dual-map apps, "map1" and "map2" should be used. Defaults to "map".
 #' @return A leaflet object.
 #' @export
@@ -224,13 +225,14 @@ leaflet_sf_col <- function(data,
                            size_line = 2,
                            alpha = NULL,
                            basemap = "light",
-                           title = NULL,
                            col_cuts = NULL,
+                           col_label_digits = NULL,
                            col_labels = NULL,
                            col_method = NULL,
-                           col_na = TRUE,
+                           col_na_rm = FALSE,
                            col_pretty_n = 4,
                            col_right_closed = TRUE, 
+                           col_title = NULL,
                            map_id = "map"
 ) {
   
@@ -238,7 +240,7 @@ leaflet_sf_col <- function(data,
   shiny <- shiny::isRunning()
   
   if (class(data)[1] != "sf") stop("Please use an sf object as data input")
-  if (is.na(sf::st_crs(data))) stop("Please assign a coordinate reference system")
+  if (is.na(sf::st_crs(data)$proj4string)) stop("Please assign a coordinate reference system")
   
   if (sf::st_is_longlat(data) == FALSE) data <- sf::st_transform(data, 4326)
   
@@ -246,7 +248,7 @@ leaflet_sf_col <- function(data,
   label_var <- rlang::enquo(label_var)
   if(is.null(rlang::get_expr(label_var))) label_var <- col_var
   
-  if (col_na == FALSE) {
+  if (col_na_rm == TRUE) {
     data <- data %>% 
       dplyr::filter(!is.na(!!col_var))
   }
@@ -288,7 +290,7 @@ leaflet_sf_col <- function(data,
         na.color = pal_na
       )
       
-      if (is.null(col_labels)) col_labels <- sv_interval_labels_num(col_cuts, right_closed = col_right_closed)  
+      if (is.null(col_labels)) col_labels <- sv_interval_labels_num(col_cuts, digits = col_label_digits, right_closed = col_right_closed)
     }
     else if (col_method == "quantile") {
       if(is.null(col_cuts)) col_cuts <- seq(0, 1, 0.25)
@@ -313,7 +315,7 @@ leaflet_sf_col <- function(data,
       na.color = pal_na
     )
     
-    if (is.null(col_labels)) col_labels <- sv_interval_labels_num(col_cuts, right_closed = col_right_closed)  
+    if (is.null(col_labels)) col_labels <- sv_interval_labels_num(col_cuts, digits = col_label_digits, right_closed = col_right_closed)
   }
   else if (col_method == "category") {
     if (is.null(col_labels)) {
@@ -351,13 +353,13 @@ leaflet_sf_col <- function(data,
   if(is.null(popup_vars_vctr)){
     popup_data <- data %>%
       dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
-      janitor::clean_names(case = "sentence") 
+      dplyr::rename_with(snakecase::to_sentence_case) 
   }
   else {
     popup_data <- data %>%
       dplyr::select(popup_vars_vctr) %>%
       dplyr::relocate(.data$geometry, .after = tidyselect::last_col()) %>%
-      janitor::clean_names(case = "sentence") 
+      dplyr::rename_with(snakecase::to_sentence_case) 
   }
   
   popup <- leafpop::popupTable(popup_data, zcol = 1:ncol(popup_data) - 1, row.numbers = FALSE, feature.id = FALSE)
@@ -368,11 +370,15 @@ leaflet_sf_col <- function(data,
     if (shiny == FALSE) {
       
       map <- leaflet() %>%
+        leaflet::addEasyButton(leaflet::easyButton(icon = "ion-arrow-shrink", 
+                                                   title = "Reset View", 
+                                                   onClick = htmlwidgets::JS("function(btn, map){ map.setView(map._initialCenter, map._initialZoom); }"))) %>% 
+        htmlwidgets::onRender(htmlwidgets::JS("function(el, x){ var map = this; map._initialCenter = map.getCenter(); map._initialZoom = map.getZoom();}")) %>% 
         addProviderTiles(basemap_name) %>%
         addCircleMarkers(
           data = data,
           color = ~ pal_fun(col_var_vctr),
-          label = ~ htmltools::htmlEscape(label_var_vctr),
+          label = ~ label_var_vctr,
           popup = ~ popup,
           radius = size_point,
           fillOpacity = alpha,
@@ -387,7 +393,7 @@ leaflet_sf_col <- function(data,
         addCircleMarkers(
           data = data,
           color = ~ pal_fun(col_var_vctr),
-          label = ~ htmltools::htmlEscape(label_var_vctr),
+          label = ~ label_var_vctr,
           popup = ~ popup,
           radius = size_point,
           fillOpacity = alpha,
@@ -402,12 +408,16 @@ leaflet_sf_col <- function(data,
     if (shiny == FALSE) {
       
       map <- leaflet() %>%
+        leaflet::addEasyButton(leaflet::easyButton(icon = "ion-arrow-shrink", 
+                                                   title = "Reset View", 
+                                                   onClick = htmlwidgets::JS("function(btn, map){ map.setView(map._initialCenter, map._initialZoom); }"))) %>% 
+        htmlwidgets::onRender(htmlwidgets::JS("function(el, x){ var map = this; map._initialCenter = map.getCenter(); map._initialZoom = map.getZoom();}")) %>% 
         addProviderTiles(basemap_name) %>%
         addPolylines(
           data = data,
           color = ~ pal_fun(col_var_vctr),
           popup = ~ popup,
-          label = ~ htmltools::htmlEscape(label_var_vctr),
+          label = ~ label_var_vctr,
           fillOpacity = alpha,
           opacity = alpha,
           weight = size_line
@@ -421,7 +431,7 @@ leaflet_sf_col <- function(data,
           data = data,
           color = ~ pal_fun(col_var_vctr),
           popup = ~ popup,
-          label = ~ htmltools::htmlEscape(label_var_vctr),
+          label = ~ label_var_vctr,
           fillOpacity = alpha,
           opacity = alpha,
           weight = size_line
@@ -433,12 +443,16 @@ leaflet_sf_col <- function(data,
     
     if (shiny == FALSE) {
       map <- leaflet() %>%
+        leaflet::addEasyButton(leaflet::easyButton(icon = "ion-arrow-shrink", 
+                                                   title = "Reset View", 
+                                                   onClick = htmlwidgets::JS("function(btn, map){ map.setView(map._initialCenter, map._initialZoom); }"))) %>% 
+        htmlwidgets::onRender(htmlwidgets::JS("function(el, x){ var map = this; map._initialCenter = map.getCenter(); map._initialZoom = map.getZoom();}")) %>% 
         addProviderTiles(basemap_name) %>%
         addPolygons(
           data = data,
           color = ~ pal_fun(col_var_vctr),
           popup = ~ popup,
-          label = ~ htmltools::htmlEscape(label_var_vctr),
+          label = ~ label_var_vctr,
           fillOpacity = alpha, 
           opacity = alpha,
           weight = size_line
@@ -452,7 +466,7 @@ leaflet_sf_col <- function(data,
           data = data,
           color = ~ pal_fun(col_var_vctr),
           popup = ~ popup,
-          label = ~ htmltools::htmlEscape(label_var_vctr),
+          label = ~ label_var_vctr,
           fillOpacity = alpha, 
           opacity = alpha,
           weight = size_line
@@ -460,12 +474,21 @@ leaflet_sf_col <- function(data,
     }
   }
   
+  if(col_na_rm == FALSE) {
+    if(any(is.na(col_var_vctr))) {
+      pal <- c(pal, pal_na)
+      col_labels <- c(col_labels, "NA")
+    }
+  }
+  
+  if (is.null(col_title)) col_title <- snakecase::to_sentence_case(rlang::as_name(col_var))
+
   map <- map %>% 
     addLegend(
       layerId = col_id,
       colors = pal,
       labels = col_labels,
-      title = stringr::str_replace_all(stringr::str_wrap(title, 20), "\n", "</br>"),
+      title = stringr::str_replace_all(stringr::str_wrap(col_title, 20), "\n", "</br>"),
       position = "bottomright",
       opacity = alpha)
   

@@ -4,20 +4,52 @@
 \alias{gg_point_facet}
 \title{Point ggplot that is facetted.}
 \usage{
-gg_point_facet(data, x_var, y_var, facet_var, text_var = NULL,
-  position = "identity", alpha = 1, size_point = 1, pal = NULL,
-  title = NULL, title_wrap = 80, subtitle = NULL,
-  subtitle_wrap = 80, x_balance = FALSE, x_expand = NULL,
-  x_gridlines_minor = FALSE, x_labels = NULL, x_pretty_n = 3,
-  x_rev = FALSE, x_title = NULL, x_title_wrap = 50,
-  x_trans = "identity", x_zero = FALSE, x_zero_line = NULL,
-  y_balance = FALSE, y_gridlines_minor = FALSE, y_expand = NULL,
-  y_labels = scales::comma, y_pretty_n = 4, y_title = NULL,
-  y_title_wrap = 50, y_trans = "identity", y_zero = FALSE,
-  y_zero_line = NULL, facet_labels = stringr::str_to_sentence,
-  facet_na = TRUE, facet_ncol = NULL, facet_nrow = NULL,
-  facet_scales = "fixed", caption = NULL, caption_wrap = 80,
-  font_family = "", font_size_title = NULL, font_size_body = NULL)
+gg_point_facet(
+  data,
+  x_var,
+  y_var,
+  facet_var,
+  text_var = NULL,
+  position = "identity",
+  alpha = 1,
+  size_point = 1,
+  pal = NULL,
+  title = NULL,
+  title_wrap = 80,
+  subtitle = NULL,
+  subtitle_wrap = 80,
+  x_balance = FALSE,
+  x_expand = NULL,
+  x_gridlines_minor = FALSE,
+  x_labels = NULL,
+  x_pretty_n = 3,
+  x_rev = FALSE,
+  x_title = NULL,
+  x_title_wrap = 50,
+  x_trans = "identity",
+  x_zero = FALSE,
+  x_zero_line = NULL,
+  y_balance = FALSE,
+  y_gridlines_minor = FALSE,
+  y_expand = NULL,
+  y_labels = scales::comma,
+  y_pretty_n = 4,
+  y_title = NULL,
+  y_title_wrap = 50,
+  y_trans = "identity",
+  y_zero = FALSE,
+  y_zero_line = NULL,
+  facet_labels = stringr::str_to_sentence,
+  facet_na_rm = FALSE,
+  facet_ncol = NULL,
+  facet_nrow = NULL,
+  facet_scales = "fixed",
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL
+)
 }
 \arguments{
 \item{data}{An ungrouped summarised tibble or dataframe. Required input.}
@@ -90,7 +122,7 @@ gg_point_facet(data, x_var, y_var, facet_var, text_var = NULL,
 
 \item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
 
-\item{facet_na}{TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.}
+\item{facet_na_rm}{TRUE or FALSE of whether to include facet_var NA values. Defaults to FALSE.}
 
 \item{facet_ncol}{The number of columns of facetted plots.}
 

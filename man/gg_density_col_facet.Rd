@@ -4,22 +4,55 @@
 \alias{gg_density_col_facet}
 \title{Smoothed density ggplot that is coloured and facetted.}
 \usage{
-gg_density_col_facet(data, x_var, col_var, facet_var,
-  density_bw = "nrd0", density_adjust = 1,
-  density_kernel = "gaussian", density_n = 512, density_trim = FALSE,
-  pal = NULL, pal_na = "#7F7F7F", pal_rev = FALSE, alpha = 0.1,
-  size_line = 0.5, title = NULL, title_wrap = 80, subtitle = NULL,
-  subtitle_wrap = 80, x_balance = FALSE, x_expand = NULL,
-  x_labels = NULL, x_pretty_n = 3, x_title = NULL,
-  x_title_wrap = 50, x_zero = FALSE, x_zero_line = NULL,
-  y_expand = NULL, y_gridlines_minor = FALSE,
-  y_labels = scales::number, y_pretty_n = 4, y_title = NULL,
-  y_title_wrap = 50, col_labels = stringr::str_to_sentence,
-  col_na = TRUE, col_rev = FALSE, col_title = NULL,
-  col_title_wrap = 25, facet_labels = stringr::str_to_sentence,
-  facet_na = TRUE, facet_ncol = NULL, facet_nrow = NULL,
-  facet_scales = "fixed", caption = NULL, caption_wrap = 80,
-  font_family = "", font_size_title = NULL, font_size_body = NULL)
+gg_density_col_facet(
+  data,
+  x_var,
+  col_var,
+  facet_var,
+  density_bw = "nrd0",
+  density_adjust = 1,
+  density_kernel = "gaussian",
+  density_n = 512,
+  density_trim = FALSE,
+  pal = NULL,
+  pal_na = "#7F7F7F",
+  pal_rev = FALSE,
+  alpha = 0.1,
+  size_line = 0.5,
+  title = NULL,
+  title_wrap = 80,
+  subtitle = NULL,
+  subtitle_wrap = 80,
+  x_balance = FALSE,
+  x_expand = NULL,
+  x_labels = NULL,
+  x_pretty_n = 3,
+  x_title = NULL,
+  x_title_wrap = 50,
+  x_zero = FALSE,
+  x_zero_line = NULL,
+  y_expand = NULL,
+  y_gridlines_minor = FALSE,
+  y_labels = scales::number,
+  y_pretty_n = 4,
+  y_title = NULL,
+  y_title_wrap = 50,
+  col_labels = stringr::str_to_sentence,
+  col_na_rm = FALSE,
+  col_rev = FALSE,
+  col_title = NULL,
+  col_title_wrap = 25,
+  facet_labels = stringr::str_to_sentence,
+  facet_na_rm = FALSE,
+  facet_ncol = NULL,
+  facet_nrow = NULL,
+  facet_scales = "fixed",
+  caption = NULL,
+  caption_wrap = 80,
+  font_family = "",
+  font_size_title = NULL,
+  font_size_body = NULL
+)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
@@ -88,7 +121,7 @@ gg_density_col_facet(data, x_var, col_var, facet_var,
 
 \item{col_labels}{A function or named vector to modify colour scale labels. Use ggplot2::waiver() to keep colour labels untransformed.}
 
-\item{col_na}{TRUE or FALSE of whether to include col_var NA values. Defaults to TRUE.}
+\item{col_na_rm}{TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.}
 
 \item{col_rev}{TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE. Defaults to FALSE.}
 
@@ -98,7 +131,7 @@ gg_density_col_facet(data, x_var, col_var, facet_var,
 
 \item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
 
-\item{facet_na}{TRUE or FALSE of whether to include facet_var NA values. Defaults to TRUE.}
+\item{facet_na_rm}{TRUE or FALSE of whether to include facet_var NA values. Defaults to FALSE.}
 
 \item{facet_ncol}{The number of columns of facetted plots.}
 
@@ -131,6 +164,6 @@ gg_density_col_facet(penguins,
                      col_var = sex, 
                      facet_var = species, 
                      x_pretty_n = 2, 
-                     col_na = FALSE)
+                     col_na_rm = FALSE)
 
 }
