@@ -7,40 +7,43 @@
 gg_stars_col(
   data,
   col_var,
+  borders = NULL,
+  borders_on_top = TRUE,
   downsample = 0,
   pal = NULL,
   pal_na = "#7F7F7F",
   pal_rev = FALSE,
-  alpha = 1,
-  borders = NULL,
-  borders_on_top = TRUE,
-  borders_pal = "#7F7F7F",
-  borders_size = 0.2,
+  pal_borders = "#7F7F7F",
+  alpha_fill = 1,
+  alpha_borders = 0.5,
+  size_borders = 0.2,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
+  col_breaks_n = 4,
   col_cuts = NULL,
-  col_label_digits = NULL,
+  col_intervals_right = TRUE,
   col_labels = NULL,
+  col_legend_none = FALSE,
   col_na_rm = FALSE,
-  col_pretty_n = 5,
   col_method = NULL,
-  col_right_closed = TRUE,
   col_title = NULL,
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
+  theme = NULL,
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{A stars object with defined coordinate reference system. Note, it cannot be a stars_proxy object. Required input.}
+\item{data}{A stars object with defined coordinate reference system in a structure to be plotted untransformed. Note, it cannot be a stars_proxy object. Required input.}
 
 \item{col_var}{Unquoted variable for points to be coloured by. Required input.}
+
+\item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
+
+\item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the stars array. Defaults to TRUE.}
 
 \item{downsample}{downsampling rate: e.g. 3 keeps rows and cols 1, 4, 7, 10 etc. A value of 0 does not downsample. It can be specified for each dimension. E.g. c(5,5,0) to downsample the first two dimensions but not the third.}
 
@@ -50,15 +53,13 @@ gg_stars_col(
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{alpha}{The opacity of features. Defaults to 1 for points/lines, or 0.95 for polygons.}
+\item{pal_borders}{Colour of the borders. Defaults to "#7F7F7F".}
 
-\item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
+\item{alpha_fill}{The opacity of the fill. Defaults to 1.}
 
-\item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the stars array. Defaults to TRUE.}
+\item{alpha_borders}{Opacity of the borders. Defaults to 0.5.}
 
-\item{borders_pal}{Colour of the borders. Defaults to "#7F7F7F".}
-
-\item{borders_size}{Size of the borders. Defaults to 0.2.}
+\item{size_borders}{Size of the borders. Defaults to 0.2.}
 
 \item{title}{Title string.}
 
@@ -68,19 +69,19 @@ gg_stars_col(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.}
 
+\item{col_breaks_n}{For a numeric colour variable, the desired number of intervals on the colour scale.}
+
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_label_digits}{If numeric colour method, the number of digits to round the labels to. Only applicable where col_labels equals NULL.}
+\item{col_intervals_right}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
-\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
+
+\item{col_legend_none}{TRUE or FALSE of whether to remove the legend.}
 
 \item{col_na_rm}{TRUE or FALSE of whether to visualise col_var NA values. Defaults to FALSE.}
 
-\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5.}
-
-\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
-
-\item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
+\item{col_method}{The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
@@ -90,13 +91,9 @@ gg_stars_col(
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
+\item{theme}{A ggplot2 theme.}
 
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
-
-\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within a shiny app with the mobileDetect function, then use mobile = input$isMobile.}
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE.}
 }
 \value{
 A ggplot object.
@@ -106,13 +103,10 @@ Map of an array in ggplot that is coloured, but not facetted.
 }
 \examples{
 library(simplevis)
-library(stars)
 
 gg_stars_col(example_stars,
              col_var = nitrate,
-             col_method = "quantile",
-             col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
              col_na_rm = TRUE,
-             borders = nz)
+             borders = example_borders)
           
 }

@@ -7,46 +7,53 @@
 gg_sf(
   data,
   text_var = NULL,
-  size_point = 1,
-  size_line = 0.5,
-  alpha = NULL,
-  pal = NULL,
   borders = NULL,
   borders_on_top = NULL,
-  borders_pal = "#7F7F7F",
-  borders_size = 0.2,
+  pal = pal_viridis_reorder(1),
+  pal_borders = "#7F7F7F",
+  alpha_fill = NULL,
+  alpha_line = 1,
+  alpha_point = 1,
+  alpha_borders = 0.5,
+  size_line = 0.5,
+  size_point = 1,
+  size_borders = 0.2,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
+  theme = NULL,
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{A sf object with defined coordinate reference system. Required input.}
+\item{data}{A sf object with defined coordinate reference system in a structure to be plotted untransformed. Required input.}
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
-
-\item{size_point}{Size of points. Defaults to 0.5.}
-
-\item{size_line}{Size of lines. Defaults to 0.5.}
-
-\item{alpha}{The opacity of features. Defaults to 1 for points/lines, or 0.5 for polygons.}
-
-\item{pal}{Character vector of hex codes.}
 
 \item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
 
 \item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the sf object supplied to the data argument. Defaults to TRUE for points and lines, but FALSE for polygons..}
 
-\item{borders_pal}{Colour of the borders. Defaults to "#7F7F7F".}
+\item{pal}{Character vector of hex codes.}
 
-\item{borders_size}{Size of the borders. Defaults to 0.2.}
+\item{pal_borders}{Colour of the borders. Defaults to "#7F7F7F".}
+
+\item{alpha_fill}{The opacity of the fill.}
+
+\item{alpha_line}{The alpha of lines and outlines.}
+
+\item{alpha_point}{The alpha of points.}
+
+\item{alpha_borders}{Opacity of the borders. Defaults to 0.5.}
+
+\item{size_line}{Size of lines. Defaults to 0.5.}
+
+\item{size_point}{Size of points. Defaults to 1.}
+
+\item{size_borders}{Size of the borders. Defaults to 0.2.}
 
 \item{title}{Title string.}
 
@@ -60,13 +67,9 @@ gg_sf(
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
+\item{theme}{A ggplot2 theme.}
 
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
-
-\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within a shiny app with the mobileDetect function, then use mobile = input$isMobile.}
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE.}
 }
 \value{
 A ggplot object.
@@ -75,7 +78,7 @@ A ggplot object.
 Map of simple features in ggplot that is not coloured and not facetted.
 }
 \examples{
-gg_sf(example_sf_point, 
-     borders = nz)
+gg_sf(example_point, 
+     borders = example_borders)
      
 }

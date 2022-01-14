@@ -9,9 +9,9 @@ interval_labels(cuts, digits = NULL, right_closed = TRUE)
 \arguments{
 \item{cuts}{A vector or numeric or character interval cuts.}
 
-\item{digits}{If cuts are numeric, the number of decimal places to round labels to.}
-
 \item{right_closed}{If cuts are numeric, TRUE or FALSE of whether intervals are to be right-closed. Defaults to TRUE.}
+
+\item{format}{A function to apply to the numeric values, e.g. scales::label_comma().}
 }
 \value{
 A vector of character labels.
@@ -20,12 +20,11 @@ A vector of character labels.
 Convert numeric or interval cuts to simple and pretty labels.
 }
 \examples{
-library(simplevis)
+simplevis:::interval_labels(c(0, 0.1, 3, 4.1, 7, 100, Inf))
 
-interval_labels(c(0, 0.1, 3, 4.1, 7, 100, Inf))
+simplevis:::interval_labels(c("(0, 10]", "(10, 50]", "(50, 100]"))
 
-interval_labels(c("(0, 10]", "(10, 50]", "(50, 100]"))
-
-interval_labels(c("[0, 10)", "[10, 50)", "[50, 100)"))
+simplevis:::interval_labels(c("[0, 10)", "[10, 50)", "[50, 100)"))
 
 }
+\keyword{internal}

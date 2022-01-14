@@ -10,7 +10,9 @@ gg_line_facet(
   y_var,
   facet_var,
   text_var = NULL,
-  pal = NULL,
+  pal = pal_viridis_reorder(1),
+  alpha_line = 1,
+  alpha_point = 1,
   size_point = 1,
   size_line = 0.5,
   title = NULL,
@@ -18,40 +20,37 @@ gg_line_facet(
   subtitle = NULL,
   subtitle_wrap = 80,
   x_balance = FALSE,
+  x_breaks_n = 2,
   x_expand = NULL,
   x_labels = NULL,
   x_na_rm = FALSE,
-  x_pretty_n = 3,
   x_rev = FALSE,
   x_title = NULL,
   x_title_wrap = 50,
   x_zero = FALSE,
   x_zero_line = NULL,
   y_balance = FALSE,
-  y_expand = NULL,
-  y_gridlines_minor = FALSE,
-  y_labels = scales::comma,
+  y_breaks_n = 3,
+  y_expand = c(0, 0),
+  y_labels = scales::label_comma(),
   y_na_rm = FALSE,
-  y_pretty_n = 4,
   y_title = NULL,
   y_title_wrap = 50,
-  y_trans = "identity",
   y_zero = FALSE,
   y_zero_line = NULL,
-  facet_labels = stringr::str_to_sentence,
+  facet_labels = snakecase::to_sentence_case,
   facet_na_rm = FALSE,
   facet_ncol = NULL,
   facet_nrow = NULL,
+  facet_rev = FALSE,
   facet_scales = "fixed",
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
+  theme = gg_theme()
 )
 }
 \arguments{
-\item{data}{A tibble or dataframe. Required input.}
+\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
 
 \item{x_var}{Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). Required input.}
 
@@ -63,9 +62,13 @@ gg_line_facet(
 
 \item{pal}{Character vector of hex codes.}
 
+\item{alpha_line}{The opacity of the line. Defaults to 1.}
+
+\item{alpha_point}{The opacity of the points.}
+
 \item{size_point}{Size of points. Defaults to 1.}
 
-\item{size_line}{Size of lines. Defaults to 0.5.}
+\item{size_line}{Size of lines. Defaults to 0.75.}
 
 \item{title}{Title string.}
 
@@ -77,13 +80,13 @@ gg_line_facet(
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 
+\item{x_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2.}
+
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
 \item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
 \item{x_na_rm}{TRUE or FALSE of whether to include x_var NA values. Defaults to FALSE.}
-
-\item{x_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3.}
 
 \item{x_rev}{For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.}
 
@@ -97,21 +100,17 @@ gg_line_facet(
 
 \item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
 
+\item{y_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4.}
+
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
-
-\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{y_labels}{A function or named vector to modify y scale labels. Use ggplot2::waiver() to keep y labels untransformed.}
 
 \item{y_na_rm}{TRUE or FALSE of whether to include y_var NA values. Defaults to FALSE.}
-
-\item{y_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4.}
 
 \item{y_title}{y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
 \item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50.}
-
-\item{y_trans}{For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".}
 
 \item{y_zero}{For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
@@ -125,17 +124,15 @@ gg_line_facet(
 
 \item{facet_nrow}{The number of rows of facetted plots.}
 
+\item{facet_rev}{TRUE or FALSE of whether the facet variable variable is reversed. Defaults to FALSE.}
+
 \item{facet_scales}{Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".}
 
 \item{caption}{Caption title string.}
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
-
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
+\item{theme}{A ggplot2 theme.}
 }
 \value{
 A ggplot object.
@@ -144,18 +141,16 @@ A ggplot object.
 Line ggplot that is facetted, but not coloured.
 }
 \examples{
-library(dplyr)
 library(simplevis)
-library(palmerpenguins)
+library(dplyr)
+        
+plot_data <- storms \%>\%
+  group_by(year, status) \%>\%
+  summarise(wind = mean(wind))
 
-plot_data <- penguins \%>\% 
-  group_by(year, species) \%>\% 
-  summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE)) \%>\% 
-  mutate(year = as.character(year))
-
-gg_line_facet(plot_data, 
-              x_var = year, 
-              y_var = body_mass_g, 
-              facet_var = species)
-
+gg_line_facet(plot_data,
+        x_var = year,
+        y_var = wind, 
+        facet_var = status)
+        
 }

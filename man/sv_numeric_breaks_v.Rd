@@ -4,24 +4,18 @@
 \alias{sv_numeric_breaks_v}
 \title{Calculate the breaks for a y axis numeric vector.}
 \usage{
-sv_numeric_breaks_v(
-  var_vctr,
-  balance = FALSE,
-  pretty_n = 5,
-  trans = "identity",
-  zero = TRUE
-)
+sv_numeric_breaks_v(var_vctr, balance = FALSE, breaks_n = 5, zero = TRUE)
 }
 \arguments{
 \item{var_vctr}{A numeric vector for the vertical scale from which to determine breaks from.}
 
 \item{balance}{Add balance to the vertical axis so that zero is in the centre of the vertical scale.}
 
-\item{pretty_n}{The desired number of intervals on the vertical axis, as calculated by the pretty algorithm. Defaults to 5.}
-
-\item{trans}{A string specifying a transformation for the vertical axis scale, such as "log10" or "sqrt". Defaults to "identity".}
+\item{breaks_n}{The desired number of intervals on the vertical axis, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{zero}{TRUE or FALSE of whether the minimum of the vertical scale is zero. Defaults to TRUE.}
+
+\item{trans}{A string specifying a transformation for the vertical axis scale, such as "log10" or "sqrt". Defaults to "identity".}
 
 \item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to NULL.}
 }

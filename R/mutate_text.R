@@ -1,15 +1,17 @@
 #' @title Add a quick tooltip text column to data.
 #' @description Add a column of tooltip text which is automatically created based on column names and values. 
 #' @param data A tibble or dataframe. Required input.
-#' @param text_vars_vctr A vector of quoted variables to include in the tooltip. Defaults to NULL, which adds all variables in.
-#' @param comma TRUE or FALSE of whether to convert numeric values to character values with comma seperators.
-#' @return A vector of labels.
+#' @param vars_vctr A vector of quoted variables to include in the tooltip. Defaults to NULL, which adds all variables in.
+#' @param numeric_format A function to format all numeric variables within the tooltip text column. Defaults to non-scientific. Use function(x) x to leave as is.
+#' 
+#' @return A tibble or data frame with an additional column called text.
 #' @export
 #' @examples
+#' library(simplevis)
 #' library(dplyr)
 #' 
 #' plot_data <- slice_sample(ggplot2::diamonds, prop = 0.05) %>% 
-#'   mutate_text(c("carat", "price"), comma = TRUE)
+#'   mutate_text(vars_vctr = c("carat", "price"))
 #' 
 #' plot <- gg_point(data = plot_data, 
 #'                  x_var = carat, 
@@ -21,60 +23,47 @@
 #' 
 #' plotly::ggplotly(plot, tooltip = "text")
 #' 
-mutate_text <- function(data, text_vars_vctr = NULL, comma = FALSE) {
+mutate_text <- function(data, 
+                        vars_vctr = NULL, 
+                        numeric_format = function(x) prettyNum(x, big.mark = "", scientific = FALSE)) {
   
   data <- data %>% 
-    dplyr::ungroup()
+    dplyr::ungroup() 
   
   class <- class(data)[1]
   
-  if(is.null(text_vars_vctr)) {
+  if (is.null(vars_vctr)) {
     if(class == "sf") {
-      text_vars_vctr <- colnames(data)[colnames(data) != "geometry"]
+      vars_vctr <- colnames(data)[colnames(data) != "geometry"]
     } else if(class != "sf") {
-      text_vars_vctr <- colnames(data)
+      vars_vctr <- colnames(data)
     }
   }
+  
+  temp <- data %>% 
+    dplyr::select(vars_vctr) %>% 
+    dplyr::mutate_if(.predicate = is.numeric, .funs = numeric_format)
   
   text <- vector("character", 0)
   
-  if(comma == TRUE) {
-    for (i in length(text_vars_vctr):1) {
-      
-      temp <- data %>% 
-        dplyr::select(text_vars_vctr[i]) 
-      
-      if(class == "sf") temp <- temp %>%
-          sf::st_drop_geometry()
-      
-      temp <- paste0(
-        snakecase::to_sentence_case(colnames(temp)),
-        ": ", 
-        format(dplyr::pull(temp, 1), big.mark = ","))
-      
-      text <- paste(temp, text, sep = "<br>")
-    }
-  }
-  else if (comma == FALSE) {
-    for (i in length(text_vars_vctr):1) {
-      
-      temp <- data %>% 
-        dplyr::select(text_vars_vctr[i]) 
-      
-      if(class == "sf") temp <- temp %>%
-          sf::st_drop_geometry()
-      
-      temp <- paste0(
-        snakecase::to_sentence_case(colnames(temp)),
-        ": ", 
-        dplyr::pull(temp, 1))
-      
-      text <- paste(temp, text, sep = "<br>")
-    }
+  for (i in length(vars_vctr):1) {
+    
+    temp2 <- temp %>% 
+      dplyr::select(vars_vctr[i])  
+    
+    if(class == "sf") temp2 <- temp2 %>%
+        sf::st_drop_geometry()
+    
+    temp2 <- paste0(
+      snakecase::to_sentence_case(colnames(temp2)),
+      ": ", 
+      dplyr::pull(temp2, 1))
+    
+    text <- paste(temp2, text, sep = "<br>")
   }
   
   data <- data %>%
-    dplyr::mutate(text = stringr::str_replace_all(text, " NA<br>", " Not available<br>"))
+    dplyr::mutate(text = text)
   
   if(class == "sf") {
     data <- data %>%
@@ -83,4 +72,3 @@ mutate_text <- function(data, text_vars_vctr = NULL, comma = FALSE) {
   
   return(data)
 }
-

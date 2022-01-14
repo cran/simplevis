@@ -9,42 +9,44 @@ gg_sf_col_facet(
   col_var,
   facet_var,
   text_var = NULL,
+  borders = NULL,
+  borders_on_top = NULL,
   pal = NULL,
   pal_na = "#7F7F7F",
   pal_rev = FALSE,
-  size_point = 1,
+  pal_borders = "#7F7F7F",
+  alpha_fill = NULL,
+  alpha_line = 1,
+  alpha_point = 1,
+  alpha_borders = 0.5,
   size_line = 0.5,
-  alpha = NULL,
-  borders = NULL,
-  borders_on_top = NULL,
-  borders_pal = "#7F7F7F",
-  borders_size = 0.2,
+  size_point = 1,
+  size_borders = 0.2,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
+  col_breaks_n = 4,
   col_cuts = NULL,
-  col_label_digits = NULL,
+  col_intervals_right = TRUE,
   col_labels = NULL,
+  col_legend_none = FALSE,
   col_method = NULL,
   col_na_rm = FALSE,
-  col_pretty_n = 5,
-  col_right_closed = TRUE,
   col_title = NULL,
   col_title_wrap = 25,
-  facet_labels = stringr::str_to_sentence,
+  facet_labels = snakecase::to_sentence_case,
   facet_na_rm = FALSE,
   facet_ncol = NULL,
   facet_nrow = NULL,
+  facet_rev = FALSE,
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
+  theme = NULL
 )
 }
 \arguments{
-\item{data}{A sf object with defined coordinate reference system. Required input.}
+\item{data}{A sf object with defined coordinate reference system in a structure to be plotted untransformed. Required input.}
 
 \item{col_var}{Unquoted variable for points to be coloured by. Required input.}
 
@@ -52,25 +54,31 @@ gg_sf_col_facet(
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
+\item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
+
+\item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the sf object supplied to the data argument. Defaults to TRUE for points and lines, but FALSE for polygons..}
+
 \item{pal}{Character vector of hex codes. Defaults to NULL, which selects the colorbrewer Set1 or viridis.}
 
 \item{pal_na}{The hex code or name of the NA colour to be used.}
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{size_point}{Size of points. Defaults to 0.5.}
+\item{pal_borders}{Colour of the borders. Defaults to "#7F7F7F".}
+
+\item{alpha_fill}{The opacity of the fill.}
+
+\item{alpha_line}{The alpha of lines and outlines.}
+
+\item{alpha_point}{The alpha of points.}
+
+\item{alpha_borders}{Opacity of the borders. Defaults to 0.5.}
 
 \item{size_line}{Size of lines. Defaults to 0.5.}
 
-\item{alpha}{The opacity of features. Defaults to 1 for points/lines, or 0.95 for polygons.}
+\item{size_point}{Size of points. Defaults to 1.}
 
-\item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
-
-\item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the sf object supplied to the data argument. Defaults to TRUE for points and lines, but FALSE for polygons..}
-
-\item{borders_pal}{Colour of the borders. Defaults to "#7F7F7F".}
-
-\item{borders_size}{Size of the borders. Defaults to 0.2.}
+\item{size_borders}{Size of the borders. Defaults to 0.2.}
 
 \item{title}{Title string.}
 
@@ -80,19 +88,19 @@ gg_sf_col_facet(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 100.}
 
+\item{col_breaks_n}{For a numeric colour variable. If "bin" col_method, the intervals on the colour scale for the pretty algorithm to aim for. If "quantile" col_method, the number of equal quantiles. Defaults to 4.}
+
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_label_digits}{If numeric colour method, the number of digits to round the labels to. Only applicable where col_labels equals NULL.}
+\item{col_intervals_right}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
-\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
 
-\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
+\item{col_legend_none}{TRUE or FALSE of whether to remove the legend.}
+
+\item{col_method}{The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".}
 
 \item{col_na_rm}{TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.}
-
-\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5.}
-
-\item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
@@ -106,15 +114,13 @@ gg_sf_col_facet(
 
 \item{facet_nrow}{The number of rows of facetted plots.}
 
+\item{facet_rev}{TRUE or FALSE of whether the facet variable variable is reversed. Defaults to FALSE.}
+
 \item{caption}{Caption title string.}
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
-
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
+\item{theme}{A ggplot2 theme.}
 }
 \value{
 A ggplot object.
@@ -123,9 +129,9 @@ A ggplot object.
 Map of simple features in ggplot that is coloured and facetted.
 }
 \examples{
-gg_sf_col_facet(example_sf_point, 
+gg_sf_col_facet(example_point, 
                 col_var = trend_category, 
                 facet_var = trend_category, 
-                borders = nz)
+                borders = example_borders)
  
 }

@@ -1,3 +1,41 @@
+# simplevis 6.0.0
+
+New features:
+* Continuous colouring across gradients for point, bar, hbar, tile, sf, stars and tile.
+* Theme flexibility for all gg functions.
+* gg_theme function to build a quick clean theme.
+* New Smooth functions.
+* New violin & hviolin functions.
+* New hboxplot functions.
+* New pointrange functions.
+* more flexibility and precision with adjusting alpha & size.
+* Updated title and categorical label default transformations to use snakecase::to_sentence_case.
+* Updated numeric label default transformations to generally use scales::label_comma().
+* Redesigned col_labels argument in leaf functions to accept a function.
+* Deprecated leaflet_ functions in favour of new leaf_ functions.
+* Removed trans arguments from functions. 
+* In density functions, renamed density_ prefixed arguments to model_.
+* Updated mutate_text to provide numeric_format argument. Removed comma argument from mutate_text.
+* In leaf_sf functions, supported layer id's.
+* In leaf_sf, added arguments to modify popup and label numeric format.
+* In leaf_sf functions, defaulted label and popup numeric vars to non-scientific numbers with labels having a comma. 
+
+Breaking:
+* In bar, changed position argument to stack = FALSE.
+* Renamed x_pretty_n argument to x_breaks_n & likewise for equivalent y & col arguments.
+* Renamed var arguments and structure for boxplot where stat = "identity".
+* Renamed col_right_closed to col_intervals_right.
+* Breaking removed *_digits arguments from gg functions.
+* Renamed example objects to remove unnecessary words.
+* Removed *_gridlines_minor arguments.
+* Removed font_family, font_size_title and font_size_body arguments.
+* Removed comma argument from mutate_text.
+* In mutate_text, renamed text_vars_vctr to vars_vctr. 
+
+Other:
+* Tidied code.
+* Numerous bug fixes and tweaks.
+
 # simplevis 5.0.0
 
 * Breaking: Renamed *_na arguments to _na_rm.

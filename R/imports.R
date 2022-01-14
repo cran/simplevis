@@ -3,6 +3,7 @@
 #' @import ggplot2
 #' @import leaflet
 #' @import sf
+#' @import stars
 #' @importFrom rlang !!
 #' @importFrom rlang :=
 #' @importFrom rlang .data
@@ -23,4 +24,3 @@ NULL
 
 #' Shiny input
 utils::globalVariables("input")
-

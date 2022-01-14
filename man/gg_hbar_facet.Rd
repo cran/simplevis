@@ -10,49 +10,47 @@ gg_hbar_facet(
   y_var,
   facet_var,
   text_var = NULL,
-  pal = NULL,
-  width = NULL,
-  alpha = 1,
+  pal = pal_viridis_reorder(1),
+  alpha_fill = 1,
+  alpha_line = 1,
   size_line = 0.5,
+  size_width = NULL,
   title = NULL,
   title_wrap = 75,
   subtitle = NULL,
   subtitle_wrap = 75,
   x_balance = FALSE,
-  x_expand = NULL,
-  x_gridlines_minor = FALSE,
-  x_labels = scales::comma,
+  x_breaks_n = 2,
+  x_expand = c(0, 0),
+  x_labels = scales::label_comma(),
   x_na_rm = FALSE,
-  x_pretty_n = 3,
   x_title = NULL,
   x_title_wrap = 50,
-  x_trans = "identity",
   x_zero = TRUE,
   x_zero_line = NULL,
   y_balance = FALSE,
+  y_breaks_n = 3,
   y_expand = NULL,
   y_labels = NULL,
   y_na_rm = FALSE,
-  y_pretty_n = 4,
   y_rev = FALSE,
   y_title = NULL,
   y_title_wrap = 50,
   y_zero = FALSE,
   y_zero_line = NULL,
-  facet_labels = stringr::str_to_sentence,
+  facet_labels = snakecase::to_sentence_case,
   facet_na_rm = FALSE,
   facet_ncol = NULL,
   facet_nrow = NULL,
+  facet_rev = FALSE,
   facet_scales = "fixed",
   caption = NULL,
   caption_wrap = 75,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
+  theme = gg_theme(gridlines = "vertical")
 )
 }
 \arguments{
-\item{data}{A tibble or dataframe. Required input.}
+\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
@@ -64,11 +62,13 @@ gg_hbar_facet(
 
 \item{pal}{Character vector of hex codes.}
 
-\item{width}{Width of bars. Defaults to 0.75.}
+\item{alpha_fill}{The opacity of the fill. Defaults to 1.}
 
-\item{alpha}{The alpha of the fill. Defaults to 1.}
+\item{alpha_line}{The opacity of the outline. Defaults to 1.}
 
 \item{size_line}{The size of the outlines of bars.}
+
+\item{size_width}{Width of bars. Defaults to 0.75.}
 
 \item{title}{Title string.}
 
@@ -80,21 +80,17 @@ gg_hbar_facet(
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
 
+\item{x_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2.}
+
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{x_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.}
-
-\item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
+\item{x_labels}{A function or named vector to modify x scale labels. Use function(x) x to keep labels untransformed.}
 
 \item{x_na_rm}{TRUE or FALSE of whether to include x_var NA values. Defaults to FALSE.}
-
-\item{x_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3.}
 
 \item{x_title}{X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
 \item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50.}
-
-\item{x_trans}{For a numeric x variable, a string specifying a transformation for the x scale, such as "log10" or "sqrt". Defaults to "identity".}
 
 \item{x_zero}{For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to TRUE.}
 
@@ -102,13 +98,13 @@ gg_hbar_facet(
 
 \item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre. Defaults to FALSE.}
 
+\item{y_breaks_n}{For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4.}
+
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use function(x) x to keep labels untransformed.}
 
 \item{y_na_rm}{TRUE or FALSE of whether to include y_var NA values. Defaults to FALSE.}
-
-\item{y_pretty_n}{For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4.}
 
 \item{y_rev}{For a categorical variable, TRUE or FALSE of whether the y variable variable is reversed. Defaults to FALSE.}
 
@@ -120,7 +116,7 @@ gg_hbar_facet(
 
 \item{y_zero_line}{For a numeric y variable, TRUE or FALSE of whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
-\item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
+\item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use function(x) x to keep labels untransformed.}
 
 \item{facet_na_rm}{TRUE or FALSE of whether to include facet_var NA values. Defaults to FALSE.}
 
@@ -128,17 +124,15 @@ gg_hbar_facet(
 
 \item{facet_nrow}{The number of rows of facetted plots.}
 
+\item{facet_rev}{TRUE or FALSE of whether the facet variable variable is reversed. Defaults to FALSE.}
+
 \item{facet_scales}{Whether facet_scales should be "fixed" across facets, "free" in both directions, or free in just one direction (i.e. "free_x" or "free_y"). Defaults to "fixed".}
 
 \item{caption}{Caption title string.}
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 75.}
 
-\item{font_family}{Font family to use. Defaults "".}
-
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
+\item{theme}{A ggplot2 theme.}
 }
 \value{
 A ggplot object.

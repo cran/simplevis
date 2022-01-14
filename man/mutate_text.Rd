@@ -4,26 +4,31 @@
 \alias{mutate_text}
 \title{Add a quick tooltip text column to data.}
 \usage{
-mutate_text(data, text_vars_vctr = NULL, comma = FALSE)
+mutate_text(
+  data,
+  vars_vctr = NULL,
+  numeric_format = function(x) prettyNum(x, big.mark = "", scientific = FALSE)
+)
 }
 \arguments{
 \item{data}{A tibble or dataframe. Required input.}
 
-\item{text_vars_vctr}{A vector of quoted variables to include in the tooltip. Defaults to NULL, which adds all variables in.}
+\item{vars_vctr}{A vector of quoted variables to include in the tooltip. Defaults to NULL, which adds all variables in.}
 
-\item{comma}{TRUE or FALSE of whether to convert numeric values to character values with comma seperators.}
+\item{numeric_format}{A function to format all numeric variables within the tooltip text column. Defaults to non-scientific. Use function(x) x to leave as is.}
 }
 \value{
-A vector of labels.
+A tibble or data frame with an additional column called text.
 }
 \description{
 Add a column of tooltip text which is automatically created based on column names and values.
 }
 \examples{
+library(simplevis)
 library(dplyr)
 
 plot_data <- slice_sample(ggplot2::diamonds, prop = 0.05) \%>\% 
-  mutate_text(c("carat", "price"), comma = TRUE)
+  mutate_text(vars_vctr = c("carat", "price"))
 
 plot <- gg_point(data = plot_data, 
                  x_var = carat, 

@@ -2,63 +2,53 @@
 % Please edit documentation in R/gg_density.R
 \name{gg_density}
 \alias{gg_density}
-\title{Smoothed density ggplot.}
+\title{Density ggplot.}
 \usage{
 gg_density(
   data,
   x_var,
-  density_bw = "nrd0",
-  density_adjust = 1,
-  density_kernel = "gaussian",
-  density_n = 512,
-  density_trim = FALSE,
-  pal = NULL,
-  alpha = 0.1,
+  pal = pal_viridis_reorder(1),
+  alpha_fill = 0.2,
+  alpha_line = 1,
   size_line = 0.5,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
   x_balance = FALSE,
+  x_breaks_n = 5,
   x_expand = NULL,
-  x_labels = NULL,
-  x_pretty_n = 6,
+  x_labels = scales::label_comma(),
   x_title = NULL,
   x_title_wrap = 50,
   x_zero = FALSE,
   x_zero_line = NULL,
-  y_expand = NULL,
-  y_gridlines_minor = FALSE,
-  y_labels = scales::number,
-  y_pretty_n = 5,
+  y_breaks_n = 5,
+  y_expand = c(0, 0),
+  y_labels = scales::label_number(big.mark = ","),
   y_title = NULL,
   y_title_wrap = 50,
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
+  theme = gg_theme(),
+  model_bw = "nrd0",
+  model_adjust = 1,
+  model_kernel = "gaussian",
+  model_n = 512,
+  model_trim = FALSE,
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{A tibble or dataframe. Required input.}
+\item{data}{An ungrouped summarised tibble or dataframe in a structure to be transformed to density statistics. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
-\item{density_bw}{The bw argument of the stats::density function. Defaults to "nrd0".}
-
-\item{density_adjust}{The adjust argument of the stats::density function. Defaults to 1.}
-
-\item{density_kernel}{The kernel argument of the stats::density function. Defaults to "gaussian".}
-
-\item{density_n}{The n argument of the stats::density function. Defaults to 512.}
-
-\item{density_trim}{The trim argument of the stats::density function. Defaults to FALSE.}
-
 \item{pal}{Character vector of hex codes.}
 
-\item{alpha}{The alpha of the fill. Defaults to 1.}
+\item{alpha_fill}{The opacity of the fill. Defaults to 0.2.}
+
+\item{alpha_line}{The opacity of the outline. Defaults to 1.}
 
 \item{size_line}{The size of the outlines of density areas.}
 
@@ -72,11 +62,11 @@ gg_density(
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 
+\item{x_breaks_n}{For a numeric x variable, the desired number of intervals on the x scale, as calculated by the}
+
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
 \item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
-
-\item{x_pretty_n}{For a numeric x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6.}
 
 \item{x_title}{X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
@@ -86,13 +76,11 @@ gg_density(
 
 \item{x_zero_line}{For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
+\item{y_breaks_n}{For a numeric y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 5.}
+
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
-
 \item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
-
-\item{y_pretty_n}{For a numeric y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{y_title}{y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
@@ -102,19 +90,25 @@ gg_density(
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
+\item{theme}{A ggplot2 theme.}
 
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
+\item{model_bw}{The bw argument of the stats::density function. Defaults to "nrd0".}
 
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
+\item{model_adjust}{The adjust argument of the stats::density function. Defaults to 1.}
 
-\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within a shiny app with the mobileDetect function, then use mobile = input$isMobile.}
+\item{model_kernel}{The kernel argument of the stats::density function. Defaults to "gaussian".}
+
+\item{model_n}{The n argument of the stats::density function. Defaults to 512.}
+
+\item{model_trim}{TRUE or FALSE of whether to trim the tails. Defaults to FALSE.}
+
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE.}
 }
 \value{
 A ggplot object.
 }
 \description{
-Smoothed density ggplot that is not coloured and not facetted.
+Density ggplot that is not coloured and not facetted.
 }
 \examples{
 library(simplevis)

@@ -26,15 +26,31 @@ library(dplyr)
 library(simplevis)
 library(palmerpenguins)
 library(ggplot2)
+library(patchwork)
+set.seed(123456789)
 ```
 
 ### Purpose 
 
 `simplevis` is a package of `ggplot2` and `leaflet` wrapper functions that aims to make visualisation easier with less brainpower required.
 
+It does this by:
+
+* using families of functions of combinations of colouring (by a variable), facetting, neither or both
+* using prefixes to make it easier to adjust aspects of the visualisation  
+* unifying colouring into one concept, and simplyfing applying different colouring methods. 
+
 ### Visualisation family types
 
-`simplevis` supports the following families of visualisation type:
+`simplevis` supports the following families of visualisation types:
+
+point
+
+```{r}
+gg_point(penguins,
+         x_var = bill_length_mm,
+         y_var = body_mass_g)
+```
 
 bar
 
@@ -43,17 +59,21 @@ plot_data <- storms %>%
   group_by(year) %>%
   summarise(wind = mean(wind))
 
-gg_bar(plot_data, 
-       x_var = year, 
+gg_bar(plot_data,
+       x_var = year,
        y_var = wind)
 ```
 
-point
+hbar
 
 ```{r}
-gg_point(iris, 
-         x_var = Sepal.Width, 
-         y_var = Sepal.Length)
+plot_data <- storms %>%
+  group_by(year) %>%
+  summarise(wind = mean(wind))
+
+gg_hbar(plot_data, 
+        x_var = wind, 
+        y_var = year)
 ```
 
 line
@@ -68,16 +88,45 @@ gg_line(plot_data,
         y_var = wind)
 ```
 
-hbar (i.e horizontal bar)
+boxplot
 
 ```{r}
-plot_data <- ggplot2::diamonds %>%
-  group_by(cut) %>%
-  summarise(price = mean(price))
+gg_boxplot(penguins, 
+           x_var = species, 
+           y_var = body_mass_g)
+```
 
-gg_hbar(plot_data, 
-        x_var = price, 
-        y_var = cut)
+density
+
+```{r}
+gg_density(penguins, 
+           x_var = body_mass_g)
+```
+
+pointrange 
+
+```{r} 
+plot_data <- penguins %>%
+   group_by(sex) %>%
+   summarise(middle = median(body_mass_g, na.rm = TRUE),
+             lower = quantile(body_mass_g, probs = 0.25, na.rm = TRUE),
+             upper = quantile(body_mass_g, probs = 0.75, na.rm = TRUE))
+
+ gg_pointrange(
+   plot_data,
+   x_var = sex,
+   y_var = middle,
+   ymin_var = lower,
+   ymax_var = upper,
+   y_title = "Body mass g")
+```
+
+smooth
+
+```{r}
+gg_smooth(penguins,  
+          x_var = bill_length_mm, 
+          y_var = body_mass_g)
 ```
 
 tile
@@ -94,39 +143,32 @@ gg_tile_col(plot_data,
             label_var = bill_length_mm) 
 ```
 
-boxplot
+violin
 
 ```{r}
-gg_boxplot(storms, 
-           x_var = year, 
-           y_var = wind)
-```
-
-density
-
-```{r}
-gg_density(penguins, 
-           x_var = body_mass_g)
+gg_violin(penguins, 
+           x_var = species, 
+           y_var = body_mass_g)
 ```
 
 sf
 
 ```{r}
-gg_sf_col(example_sf_point, 
+gg_sf_col(example_point, 
           col_var = trend_category, 
-          borders = nz)
+          borders = example_borders)
 ```
 
 stars
 
 ```{r}
-library(stars)
-
 gg_stars_col(example_stars,
              col_var = nitrate,
              col_na_rm = TRUE,
-             borders = nz)
+             borders = example_borders)
 ```
+
+There are also the following horizontal functions: `hbar*()`, `hboxplot*()`, `hpointrange` and `hviolin*()`.
 
 ### Colouring, facetting, neither or both
 
@@ -178,7 +220,7 @@ For boxplot, there is adefault stat of `boxplot`, which means the `y_var` will b
 
 For density, the stat of the `x_var` based on the density prefixed arguments that inform the density calculation.
 
-Generally, an `x_var` and a `y_var` is required. However, `y_var` is not required for `density*()` functions. Neither `x_var` or `y_var` are required for `gg_sf*()` (or `leaflet_sf*()`) functions.
+Generally, an `x_var` and a `y_var` is required. However, `y_var` is not required for `density*()` functions. Neither `x_var` or `y_var` are required for `gg_sf*()` (or `leaf_sf*()`) functions.
 
 ### Titles
 
@@ -212,7 +254,7 @@ You can also request no x_title using `x_title = ""` or likewise for `y_title` a
 
 ### Colour palettes
 
-Change the colour palette by supplying a vector of colours to the `pal` argument. 
+Change the colour palette by supplying a vector of hex code colours to the `pal` argument. 
 
 ```{r}
 gg_point(iris, 
@@ -221,21 +263,32 @@ gg_point(iris,
          pal = "#e7298a")
 ```
 
+```{r}
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = species, 
+             pal = c("#da3490", "#9089fa", "#47e26f"))
+```
+
+Refer to the [colour](https://statisticsnz.github.io/simplevis/articles/colour.html) article for further information.
+
 ### Scales
 
-simplevis makes it easy to make easy scale transformations.
+simplevis makes it easy to modify defaults.
 
-These use consistent prefixes based on `x_*`, `y_*`, `col_*` or `facet_*`, and as such the autocomplete can help identify what you need.
+Arguments have consistent prefixes based on `x_*`, `y_*`, `col_*` or `facet_*`, and as such the autocomplete can help identify what you need.
 
 Some examples of transformations available are:
 
 * `*_na_rm` to quickly not include NA observations
 * `*_labels` to adjust labels for any x, y, col or facet scale
 * `*_zero` to start at zero for numeric x or y scales 
-* `*_pretty_n` for the number of numeric bins of breaks for the x or y scale to aim for 
+* `*_breaks_n` for the number of numeric bins of breaks for the x, y or col scale to aim for 
 * `*_rev` to reverse the order of categorical x, y or col scales in bars 
-* `*_gridlines_minor` whether to add minor gridlines.
 * `*_expand` to add padding to an x or y scale.
+* `*_balance` to balance a numeric scale, so that zero is in the centre 
+* `col_legend_none` to turn the legend off.
 
 ```{r}
 plot_data <- storms %>%
@@ -246,13 +299,13 @@ gg_bar_col(plot_data,
         x_var = year, 
         y_var = wind, 
         col_var = status,
-        position = "stack",
-        x_pretty_n = 4,
+        stack = TRUE,
+        x_breaks_n = 4,
         x_labels = function(x) stringr::str_sub(x, 3, 4),
-        y_labels = function(x) scales::comma(x, accuracy = 0.1), 
+        y_labels = scales::label_comma(accuracy = 0.1), 
+        col_labels = c("H", "TD", "TS"),
         y_zero = T, 
-        y_pretty_n = 10,
-        y_gridlines_minor = T,
+        y_breaks_n = 10,
         y_expand = ggplot2::expansion(mult = c(0.025, 0.025)))
 ```
 
@@ -264,19 +317,36 @@ gg_point_col(penguins,
              col_na_rm = TRUE)
 ```
 
-`bar*()` and `hbar*()` plots support a `"stack"` position as well as the default `"dodge"`.
-
 ```{r}
 plot_data <- penguins %>% 
-  group_by(sex, species) %>% 
-  summarise(count = n())
+  group_by(species) %>% 
+  summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE))  
 
-gg_hbar_col(plot_data, 
-        x_var = count, 
-        y_var = species, 
-        col_var = sex,
-        position = "stack")
+gg_bar_col(plot_data, 
+       x_var = species, 
+       y_var = body_mass_g, 
+       col_var = species, 
+       col_legend_none = TRUE,
+       size_width = 0.5)
 ```
+
+Refer to the [scales](https://statisticsnz.github.io/simplevis/articles/scales.html) article for further information.
+
+### Themes
+
+You can adjust the theme of any `simplevis` plot by providing a `ggplot2` theme to the `theme` argument.
+
+```{r}
+gg_point_col(penguins, 
+             x_var = bill_length_mm, 
+             y_var = body_mass_g, 
+             col_var = species, 
+             title = "A nice long title", 
+             subtitle = "And a subtitle",
+             theme = ggplot2::theme_grey())
+```
+
+Refer to the [themes](https://statisticsnz.github.io/simplevis/articles/themes.html) article for further information.
 
 ### `sf` and `stars` maps
 
@@ -301,16 +371,22 @@ gg_hbar_col(plot_data,
 * No `x_var` and `y_var` variables are required
 * Borders can added to maps by providing an `sf` object to the `borders` argument. 
 
-The following example objects are provided withing the package for learning purposes: `example_sf_point`, `example_sf_polygon` and `example_stars`.
+The following example objects are provided withing the package for learning purposes: `example_point`, `example_polygon` and `example_stars`.
 
 The borders argument allows for the user to provide an sf object as context to the map (e.g. a coastline or administrative boundaries). An sf object of the New Zealand coastline has been provided to illustrate how this works.
 
 ```{r}
-gg_sf_col(example_sf_point, 
-          col_var = median, 
-          col_method = "quantile",
-          col_cuts = c(0, 0.25, 0.5, 0.75, 1),
-          borders = nz)
+gg_sf_col(example_polygon, 
+          col_var = density, 
+          col_method = "continuous",
+          borders = example_borders)
+```
+
+```{r}
+gg_sf_col(example_polygon, 
+          col_var = density, 
+          col_method = "bin",
+          borders = example_borders)
 ```
 
 ```{r}
@@ -319,50 +395,40 @@ gg_stars_col(example_stars,
              col_method = "quantile",
              col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
              col_na_rm = TRUE,
-             borders = nz)
+             borders = example_borders)
 ```
 
 ### leaflet wrappers
 
-simplevis also provides a `leaflet` wrapper functions for `sf` and `stars` objects. 
+simplevis also provides a `leaflet` wrapper functions for `sf` and `stars` objects. These functions work in a similar way to the `gg_sf*()` and `gg_stars*()` functions.
 
-```{r}
-leaflet_sf_col(example_sf_point, 
-               col_var = trend_category)
-```
-
-
-```{r}
-library(stars)
-
-leaflet_stars_col(example_stars, 
-                  col_var = nitrate, 
-                  col_method = "quantile", 
-                  col_cuts = c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1),
-                  col_na_rm = TRUE)
-
-```
+Refer to the [leaflet](https://statisticsnz.github.io/simplevis/articles/leaflet.html) article for further information.
 
 ### Supported variable classes
 
-variable types supported by the different groups of functions are outlined below.
-
-A stat of `identity` refers to the value being plotted as it is. A stat of `boxplot` refers to boxplot statistics being calculated from the data, and these plotted.
+Variable types supported by the different families of functions are outlined below.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 7}
 tibble::tribble(
-  ~family, ~data, ~x_var, ~y_var, ~col_var, ~facet_var, ~stat,
-  "bar", "tibble or data.frame", "Any*", "Numeric", "Categorical or numeric", "Categorical", "identity",
-  "hbar", "tibble or data.frame", "Numeric", "Any*", "Categorical or numeric", "Categorical", "identity",
-  "line", "tibble or data.frame", "Any", "Numeric", "Categorical", "Categorical", "identity",
-  "point", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical", "identity",
-  "density", "tibble or data.frame", "Numeric", NA, "Categorical",  "Categorical", "density",
-  "boxplot", "tibble or data.frame", "Any*", "Numeric", "Categorical", "Categorical", "boxplot (or identity)",
-  "tile",  "tibble or data.frame", "Categorical", "Categorical", "Categorical or numeric", "Categorical", "identity",
-  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical", "identity",
-  "stars", "stars", NA, NA, "Categorical or numeric", NA, "identity",
-  ) %>% 
-  DT::datatable()
+  ~family, ~data, ~x_var, ~y_var, ~col_var, ~facet_var, 
+  "bar", "tibble or data.frame", "Any*", "Numeric", "Categorical or numeric", "Categorical",
+  "boxplot", "tibble or data.frame", "Categorical", "Numeric", "Categorical", "Categorical",
+  "density", "tibble or data.frame", "Numeric", NA, "Categorical",  "Categorical", 
+  "line", "tibble or data.frame", "Any", "Numeric", "Categorical", "Categorical",
+  "point", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical",
+  "pointrange", "tibble or data.frame", "Any", "Numeric", "Categorical or numeric", "Categorical",
+  "sf", "sf", NA, NA, "Categorical or numeric", "Categorical",
+  "smooth", "tibble or data.frame", "Numeric", "Numeric", "Categorical or numeric", "Categorical",
+  "stars", "stars", NA, NA, "Categorical or numeric", NA,
+  "tile",  "tibble or data.frame", "Categorical", "Categorical", "Categorical or numeric", "Categorical",
+  "violin", "tibble or data.frame", "Categorical", "Numeric", "Categorical", "Categorical", 
+  "hbar", "tibble or data.frame", "Numeric", "Any*", "Categorical or numeric", "Categorical",
+  "hboxplot", "tibble or data.frame", "Numeric", "Categorical", "Categorical", "Categorical",
+  "hviolin", "tibble or data.frame", "Numeric", "Categorical", "Categorical", "Categorical", 
+  "hpointrange", "tibble or data.frame", "Numeric", "Any", "Categorical or numeric", "Categorical"
+  ) %>%
+  DT::datatable(options = list(pageLength = 20, lengthChange = FALSE))
+    
 ```
 
 Where:
@@ -378,27 +444,33 @@ Where:
 ```{r}
 penguins %>% 
   gg_density_col(x_var = body_mass_g, 
-                 col_var = species)
+                 col_var = sex,
+                 col_na_rm = TRUE)
 ```
 
-### Output objects and adding layers
+### Extending simplevis Output objects 
 
-All `gg_*` and `leaflet_*` wrapper functions produce ggplot or leaflet objects.
+All `gg_*` and `leaf_*` wrapper functions produce ggplot or leaflet objects.
 
 This means layers can be added to the functions in the same way you would a ggplot2 or leaflet object.
 
-Note you need to add _all_ aesthetics to any additional layers.
+Note you need to add _all_ aesthetics to any additional `geom_*` layers.
 
 ```{r}
-gg_point_col(penguins, 
-             x_var = bill_length_mm, 
-             y_var = body_mass_g, 
+gg_point_col(penguins,
+             x_var = bill_length_mm,
+             y_var = body_mass_g,
              col_var = species) +
-  geom_smooth(aes(x = bill_length_mm, y = body_mass_g, col = species))
+  ggplot2::scale_y_log10(
+    name = "Bill length mm",
+    breaks = function(x) pretty(x, 4),
+    limits = function(x) c(min(pretty(x, 4)), max(pretty(x, 4))),
+    expand = c(0, 0)
+  ) 
 
 ```
 
-This means you can facet by more than one variable, provided that you are not using a position of "stack". 
+This means you can facet by more than one variable, provided that you are not stacking your bars. 
 
 ```{r, fig.height = 4.5}
 plot_data <- penguins %>% 
@@ -408,62 +480,49 @@ plot_data <- penguins %>%
 gg_bar(plot_data, 
        x_var = sex, 
        y_var = body_mass_g, 
-       width = 0.66, 
+       size_width = 0.66, 
        x_na_rm = TRUE, 
-       y_pretty_n = 3) +
+       y_breaks_n = 3) +
   facet_grid(rows = vars(species), 
              cols = vars(island), 
              labeller = as_labeller(snakecase::to_sentence_case))
 
 ```
 
-### ggplotly interactive visualisation
+The `patchwork` package is useful to patch visualisations together.
 
-All ggplot objects can be converted into interactive html objects using ggplotly. You can simply wrap the plot object in `plotly::ggplotly()`. 
+```{r}
+library(patchwork)
 
-The `plotly_camera` function removes plotly widgets other than the camera to keep things tidy.
+p1 <- gg_point(penguins, 
+               x_var = species, 
+               y_var = body_mass_g, 
+               x_jitter = 0.2, 
+               alpha_point = 0.5) 
+
+p2 <- gg_boxplot(penguins, 
+                 x_var = species, 
+                 y_var = body_mass_g) 
+
+p1 + p2
+```
+
+All ggplot objects can be converted into interactive html objects using `plotly::ggplotly`. 
 
 ```{r, eval = FALSE}
-plot <- gg_point_col(penguins, 
-                     x_var = bill_length_mm, 
-                     y_var = body_mass_g, 
-                     col_var = species) 
+plot <- gg_point_col(penguins,
+                     x_var = bill_length_mm,
+                     y_var = body_mass_g,
+                     col_var = species)
 
-plotly::ggplotly(plot) %>% 
+plotly::ggplotly(plot) %>%
   plotly_camera()
 ```
 
 `simplevis` also offers more customisability for making tooltips(i.e. hover values) in ggplotly (i.e. hover values). 
 
-A variable can be added to the `text_var` in the `gg_*` function. This variable is then used in the ggplotly tooltip when `tooltip = text` is added to the `ggplotly` function.
-
-`simplevis` provides a `mutate_text` function which can produce a variable that is a string or variable names and values for a tooltip. Note this function converts column names to sentence case using the `snakecase::to_sentence_case` function. 
-
-The `mutate_text` function uses all variables in the dataset by defalut, but a subset can be used if desired. 
-
-```{r, eval = FALSE}
-plot <- gg_point_col(penguins, 
-                     x_var = bill_length_mm, 
-                     y_var = body_mass_g, 
-                     col_var = species) 
-
-plotly::ggplotly(plot) %>% 
-  plotly_camera()
-
-plot_data <- penguins %>% 
-  mutate_text()
-
-plot <- gg_point_col(plot_data, 
-                     x_var = bill_length_mm, 
-                     y_var = body_mass_g, 
-                     col_var = species, 
-                     text_var = text, 
-                     font_family = "Helvetica")
-
-plotly::ggplotly(plot, tooltip = "text") %>% 
-  plotly_camera()
-```
+Refer to the [ggplotly](https://statisticsnz.github.io/simplevis/articles/ggplotly.html) article for further information.
 
 ### Further information
 
-For further information, see the articles on the [website](https://statisticsnz.github.io/simplevis/).
+For further information, see the articles on the [simplevis](https://statisticsnz.github.io/simplevis/) website.

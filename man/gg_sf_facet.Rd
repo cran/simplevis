@@ -8,43 +8,59 @@ gg_sf_facet(
   data,
   facet_var,
   text_var = NULL,
-  size_point = 1,
+  pal = pal_viridis_reorder(1),
+  pal_borders = "#7F7F7F",
+  borders = NULL,
+  borders_on_top = NULL,
+  alpha_fill = NULL,
+  alpha_line = 1,
+  alpha_point = 1,
+  alpha_borders = 0.5,
   size_line = 0.5,
-  alpha = NULL,
-  pal = NULL,
-  facet_labels = stringr::str_to_sentence,
+  size_point = 1,
+  size_borders = 0.2,
+  facet_labels = snakecase::to_sentence_case,
   facet_na_rm = FALSE,
   facet_ncol = NULL,
   facet_nrow = NULL,
-  borders = NULL,
-  borders_on_top = NULL,
-  borders_pal = "#7F7F7F",
-  borders_size = 0.2,
+  facet_rev = FALSE,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL
+  theme = NULL
 )
 }
 \arguments{
-\item{data}{A sf object with defined coordinate reference system. Required input.}
+\item{data}{A sf object with defined coordinate reference system in a structure to be plotted untransformed. Required input.}
 
 \item{facet_var}{Unquoted categorical variable to facet the data by. Required input.}
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
-\item{size_point}{Size of points. Defaults to 0.5.}
+\item{pal}{Character vector of hex codes.}
+
+\item{pal_borders}{Colour of the borders. Defaults to "#7F7F7F".}
+
+\item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
+
+\item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the sf object supplied to the data argument. Defaults to TRUE for points and lines, but FALSE for polygons..}
+
+\item{alpha_fill}{The opacity of the fill.}
+
+\item{alpha_line}{The alpha of lines and outlines.}
+
+\item{alpha_point}{The alpha of points.}
+
+\item{alpha_borders}{Opacity of the borders. Defaults to 0.5.}
 
 \item{size_line}{Size of lines. Defaults to 0.5.}
 
-\item{alpha}{The opacity of features. Defaults to 1 for points/lines, or 0.5 for polygons.}
+\item{size_point}{Size of points. Defaults to 1.}
 
-\item{pal}{Character vector of hex codes.}
+\item{size_borders}{Size of the borders. Defaults to 0.2.}
 
 \item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
 
@@ -54,13 +70,7 @@ gg_sf_facet(
 
 \item{facet_nrow}{The number of rows of facetted plots.}
 
-\item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
-
-\item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the sf object supplied to the data argument. Defaults to TRUE for points and lines, but FALSE for polygons..}
-
-\item{borders_pal}{Colour of the borders. Defaults to "#7F7F7F".}
-
-\item{borders_size}{Size of the borders. Defaults to 0.2.}
+\item{facet_rev}{TRUE or FALSE of whether the facet variable variable is reversed. Defaults to FALSE.}
 
 \item{title}{Title string.}
 
@@ -74,11 +84,7 @@ gg_sf_facet(
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
-
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
+\item{theme}{A ggplot2 theme.}
 }
 \value{
 A ggplot object.
@@ -87,8 +93,8 @@ A ggplot object.
 Map of simple features in ggplot that is facetted, but not coloured.
 }
 \examples{
-gg_sf_facet(example_sf_point, 
+gg_sf_facet(example_point, 
             facet_var = trend_category, 
-            borders = nz)
+            borders = example_borders)
 
 }

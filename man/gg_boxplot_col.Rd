@@ -9,60 +9,59 @@ gg_boxplot_col(
   x_var,
   y_var = NULL,
   col_var,
-  stat = "boxplot",
   pal = NULL,
   pal_na = "#7F7F7F",
   pal_rev = FALSE,
-  width = 0.5,
-  alpha = 1,
+  alpha_fill = 0.2,
+  alpha_line = 1,
+  alpha_point = 1,
   size_line = 0.5,
   size_point = 1,
+  size_width = 0.5,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
-  x_balance = FALSE,
-  x_labels = NULL,
-  x_pretty_n = 6,
-  x_expand = NULL,
+  x_expand = ggplot2::waiver(),
+  x_labels = snakecase::to_sentence_case,
   x_na_rm = FALSE,
+  x_rev = FALSE,
   x_title = NULL,
   x_title_wrap = 50,
-  x_zero = FALSE,
-  x_zero_line = NULL,
   y_balance = FALSE,
-  y_expand = NULL,
-  y_gridlines_minor = FALSE,
-  y_labels = scales::comma,
-  y_pretty_n = 5,
-  x_rev = FALSE,
+  y_expand = c(0, 0),
+  y_labels = scales::label_comma(),
+  y_breaks_n = 5,
   y_title = NULL,
   y_title_wrap = 50,
-  y_trans = "identity",
   y_zero = FALSE,
   y_zero_line = NULL,
-  col_labels = stringr::str_to_sentence,
+  col_labels = snakecase::to_sentence_case,
+  col_legend_none = FALSE,
   col_na_rm = FALSE,
+  col_rev = FALSE,
   col_title = NULL,
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
+  theme = gg_theme(),
+  stat = "boxplot",
+  ymin_var = NULL,
+  ylower_var = NULL,
+  ymiddle_var = NULL,
+  yupper_var = NULL,
+  ymax_var = NULL,
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{A tibble or dataframe. Required input.}
+\item{data}{An ungrouped summarised tibble or dataframe generally in a structure to be transformed to boxplot statistics (or alternatively in a structure of summary boxplot statistics). Required input.}
 
-\item{x_var}{Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). Required input.}
+\item{x_var}{Unquoted categorical variable to be on the x scale (i.e. character, factor, logical). Required input.}
 
-\item{y_var}{Generally an unquoted numeric variable to be on the y scale. However if stat = "identity" is selected, a list-column with min, lower, middle, upper, and max variable names.}
+\item{y_var}{Unquoted numeric variable to be on the y scale for when stat = "boxplot" is selected.}
 
 \item{col_var}{Unquoted categorical variable to colour the fill of the boxes. Required input.}
-
-\item{stat}{String of "boxplot" or "identity". Defaults to "boxplot".}
 
 \item{pal}{Character vector of hex codes.}
 
@@ -70,13 +69,17 @@ gg_boxplot_col(
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{width}{Width of the box. Defaults to 0.5.}
+\item{alpha_fill}{The opacity of the fill. Defaults to 0.2.}
 
-\item{alpha}{The alpha of the fill. Defaults to 1.}
+\item{alpha_line}{The opacity of the outline. Defaults to 1.}
+
+\item{alpha_point}{The opacity of the outlier points. Defaults to 1.}
 
 \item{size_line}{The size of the outlines of boxplots. Defaults to 0.5.}
 
-\item{size_point}{The size of the outliers. Defaults to 1.}
+\item{size_point}{The size of the outlier points. Defaults to 1.}
+
+\item{size_width}{Width of boxes. Defaults to 0.5.}
 
 \item{title}{Title string.}
 
@@ -86,49 +89,41 @@ gg_boxplot_col(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 75.}
 
-\item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
+\item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
 \item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
 
-\item{x_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 6.}
-
-\item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
-
 \item{x_na_rm}{TRUE or FALSE of whether to include x_var NA values. Defaults to FALSE.}
 
-\item{x_title}{X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
+\item{x_rev}{For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.}
+
+\item{x_title}{x scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
 \item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50.}
-
-\item{x_zero}{For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to FALSE.}
-
-\item{x_zero_line}{For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
 \item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
 
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{y_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the y scale. Defaults to FALSE.}
+\item{y_labels}{A function or named vector to modify y scale labels. Use ggplot2::waiver() to keep y labels untransformed.}
 
-\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
-
-\item{y_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5.}
-
-\item{x_rev}{For a categorical x variable, TRUE or FALSE of whether the x variable variable is reversed. Defaults to FALSE.}
+\item{y_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5.}
 
 \item{y_title}{y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
 \item{y_title_wrap}{Number of characters to wrap the y title to. Defaults to 50.}
 
-\item{y_trans}{For a numeric y variable, a string specifying a transformation for the y scale, such as "log10" or "sqrt". Defaults to "identity".}
-
 \item{y_zero}{For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
 \item{y_zero_line}{For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
-\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence. Use ggplot2::waiver() to keep colour labels untransformed.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case. Use ggplot2::waiver() to keep colour labels untransformed.}
+
+\item{col_legend_none}{TRUE or FALSE of whether to remove the legend.}
 
 \item{col_na_rm}{TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.}
+
+\item{col_rev}{TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
@@ -138,13 +133,21 @@ gg_boxplot_col(
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
+\item{theme}{A ggplot2 theme.}
 
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
+\item{stat}{String of "boxplot" or "identity". Defaults to "boxplot".}
 
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
+\item{ymin_var}{Unquoted numeric variable for minimum of whisker on the y scale for when stat = "identity" is selected.}
 
-\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within a shiny app with the mobileDetect function, then use mobile = input$isMobile.}
+\item{ylower_var}{Unquoted numeric variable for minimum of box on the y scale for when stat = "identity" is selected.}
+
+\item{ymiddle_var}{Unquoted numeric variable for middle of box on the y scale for when stat = "identity" is selected.}
+
+\item{yupper_var}{Unquoted numeric variable for maximum of box on the y scale for when stat = "identity" is selected.}
+
+\item{ymax_var}{Unquoted numeric variable for maximum of whisker on the y scale for when stat = "identity" is selected.}
+
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE.}
 }
 \value{
 A ggplot object.
@@ -154,20 +157,43 @@ Boxplot ggplot that is coloured
 }
 \examples{
 library(simplevis)
+library(dplyr)
 library(palmerpenguins)
 
 gg_boxplot_col(penguins, 
                x_var = species, 
                y_var = body_mass_g, 
-               col_var = sex)
+               col_var = sex, 
+               col_na_rm = TRUE)
 
-plot <- gg_boxplot_col(penguins, 
-                       x_var = species, 
-                       y_var = body_mass_g, 
-                       col_var = sex)
+#For ggplotly, pipe in plotly::layout(boxmode = "group") layer
 
-plotly::ggplotly(plot) \%>\%
-  plotly::layout(boxmode = "group") \%>\%
-  plotly_camera()
+plot_data <- penguins \%>\%
+  group_by(species, sex) \%>\%
+  summarise_boxplot_stats(body_mass_g)
+
+outliers <- penguins \%>\% 
+  group_by(species, sex) \%>\% 
+  summarise_boxplot_outliers(body_mass_g)
+
+size_width <- 0.5
+
+gg_boxplot_col(plot_data,
+               x_var = species,
+               ymin_var = min,
+               ylower_var = lower,
+               ymiddle_var = middle,
+               yupper_var = upper,
+               ymax_var = max,
+               col_var = sex,
+               size_width = size_width,
+               stat = "identity",
+               y_title = "Body mass g",
+               y_breaks_n = 4, 
+               col_na_rm = TRUE) +
+               ggplot2::geom_point(ggplot2::aes(x = species, y = body_mass_g, col = sex), 
+                     size = 0.75, 
+                     position = ggplot2::position_dodge(width = size_width),
+                     data = outliers)
 
 }

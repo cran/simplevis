@@ -6,41 +6,42 @@
 \usage{
 gg_stars(
   data,
-  downsample = 0,
-  pal = NULL,
-  alpha = 0.5,
   borders = NULL,
   borders_on_top = TRUE,
-  borders_pal = "#323232",
-  borders_size = 0.2,
+  downsample = 0,
+  pal = pal_viridis_reorder(1),
+  pal_borders = "#323232",
+  alpha_fill = 0.5,
+  alpha_borders = 0.5,
+  size_borders = 0.2,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
   caption = NULL,
   caption_wrap = 80,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
+  theme = NULL,
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{A stars object with defined coordinate reference system. Note, it cannot be a stars_proxy object. Required input.}
-
-\item{downsample}{downsampling rate: e.g. 3 keeps rows and cols 1, 4, 7, 10 etc. A value of 0 does not downsample. It can be specified for each dimension. E.g. c(5,5,0) to downsample the first two dimensions but not the third.}
-
-\item{pal}{Character vector of hex codes.}
-
-\item{alpha}{The opacity of the array. Defaults to 0.5.}
+\item{data}{A stars object with defined coordinate reference system in a structure to be plotted untransformed. Note, it cannot be a stars_proxy object. Required input.}
 
 \item{borders}{A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.}
 
 \item{borders_on_top}{TRUE or FALSE  as to whether the borders are on top of the stars array. Defaults to TRUE.}
 
-\item{borders_pal}{Colour of the borders. Defaults to "#323232".}
+\item{downsample}{downsampling rate: e.g. 3 keeps rows and cols 1, 4, 7, 10 etc. A value of 0 does not downsample. It can be specified for each dimension. E.g. c(5,5,0) to downsample the first two dimensions but not the third.}
 
-\item{borders_size}{Size of the borders. Defaults to 0.2.}
+\item{pal}{Character vector of hex codes.}
+
+\item{pal_borders}{Colour of the borders. Defaults to "#323232".}
+
+\item{alpha_fill}{The opacity of the fill. Defaults to 0.5.}
+
+\item{alpha_borders}{Opacity of the borders. Defaults to 0.5.}
+
+\item{size_borders}{Size of the borders. Defaults to 0.2.}
 
 \item{title}{Title string.}
 
@@ -54,13 +55,9 @@ gg_stars(
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 80.}
 
-\item{font_family}{Font family to use. Defaults to "".}
+\item{theme}{A ggplot2 theme.}
 
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
-
-\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within a shiny app with the mobileDetect function, then use mobile = input$isMobile.}
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE.}
 }
 \value{
 A ggplot object.
@@ -70,9 +67,8 @@ Map of an array in ggplot that is not coloured and not facetted.
 }
 \examples{
 library(simplevis)
-library(stars)
 
 gg_stars(example_stars, 
-     borders = nz)
+     borders = example_borders)
      
 }

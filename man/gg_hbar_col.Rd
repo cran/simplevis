@@ -10,59 +10,55 @@ gg_hbar_col(
   y_var,
   col_var,
   text_var = NULL,
-  position = NULL,
+  stack = FALSE,
   pal = NULL,
   pal_na = "#7F7F7F",
   pal_rev = FALSE,
-  width = NULL,
-  alpha = 1,
+  alpha_fill = 1,
+  alpha_line = 1,
   size_line = 0.5,
+  size_width = NULL,
   title = NULL,
   title_wrap = 75,
   subtitle = NULL,
   subtitle_wrap = 75,
   x_balance = FALSE,
-  x_expand = NULL,
-  x_gridlines_minor = FALSE,
-  x_labels = scales::comma,
+  x_breaks_n = 5,
+  x_expand = c(0, 0),
+  x_labels = scales::label_comma(),
   x_na_rm = FALSE,
-  x_pretty_n = 5,
   x_title = NULL,
   x_title_wrap = 50,
-  x_trans = "identity",
   x_zero = TRUE,
   x_zero_line = NULL,
   y_balance = FALSE,
+  y_breaks_n = 5,
   y_expand = NULL,
   y_labels = NULL,
   y_na_rm = FALSE,
-  y_pretty_n = 6,
-  y_reorder = FALSE,
   y_rev = FALSE,
   y_title = NULL,
   y_title_wrap = 50,
   y_zero = FALSE,
   y_zero_line = NULL,
+  col_breaks_n = 4,
   col_cuts = NULL,
-  col_label_digits = NULL,
+  col_intervals_right = TRUE,
   col_labels = NULL,
+  col_legend_none = FALSE,
   col_method = NULL,
   col_na_rm = FALSE,
-  col_pretty_n = 5,
   col_rev = FALSE,
-  col_right_closed = TRUE,
   col_title = NULL,
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 75,
-  font_family = "",
-  font_size_title = NULL,
-  font_size_body = NULL,
+  theme = gg_theme(gridlines = "vertical"),
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{A tibble or dataframe. Required input.}
+\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
@@ -72,7 +68,7 @@ gg_hbar_col(
 
 \item{text_var}{Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.}
 
-\item{position}{Whether bars are positioned by "dodge" or "stack". Defaults to "dodge".}
+\item{stack}{TRUE or FALSE of whether bars are to be positioned by "stack". Defaults to FALSE, which positions by "dodge".}
 
 \item{pal}{Character vector of hex codes.}
 
@@ -80,11 +76,13 @@ gg_hbar_col(
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{width}{Width of bars. Defaults to 0.75.}
+\item{alpha_fill}{The opacity of the fill. Defaults to 1.}
 
-\item{alpha}{The alpha of the fill. Defaults to 1.}
+\item{alpha_line}{The opacity of the outline. Defaults to 1.}
 
 \item{size_line}{The size of the outlines of bars.}
+
+\item{size_width}{Width of bars. Defaults to 0.75.}
 
 \item{title}{Title string.}
 
@@ -96,21 +94,17 @@ gg_hbar_col(
 
 \item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
 
+\item{x_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2.}
+
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{x_gridlines_minor}{TRUE or FALSE of whether to add minor gridlines to the x scale. Defaults to FALSE.}
-
-\item{x_labels}{A function or named vector to modify x scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep x labels untransformed.}
+\item{x_labels}{A function or named vector to modify x scale labels. Use function(x) x to keep labels untransformed.}
 
 \item{x_na_rm}{TRUE or FALSE of whether to include x_var NA values. Defaults to FALSE.}
-
-\item{x_pretty_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 3.}
 
 \item{x_title}{X scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
 \item{x_title_wrap}{Number of characters to wrap the x title to. Defaults to 50.}
-
-\item{x_trans}{For a numeric x variable, a string specifying a transformation for the x scale, such as "log10" or "sqrt". Defaults to "identity".}
 
 \item{x_zero}{For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to TRUE.}
 
@@ -118,15 +112,13 @@ gg_hbar_col(
 
 \item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre. Defaults to FALSE.}
 
+\item{y_breaks_n}{For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4.}
+
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
-\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use ggplot2::waiver() to keep y labels untransformed.}
+\item{y_labels}{A function or named vector to modify y scale labels. If NULL, categorical variable labels are converted to sentence case. Use function(x) x to keep labels untransformed.}
 
 \item{y_na_rm}{TRUE or FALSE of whether to include y_var NA values. Defaults to FALSE.}
-
-\item{y_pretty_n}{For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4.}
-
-\item{y_reorder}{For a categorical y variable, TRUE or FALSE of whether the y variable variable is to be reordered by the y variable. Defaults to FALSE.}
 
 \item{y_rev}{For a categorical variable, TRUE or FALSE of whether the y variable variable is reversed. Defaults to FALSE.}
 
@@ -138,21 +130,21 @@ gg_hbar_col(
 
 \item{y_zero_line}{For a numeric y variable, TRUE or FALSE of whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
+\item{col_breaks_n}{For a numeric colour variable, the desired number of intervals on the colour scale.}
+
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_label_digits}{If numeric colour method, the number of digits to round the labels to. Only applicable where col_labels equals NULL.}
+\item{col_intervals_right}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
 
-\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to stringr::str_to_sentence for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.}
+\item{col_labels}{A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::label_comma() for numeric. Use function(x) x to keep labels untransformed.}
 
-\item{col_method}{The method of colouring features, either "bin", "quantile" or "category." If numeric, defaults to "bin".}
+\item{col_legend_none}{TRUE or FALSE of whether to remove the legend.}
+
+\item{col_method}{The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".}
 
 \item{col_na_rm}{TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.}
 
-\item{col_pretty_n}{For a numeric colour variable of "bin" col_method, the desired number of intervals on the colour scale, as calculated by the pretty algorithm. Defaults to 5.}
-
-\item{col_rev}{TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE. Defaults to FALSE.}
-
-\item{col_right_closed}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
+\item{col_rev}{TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE.}
 
 \item{col_title}{Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.}
 
@@ -162,13 +154,9 @@ gg_hbar_col(
 
 \item{caption_wrap}{Number of characters to wrap the caption to. Defaults to 75.}
 
-\item{font_family}{Font family to use. Defaults to "".}
+\item{theme}{A ggplot2 theme.}
 
-\item{font_size_title}{Font size for the title text. Defaults to 11.}
-
-\item{font_size_body}{Font size for all text other than the title. Defaults to 10.}
-
-\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE. If within a shiny app with the mobileDetect function, then use mobile = input$isMobile.}
+\item{mobile}{Whether the plot is to be displayed on a mobile device. Defaults to FALSE.}
 }
 \value{
 A ggplot object.
@@ -185,15 +173,18 @@ plot_data <- penguins \%>\%
   group_by(species, sex) \%>\% 
   summarise(body_mass_g = mean(body_mass_g, na.rm = TRUE))  
 
-gg_hbar_col(plot_data, 
-            x_var = body_mass_g, 
-            y_var = species, 
-            col_var = sex)
+gg_hbar_col(plot_data,
+           x_var = body_mass_g,
+           y_var = species,
+           col_var = sex,
+           col_na_rm = TRUE)
 
-gg_hbar_col(plot_data, 
-            x_var = body_mass_g, 
-            y_var = species, 
-            col_var = sex, 
-            position = "stack")
+ gg_hbar_col(plot_data,
+           x_var = body_mass_g,
+           y_var = species,
+           col_var = sex,
+           col_na_rm = TRUE,
+           stack = TRUE,
+           size_width = 0.5)
             
 }
