@@ -14,7 +14,7 @@ gg_point_col(
   pal_na = "#7F7F7F",
   pal_rev = FALSE,
   alpha_point = 1,
-  size_point = 1,
+  size_point = 1.5,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
@@ -49,7 +49,7 @@ gg_point_col(
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(gridlines = "both"),
+  theme = gg_theme(gridlines_h = TRUE, gridlines_v = TRUE),
   mobile = FALSE
 )
 }
@@ -72,7 +72,7 @@ gg_point_col(
 
 \item{alpha_point}{The opacity of the points.}
 
-\item{size_point}{Size of points. Defaults to 1.}
+\item{size_point}{Size of points. Defaults to 1.5.}
 
 \item{title}{Title string.}
 

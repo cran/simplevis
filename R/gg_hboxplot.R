@@ -8,7 +8,7 @@
 #' @param alpha_line The opacity of the outline. Defaults to 1. 
 #' @param alpha_point The opacity of the outlier points. Defaults to 1. 
 #' @param size_line The size of the outlines of boxplots.
-#' @param size_point The size of the outlier points. Defaults to 1.
+#' @param size_point The size of the outlier points. Defaults to 1.5.
 #' @param size_width Width of boxes. Defaults to 0.5.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
@@ -73,14 +73,14 @@
 #'             data = outliers)
 #'   
 gg_hboxplot <- function(data,
-                    x_var,
+                    x_var = NULL,
                     y_var,
                     pal = pal_viridis_reorder(1),
                     alpha_fill = 0.2,
                     alpha_line = 1,
                     alpha_point = 1,
                     size_line = 0.5,
-                    size_point = 1,
+                    size_point = 1.5,
                     size_width = 0.5,
                     title = NULL,
                     title_wrap = 75,
@@ -102,7 +102,7 @@ gg_hboxplot <- function(data,
                     y_title_wrap = 50,
                     caption = NULL,
                     caption_wrap = 75,
-                    theme = gg_theme(gridlines = "vertical"),
+                    theme = gg_theme(gridlines_v = TRUE),
                     stat = "boxplot",
                     xmin_var = NULL,
                     xlower_var = NULL,
@@ -140,7 +140,7 @@ gg_hboxplot <- function(data,
   }
   
   #warnings
-  if (is.numeric(y_var_vctr)) stop("Please use a numeric y variable for a horizontal boxplot")
+  if (is.numeric(y_var_vctr)) stop("Please use a categorical y variable for a horizontal boxplot")
   if (stat == "boxplot" & !is.numeric(x_var_vctr)) stop("Please use a numeric x variable for a horizontal boxplot when stat = 'boxplot'")
   
   #logical to factor
@@ -278,7 +278,7 @@ gg_hboxplot <- function(data,
 #' @param alpha_line The opacity of the outline. Defaults to 1. 
 #' @param alpha_point The opacity of the outlier points. Defaults to 1. 
 #' @param size_line The size of the outlines of boxplots.
-#' @param size_point The size of the outlier points. Defaults to 1.
+#' @param size_point The size of the outlier points. Defaults to 1.5.
 #' @param size_width Width of boxes. Defaults to 0.5.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
@@ -359,7 +359,7 @@ gg_hboxplot <- function(data,
 #'                      data = outliers)
 #'                      
 gg_hboxplot_col <- function(data,
-                        x_var,
+                        x_var = NULL,
                         y_var,
                         col_var,
                         pal = NULL,
@@ -369,7 +369,7 @@ gg_hboxplot_col <- function(data,
                         alpha_line = 1,
                         alpha_point = 1,
                         size_line = 0.5,
-                        size_point = 1,
+                        size_point = 1.5,
                         size_width = 0.5,
                         title = NULL,
                         title_wrap = 75,
@@ -397,7 +397,7 @@ gg_hboxplot_col <- function(data,
                         col_title_wrap = 25,
                         caption = NULL,
                         caption_wrap = 75,
-                        theme = gg_theme(gridlines = "vertical"),
+                        theme = gg_theme(gridlines_v = TRUE),
                         stat = "boxplot",
                         xmin_var = NULL,
                         xlower_var = NULL,
@@ -442,7 +442,7 @@ gg_hboxplot_col <- function(data,
   }
 
   #warnings
-  if (is.numeric(y_var_vctr)) stop("Please use a numeric y variable for a horizontal boxplot")
+  if (is.numeric(y_var_vctr)) stop("Please use a categorical y variable for a horizontal boxplot")
   if (stat == "boxplot" & !is.numeric(x_var_vctr)) stop("Please use a numeric x variable for a horizontal boxplot when stat = 'boxplot'")
   if (is.numeric(col_var_vctr)) stop("Please use a categorical colour variable for a horizontal boxplot")
   
@@ -638,7 +638,7 @@ gg_hboxplot_col <- function(data,
 #' @param alpha_line The opacity of the outline. Defaults to 1. 
 #' @param alpha_point The opacity of the outlier points. Defaults to 1. 
 #' @param size_line The size of the outlines of boxplots. 
-#' @param size_point The size of the outlier points. Defaults to 1.
+#' @param size_point The size of the outlier points. Defaults to 1.5.
 #' @param size_width Width of boxes. Defaults to 0.5.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
@@ -687,7 +687,7 @@ gg_hboxplot_col <- function(data,
 #'               y_na_rm = TRUE)
 #'
 gg_hboxplot_facet <- function(data,
-                          x_var,
+                          x_var = NULL,
                           y_var,
                           facet_var,
                           pal = pal_viridis_reorder(1),
@@ -695,7 +695,7 @@ gg_hboxplot_facet <- function(data,
                           alpha_line = 1,
                           alpha_point = 1,
                           size_line = 0.5,
-                          size_point = 1,
+                          size_point = 1.5,
                           size_width = 0.5,
                           title = NULL,
                           title_wrap = 75,
@@ -723,7 +723,7 @@ gg_hboxplot_facet <- function(data,
                           facet_scales = "fixed",
                           caption = NULL,
                           caption_wrap = 75,
-                          theme = gg_theme(gridlines = "vertical"),
+                          theme = gg_theme(gridlines_v = TRUE),
                           stat = "boxplot", 
                           xmin_var = NULL,
                           xlower_var = NULL,
@@ -767,7 +767,7 @@ gg_hboxplot_facet <- function(data,
   }
 
   #warnings
-  if (is.numeric(y_var_vctr)) stop("Please use a numeric y variable for a horizontal boxplot")
+  if (is.numeric(y_var_vctr)) stop("Please use a categorical y variable for a horizontal boxplot")
   if (stat == "boxplot" & !is.numeric(x_var_vctr)) stop("Please use a numeric x variable for a horizontal boxplot when stat = 'boxplot'")
   if (is.numeric(facet_var_vctr)) stop("Please use a categorical facet variable for a horizontal boxplot")
   
@@ -915,7 +915,7 @@ gg_hboxplot_facet <- function(data,
 #' @param alpha_point The opacity of the outlier points. Defaults to 1. 
 #' @param size_width Width of boxes. Defaults to 0.5.
 #' @param size_line The size of the outlines of boxplots. 
-#' @param size_point The size of the outlier points. Defaults to 1.
+#' @param size_point The size of the outlier points. Defaults to 1.5.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
@@ -973,7 +973,7 @@ gg_hboxplot_facet <- function(data,
 #' #For ggplotly, pipe in plotly::layout(boxmode = "group") layer
 #' 
 gg_hboxplot_col_facet <- function(data,
-                              x_var,
+                              x_var = NULL,
                               y_var,
                               col_var,
                               facet_var,
@@ -984,7 +984,7 @@ gg_hboxplot_col_facet <- function(data,
                               alpha_line = 1,
                               alpha_point = 1,
                               size_line = 0.5,
-                              size_point = 1,
+                              size_point = 1.5,
                               size_width = 0.5,
                               title = NULL,
                               title_wrap = 75,
@@ -1018,7 +1018,7 @@ gg_hboxplot_col_facet <- function(data,
                               facet_scales = "fixed",
                               caption = NULL,
                               caption_wrap = 75,
-                              theme = gg_theme(gridlines = "vertical"), 
+                              theme = gg_theme(gridlines_v = TRUE), 
                               stat = "boxplot", 
                               xmin_var = NULL,
                               xlower_var = NULL,
@@ -1069,7 +1069,7 @@ gg_hboxplot_col_facet <- function(data,
   }
   
   #warnings
-  if (is.numeric(y_var_vctr)) stop("Please use a numeric y variable for a horizontal boxplot")
+  if (is.numeric(y_var_vctr)) stop("Please use a categorical y variable for a horizontal boxplot")
   if (stat == "boxplot" & !is.numeric(x_var_vctr)) stop("Please use a numeric x variable for a horizontal boxplot when stat = 'boxplot'")
   if (is.numeric(col_var_vctr)) stop("Please use a categorical colour variable for a horizontal boxplot")
   if (is.numeric(facet_var_vctr)) stop("Please use a categorical facet variable for a horizontal boxplot")

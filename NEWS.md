@@ -1,3 +1,22 @@
+# simplevis 6.1.0
+
+* In leaf_*, removed side-effect of clearing the map, and added a new function to do this.
+* Created leaf_clear() for use in shiny.
+* In leaf_*, added group_id and legend_id arguments. 
+* Made theme outputs from gg_theme a gg and theme object, rather than a list.
+* Changed the gg_theme() family argument to font.
+* Changed the gg_theme() gridlines arguments to gridlines_h and gridlines_v.
+* Changed gg_theme() gridlines default to no gridlines.
+* Moved the gg_theme gridlines arguments to the front.
+* In theme, added arguments to modify background colours.
+* In theme, changed face_ arguments to style_.
+* Added functionality to allow different font for titles to body.
+* Dropped gg_theme_void, and merged this functionality into gg_theme with void argument.
+* Dropped gg_theme_mobile_extra_map and merged this functionality into gg_theme_mobile_extra with void argument.
+* In density, updated default to gridlines each way.
+* Updated size_point default to 1.5.
+* Fixed leaf_sf*() functions to wotk with longlat CRS's that are not 4326 (e.g. 4167).
+
 # simplevis 6.0.0
 
 New features:

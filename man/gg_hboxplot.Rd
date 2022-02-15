@@ -6,14 +6,14 @@
 \usage{
 gg_hboxplot(
   data,
-  x_var,
+  x_var = NULL,
   y_var,
   pal = pal_viridis_reorder(1),
   alpha_fill = 0.2,
   alpha_line = 1,
   alpha_point = 1,
   size_line = 0.5,
-  size_point = 1,
+  size_point = 1.5,
   size_width = 0.5,
   title = NULL,
   title_wrap = 75,
@@ -35,7 +35,7 @@ gg_hboxplot(
   y_title_wrap = 50,
   caption = NULL,
   caption_wrap = 75,
-  theme = gg_theme(gridlines = "vertical"),
+  theme = gg_theme(gridlines_v = TRUE),
   stat = "boxplot",
   xmin_var = NULL,
   xlower_var = NULL,
@@ -62,7 +62,7 @@ gg_hboxplot(
 
 \item{size_line}{The size of the outlines of boxplots.}
 
-\item{size_point}{The size of the outlier points. Defaults to 1.}
+\item{size_point}{The size of the outlier points. Defaults to 1.5.}
 
 \item{size_width}{Width of boxes. Defaults to 0.5.}
 

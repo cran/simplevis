@@ -6,13 +6,11 @@
 #'
 #' @export
 shiny_demo <- function(mobile = FALSE) {
-  suppressWarnings({
-    
-    demodir <- system.file("shiny", package = "simplevis")
-    
-    if (mobile == FALSE) demo <- 1
-    if (mobile == TRUE) demo <- 2
-    
-    shiny::runApp(sprintf("%s/%s", demodir, demo))
-  })
+  
+  demodir <- system.file("shiny", package = "simplevis")
+  
+  if (mobile == FALSE) demo <- 1
+  if (mobile == TRUE) demo <- 2
+  
+  shiny::runApp(sprintf("%s/%s", demodir, demo))
 }

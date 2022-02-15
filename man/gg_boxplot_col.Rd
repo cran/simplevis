@@ -16,7 +16,7 @@ gg_boxplot_col(
   alpha_line = 1,
   alpha_point = 1,
   size_line = 0.5,
-  size_point = 1,
+  size_point = 1.5,
   size_width = 0.5,
   title = NULL,
   title_wrap = 80,
@@ -44,7 +44,7 @@ gg_boxplot_col(
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(),
+  theme = gg_theme(gridlines_h = TRUE),
   stat = "boxplot",
   ymin_var = NULL,
   ylower_var = NULL,
@@ -77,7 +77,7 @@ gg_boxplot_col(
 
 \item{size_line}{The size of the outlines of boxplots. Defaults to 0.5.}
 
-\item{size_point}{The size of the outlier points. Defaults to 1.}
+\item{size_point}{The size of the outlier points. Defaults to 1.5.}
 
 \item{size_width}{Width of boxes. Defaults to 0.5.}
 

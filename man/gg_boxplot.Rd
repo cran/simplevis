@@ -13,7 +13,7 @@ gg_boxplot(
   alpha_line = 1,
   alpha_point = 1,
   size_line = 0.5,
-  size_point = 1,
+  size_point = 1.5,
   size_width = 0.5,
   title = NULL,
   title_wrap = 80,
@@ -41,7 +41,7 @@ gg_boxplot(
   ymiddle_var = NULL,
   yupper_var = NULL,
   ymax_var = NULL,
-  theme = gg_theme(),
+  theme = gg_theme(gridlines_h = TRUE),
   mobile = FALSE
 )
 }
@@ -62,7 +62,7 @@ gg_boxplot(
 
 \item{size_line}{The size of the outlines of boxplots. Defaults to 0.5.}
 
-\item{size_point}{The size of the outlier points. Defaults to 1.}
+\item{size_point}{The size of the outlier points. Defaults to 1.5.}
 
 \item{size_width}{Width of boxes. Defaults to 0.5.}
 

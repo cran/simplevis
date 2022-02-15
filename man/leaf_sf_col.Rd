@@ -31,6 +31,8 @@ leaf_sf_col(
   col_title = NULL,
   label_numeric_format = function(x) prettyNum(x, big.mark = ",", scientific = FALSE),
   layer_id_var = NULL,
+  group_id = NULL,
+  legend_id = NULL,
   map_id = "map"
 )
 }
@@ -87,7 +89,11 @@ leaf_sf_col(
 
 \item{layer_id_var}{Unquoted variable to be used as a shiny id, such that in the event where a feature is clicked on, the applicable value of this is available as input$map_marker_click$id or input$map_shape_click$id.}
 
-\item{map_id}{The shiny map id for a leaflet map within a shiny app. Defaults to "map".}
+\item{group_id}{The id name for the sf group.}
+
+\item{legend_id}{The id name for the layerId of the legend.}
+
+\item{map_id}{The map id for the leaflet map. Defaults to "map".}
 }
 \value{
 A leaflet object.
@@ -96,6 +102,7 @@ A leaflet object.
 Map of simple features in leaflet that is coloured.
 }
 \examples{
+\dontrun{
 leaf_sf_col(example_point,
               col_var = trend_category)
 
@@ -121,5 +128,6 @@ leaf_sf_col(example_polygon,
               col_var = density,
               col_method = "quantile",
               col_cuts = c(0, 0.25, 0.5, 0.75, 0.95, 1))
+}
 
 }

@@ -11,7 +11,7 @@
 #' @param alpha_point The alpha of points. 
 #' @param alpha_borders Opacity of the borders. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param size_point Size of points. Defaults to 1.
+#' @param size_point Size of points. Defaults to 1.5.
 #' @param size_borders Size of the borders. Defaults to 0.2.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
@@ -38,7 +38,7 @@ gg_sf <- function(data,
                   alpha_point = 1,
                   alpha_borders = 0.5,
                   size_line = 0.5,
-                  size_point = 1,
+                  size_point = 1.5,
                   size_borders = 0.2,
                   title = NULL,
                   title_wrap = 80,
@@ -46,7 +46,7 @@ gg_sf <- function(data,
                   subtitle_wrap = 80,
                   caption = NULL,
                   caption_wrap = 80,
-                  theme = NULL,
+                  theme = gg_theme(void = TRUE),
                   mobile = FALSE
 ) {
   
@@ -72,8 +72,6 @@ gg_sf <- function(data,
   }
   
   #fundamentals
-  if (is.null(theme)) theme <- gg_theme_map()
-
   plot <- ggplot(data) +
     theme
   
@@ -166,7 +164,7 @@ gg_sf <- function(data,
         subtitle = stringr::str_wrap(subtitle, 40),
         caption = stringr::str_wrap(caption, 50)
       ) + 
-      theme_mobile_extra_map()
+      theme_mobile_extra(void = TRUE)
   }
   
   return(plot)
@@ -188,7 +186,7 @@ gg_sf <- function(data,
 #' @param alpha_point The alpha of points. 
 #' @param alpha_borders Opacity of the borders. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param size_point Size of points. Defaults to 1.
+#' @param size_point Size of points. Defaults to 1.5.
 #' @param size_borders Size of the borders. Defaults to 0.2.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
@@ -257,7 +255,7 @@ gg_sf_col <- function(data,
                       alpha_point = 1,
                       alpha_borders = 0.5,
                       size_line = 0.5,
-                      size_point = 1,
+                      size_point = 1.5,
                       size_borders = 0.2,
                       title = NULL,
                       title_wrap = 80,
@@ -274,7 +272,7 @@ gg_sf_col <- function(data,
                       col_title_wrap = 25,
                       caption = NULL,
                       caption_wrap = 80,
-                      theme = NULL,
+                      theme = gg_theme(void = TRUE),
                       mobile = FALSE
 ) {
   
@@ -324,8 +322,6 @@ gg_sf_col <- function(data,
   if (is.null(col_title)) col_title <- snakecase::to_sentence_case(rlang::as_name(col_var))
   
   #fundamentals
-  if (is.null(theme)) theme <- gg_theme_map()
-  
   plot <- ggplot(data) +
     theme
   
@@ -577,7 +573,7 @@ gg_sf_col <- function(data,
         subtitle = stringr::str_wrap(subtitle, 40),
         caption = stringr::str_wrap(caption, 50)
       )  +
-      theme_mobile_extra_map()
+      theme_mobile_extra(void = TRUE)
   }
   
   return(plot)
@@ -596,7 +592,7 @@ gg_sf_col <- function(data,
 #' @param alpha_line The alpha of lines and outlines. 
 #' @param alpha_point The alpha of points. 
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param size_point Size of points. Defaults to 1.
+#' @param size_point Size of points. Defaults to 1.5.
 #' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.
 #' @param facet_na_rm TRUE or FALSE of whether to include facet_var NA values. Defaults to FALSE.
 #' @param facet_ncol The number of columns of facetted plots. 
@@ -632,7 +628,7 @@ gg_sf_facet <- function(data,
                         alpha_point = 1,
                         alpha_borders = 0.5,
                         size_line = 0.5,
-                        size_point = 1,
+                        size_point = 1.5,
                         size_borders = 0.2,
                         facet_labels = snakecase::to_sentence_case,
                         facet_na_rm = FALSE,
@@ -645,7 +641,7 @@ gg_sf_facet <- function(data,
                         subtitle_wrap = 80,
                         caption = NULL,
                         caption_wrap = 80,
-                        theme = NULL) {
+                        theme = gg_theme(void = TRUE)) {
   
   #ungroup
   data <- dplyr::ungroup(data)
@@ -697,8 +693,6 @@ gg_sf_facet <- function(data,
   }
   
   #fundamentals
-  if (is.null(theme)) theme <- gg_theme_map()
-  
   plot <- ggplot(data) +
     theme
   
@@ -803,7 +797,7 @@ gg_sf_facet <- function(data,
 #' @param alpha_point The alpha of points. 
 #' @param alpha_borders Opacity of the borders. Defaults to 0.5.
 #' @param size_line Size of lines. Defaults to 0.5.
-#' @param size_point Size of points. Defaults to 1.
+#' @param size_point Size of points. Defaults to 1.5.
 #' @param size_borders Size of the borders. Defaults to 0.2.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
@@ -850,7 +844,7 @@ gg_sf_col_facet <- function(data,
                             alpha_point = 1,
                             alpha_borders = 0.5,
                             size_line = 0.5,
-                            size_point = 1,
+                            size_point = 1.5,
                             size_borders = 0.2,
                             title = NULL,
                             title_wrap = 80,
@@ -872,7 +866,7 @@ gg_sf_col_facet <- function(data,
                             facet_rev = FALSE,
                             caption = NULL,
                             caption_wrap = 80,
-                            theme = NULL)
+                            theme = gg_theme(void = TRUE))
 {
   
   #ungroup
@@ -944,8 +938,6 @@ gg_sf_col_facet <- function(data,
   }
   
   #fundamentals
-  if (is.null(theme)) theme <- gg_theme_map()
-  
   plot <- ggplot(data) +
     theme
   
