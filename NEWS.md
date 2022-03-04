@@ -1,3 +1,13 @@
+# simplevis 6.2.0
+
+* Added gg_histogram*() functions.
+* In leaf_sf*(), updated the map_id default to leaf
+* Updated app demos.
+* Adjusted default alpha_fill values.
+* Added kimisc to imports.
+* Changed default bar oob back to ggplot2 default.
+* Changed gg_pointrange*() and gg_hpointrange*() y_var and x_var arguments to ymiddle_var and xmiddle_var. 
+
 # simplevis 6.1.0
 
 * In leaf_*, removed side-effect of clearing the map, and added a new function to do this.

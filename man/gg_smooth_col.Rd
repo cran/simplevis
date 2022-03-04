@@ -12,7 +12,7 @@ gg_smooth_col(
   pal = NULL,
   pal_na = "#7F7F7F",
   pal_rev = FALSE,
-  alpha_fill = 0.2,
+  alpha_fill = 0.5,
   alpha_line = 1,
   alpha_point = 1,
   size_line = 0.5,
@@ -61,7 +61,7 @@ gg_smooth_col(
 
 \item{y_var}{Unquoted numeric variable to be on the y scale. Required input.}
 
-\item{col_var}{Unquoted variable for points to be coloured by. Required input.}
+\item{col_var}{Unquoted categorical variable for points to be coloured by. Required input.}
 
 \item{pal}{Character vector of hex codes.}
 
@@ -69,7 +69,7 @@ gg_smooth_col(
 
 \item{pal_rev}{Reverses the palette. Defaults to FALSE.}
 
-\item{alpha_fill}{The opacity of the fill. Defaults to 0.2.}
+\item{alpha_fill}{The opacity of the fill. Defaults to 0.5.}
 
 \item{alpha_line}{The opacity of the line. Defaults to 1.}
 

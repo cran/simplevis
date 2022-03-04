@@ -232,7 +232,7 @@ gg_hbar <- function(data,
     x_limits <- c(min(x_breaks, na.rm = TRUE), max(x_breaks, na.rm = TRUE))
     
     plot <- plot +
-      scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels, oob = scales::oob_squish)
+      scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels)
   })
   
   if (x_zero_line == TRUE) {
@@ -511,7 +511,7 @@ gg_hbar_col <- function(data,
         data <- data %>%
           dplyr::mutate(
             dplyr::across(!!col_var, 
-                          ~ cut_format(.x, col_cuts,
+                          ~ kimisc::cut_format(.x, col_cuts,
                                        right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
         
         col_labels <- sv_interval_labels_chr
@@ -520,7 +520,7 @@ gg_hbar_col <- function(data,
         data <- data %>%
           dplyr::mutate(
             dplyr::across(!!col_var, 
-                          ~ cut_format(.x, col_cuts,
+                          ~ kimisc::cut_format(.x, col_cuts,
                                        right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
       }
       
@@ -632,7 +632,7 @@ gg_hbar_col <- function(data,
     x_limits <- c(min(x_breaks, na.rm = TRUE), max(x_breaks, na.rm = TRUE))
     
     plot <- plot +
-      scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels, oob = scales::oob_squish)
+      scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels)
   })
   
   if (x_zero_line == TRUE) {
@@ -972,7 +972,7 @@ gg_hbar_facet <- function(data,
       x_limits <- c(min(x_breaks, na.rm = TRUE), max(x_breaks, na.rm = TRUE))
       
       plot <- plot +
-        scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels, oob = scales::oob_squish)
+        scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels)
     })
   }
   else if (facet_scales %in% c("free", "free_x")) {
@@ -1269,7 +1269,7 @@ gg_hbar_col_facet <- function(data,
         data <- data %>%
           dplyr::mutate(
             dplyr::across(!!col_var, 
-                          ~ cut_format(.x, col_cuts,
+                          ~ kimisc::cut_format(.x, col_cuts,
                                        right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
         
         col_labels <- sv_interval_labels_chr
@@ -1278,7 +1278,7 @@ gg_hbar_col_facet <- function(data,
         data <- data %>%
           dplyr::mutate(
             dplyr::across(!!col_var, 
-                          ~ cut_format(.x, col_cuts,
+                          ~ kimisc::cut_format(.x, col_cuts,
                                        right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
       }
       
@@ -1386,7 +1386,7 @@ gg_hbar_col_facet <- function(data,
       x_limits <- c(min(x_breaks, na.rm = TRUE), max(x_breaks, na.rm = TRUE))
       
       plot <- plot +
-        scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels, oob = scales::oob_squish)
+        scale_y_continuous(expand = x_expand, breaks = x_breaks, limits = x_limits, labels = x_labels)
     })
   }
   else if (facet_scales %in% c("free", "free_x")) {

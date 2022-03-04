@@ -1,4 +1,4 @@
-<img src="man/figures/logo.png" height="150" align = "right">
+<img src="man/figures/logo.png" align="right" height="139" style="float:right; height:139px;">
 
 <!-- badges: start -->
   [![CRAN status](https://www.r-pkg.org/badges/version/simplevis)](https://CRAN.R-project.org/package=simplevis)
@@ -13,12 +13,6 @@
 ### Purpose
 
 `simplevis` is a package of `ggplot2` and `leaflet` wrapper functions that aims to make visualisation easier with less brainpower required.
-
-It does this by:
-
-* using families of functions of combinations of colouring (by a variable), facetting, neither or both
-* using prefixes to make it easier to adjust aspects of the visualisation  
-* unifying colouring into one concept, and simplyfing applying different colouring methods. 
 
 ### Installation
 
