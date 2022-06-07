@@ -1,8 +1,8 @@
 Package: simplevis
 Type: Package
-Title: Simple 'ggplot2' and 'leaflet' Visualisation with Less
-        Brainpower
-Version: 6.2.0
+Title: Wrappers to Simplify Beautiful 'ggplot2' and 'leaflet'
+        Visualisation
+Version: 6.3.0
 Authors@R: 
     c(person(given = "David",
              family = "Hodge",
@@ -19,28 +19,30 @@ Authors@R:
              comment = c(ORCID = "0000-0002-1727-5110")),
       person(given = "Statistics New Zealand",
              role = c("cph")))
-Description: Wrapper functions to make 'ggplot2' and 'leaflet' visualisation easier with less brainpower required.
+Description: Wrapper functions around the amazing 'ggplot2' and 'leaflet' 
+    packages that aims to simplify beautiful 'ggplot2' and 'leaflet'  
+    visualisation. Precursor package to the 'ggblanket' package. 
 License: MIT + file LICENSE
-URL: https://statisticsnz.github.io/simplevis/,
-        https://github.com/statisticsnz/simplevis/
-BugReports: https://github.com/statisticsNZ/simplevis/issues/
+URL: https://StatisticsNZ.github.io/simplevis/,
+        https://github.com/StatisticsNZ/simplevis/
+BugReports: https://github.com/StatisticsNZ/simplevis/issues/
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
 Imports: dplyr, forcats, ggplot2, htmlwidgets, leaflet, leafem,
-        leafpop, kimisc, lubridate, magrittr, plotly, purrr, rlang,
+        leafpop, lubridate, magrittr, plotly, purrr, rlang, santoku,
         scales, sf, shiny, snakecase, stars, stringr, tidyr,
         tidyselect, viridis
-Suggests: DT, glue, knitr, pals, palmerpenguins, patchwork, rgdal,
-        rgeos, rmarkdown, s2, shinycssloaders, tibble, tidytext
+Suggests: DT, glue, gt, knitr, pals, palmerpenguins, patchwork, rgdal,
+        rgeos, rmarkdown, s2, tibble, tidytext
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 NeedsCompilation: no
-Packaged: 2022-03-04 04:05:57 UTC; dhodge
+Packaged: 2022-06-07 09:04:36 UTC; david
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Kate Lee [ctb] (<https://orcid.org/0000-0002-0886-3746>),
   Xavier Miles [ctb] (<https://orcid.org/0000-0002-1727-5110>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-03-04 04:30:02 UTC
+Date/Publication: 2022-06-07 09:20:02 UTC

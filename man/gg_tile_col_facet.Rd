@@ -21,7 +21,7 @@ gg_tile_col_facet(
   size_line = 0.5,
   size_label = 3.5,
   size_height = 1,
-  size_width = 1,
+  width = 1,
   title = NULL,
   title_wrap = 75,
   subtitle = NULL,
@@ -40,7 +40,7 @@ gg_tile_col_facet(
   y_title_wrap = 50,
   col_breaks_n = 4,
   col_cuts = NULL,
-  col_intervals_right = TRUE,
+  col_intervals_left = TRUE,
   col_labels = NULL,
   col_legend_none = FALSE,
   col_method = NULL,
@@ -59,7 +59,7 @@ gg_tile_col_facet(
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
+\item{data}{A data frame in a structure to be plotted untransformed. Required input.}
 
 \item{x_var}{Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). If numeric, date or datetime, variable values are bins that are mutually exclusive and equidistant. Required input.}
 
@@ -91,7 +91,7 @@ gg_tile_col_facet(
 
 \item{size_height}{Height of tiles. Defaults to 1.}
 
-\item{size_width}{Width of tiles. Defaults to 1.}
+\item{width}{Width of tiles. Defaults to 1.}
 
 \item{title}{Title string.}
 
@@ -129,7 +129,7 @@ gg_tile_col_facet(
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_intervals_right}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
+\item{col_intervals_left}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.}
 
 \item{col_labels}{A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::label_comma() for numeric. Use function(x) x to keep labels untransformed.}
 

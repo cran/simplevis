@@ -1,7 +1,7 @@
 #' @title Histogram ggplot.
 #' 
-#' @description histogram ggplot that is not coloured and not facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.
+#' @description Histogram ggplot that is not coloured and not facetted.
+#' @param data A data frame in a structure to be transformed to histogram statistics. Required input.
 #' @param x_var Unquoted numeric variable to be on the x scale. Required input.
 #' @param pal Character vector of hex codes. 
 #' @param alpha_fill The opacity of the fill. Defaults to 0.5.  
@@ -38,7 +38,7 @@
 #' 
 gg_histogram <- function(data,
                        x_var,
-                       pal = pal_viridis_reorder(1),
+                       pal = pal_viridis_mix(1),
                        alpha_fill = 0.5,
                        alpha_line = 1,
                        size_line = 0.5,
@@ -59,7 +59,7 @@ gg_histogram <- function(data,
                        y_title_wrap = 50,
                        caption = NULL,
                        caption_wrap = 80,
-                       theme = gg_theme(gridlines_h = TRUE),
+                       theme = gg_theme(y_grid = TRUE),
                        mobile = FALSE) {
   
   #ungroup
@@ -151,8 +151,8 @@ gg_histogram <- function(data,
 
 #' @title Histogram ggplot that is coloured.
 #' 
-#' @description histogram ggplot that is coloured but not facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.
+#' @description Histogram ggplot that is coloured, but not facetted.
+#' @param data A data frame in a structure to be transformed to histogram statistics. Required input.
 #' @param x_var Unquoted numeric variable to be on the x scale. Required input.
 #' @param col_var Unquoted categorical variable to colour histogram areas. Required input.
 #' @param pal Character vector of hex codes. 
@@ -228,7 +228,7 @@ gg_histogram_col <- function(data,
                            col_title_wrap = 25,
                            caption = NULL,
                            caption_wrap = 80,
-                           theme = gg_theme(gridlines_h = TRUE),
+                           theme = gg_theme(y_grid = TRUE),
                            mobile = FALSE) {
   
   #ungroup
@@ -271,7 +271,7 @@ gg_histogram_col <- function(data,
   }
   else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+  if (is.null(pal)) pal <- pal_d3_mix(col_n)
   else pal <- pal[1:col_n]
   
   if (pal_rev == TRUE) pal <- rev(pal)
@@ -339,15 +339,6 @@ gg_histogram_col <- function(data,
       name = stringr::str_wrap(col_title, col_title_wrap)
     )
   
-  if (mobile == TRUE & col_legend_none == TRUE) {
-    plot <- plot +
-      guides(col = guide_legend(ncol = 1), 
-             fill = guide_legend(ncol = 1))
-  }
-  
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
-  
   #titles
   if (mobile == FALSE) {
     plot <- plot +
@@ -371,13 +362,18 @@ gg_histogram_col <- function(data,
       theme_mobile_extra()
   }
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }
 
 #' @title Histogram ggplot that is facetted.
 #' 
-#' @description histogram ggplot that is facetted, but not coloured.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.
+#' @description Histogram ggplot that is facetted, but not coloured.
+#' @param data A data frame in a structure to be transformed to histogram statistics. Required input.
 #' @param x_var Unquoted numeric variable to be on the x scale. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
 #' @param pal Character vector of hex codes. 
@@ -422,7 +418,7 @@ gg_histogram_col <- function(data,
 gg_histogram_facet <- function(data,
                              x_var,
                              facet_var,
-                             pal = pal_viridis_reorder(1),
+                             pal = pal_viridis_mix(1),
                              alpha_fill = 0.5,
                              alpha_line = 1,
                              size_line = 0.5,
@@ -449,7 +445,7 @@ gg_histogram_facet <- function(data,
                              facet_scales = "fixed",
                              caption = NULL,
                              caption_wrap = 80,
-                             theme = gg_theme(gridlines_h = TRUE)
+                             theme = gg_theme(y_grid = TRUE)
                              ) {
   
   #ungroup
@@ -551,8 +547,8 @@ gg_histogram_facet <- function(data,
 
 #' @title Histogram ggplot that is coloured and facetted.
 #' 
-#' @description histogram ggplot that is coloured and facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.
+#' @description Histogram ggplot that is coloured and facetted.
+#' @param data A data frame in a structure to be transformed to histogram statistics. Required input.
 #' @param x_var Unquoted numeric variable to be on the x scale. Required input.
 #' @param col_var Unquoted categorical variable to colour histogram areas. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
@@ -642,7 +638,7 @@ gg_histogram_col_facet <- function(data,
                                  facet_scales = "fixed",
                                  caption = NULL,
                                  caption_wrap = 80, 
-                                 theme = gg_theme(gridlines_h = TRUE)
+                                 theme = gg_theme(y_grid = TRUE)
                                  ) {
   
   #ungroup
@@ -699,7 +695,7 @@ gg_histogram_col_facet <- function(data,
   }
   else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+  if (is.null(pal)) pal <- pal_d3_mix(col_n)
   else pal <- pal[1:col_n]
   
   if (pal_rev == TRUE) pal <- rev(pal)
@@ -755,9 +751,6 @@ gg_histogram_col_facet <- function(data,
   }
   
   #colour, titles & facetting
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
-  
   plot <- plot +
     scale_colour_manual(
       values = pal_line,
@@ -781,5 +774,10 @@ gg_histogram_col_facet <- function(data,
       caption = stringr::str_wrap(caption, caption_wrap)
     ) 
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }

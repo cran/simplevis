@@ -17,12 +17,12 @@ gg_bar_col(
   alpha_fill = 1,
   alpha_line = 1,
   size_line = 0.5,
-  size_width = NULL,
+  width = NULL,
   title = NULL,
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
-  x_balance = FALSE,
+  x_zero_mid = FALSE,
   x_expand = NULL,
   x_labels = NULL,
   x_na_rm = FALSE,
@@ -32,7 +32,7 @@ gg_bar_col(
   x_title_wrap = 50,
   x_zero = FALSE,
   x_zero_line = NULL,
-  y_balance = FALSE,
+  y_zero_mid = FALSE,
   y_expand = c(0, 0),
   y_labels = scales::label_comma(),
   y_na_rm = FALSE,
@@ -43,7 +43,7 @@ gg_bar_col(
   y_zero_line = NULL,
   col_breaks_n = 4,
   col_cuts = NULL,
-  col_intervals_right = TRUE,
+  col_intervals_left = TRUE,
   col_labels = NULL,
   col_legend_none = FALSE,
   col_method = NULL,
@@ -53,12 +53,12 @@ gg_bar_col(
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(gridlines_h = TRUE),
+  theme = gg_theme(y_grid = TRUE),
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
+\item{data}{A data frame in a structure to be plotted untransformed. Required input.}
 
 \item{x_var}{Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). If numeric, date or datetime, variable values are bins that are mutually exclusive and equidistant. Required input.}
 
@@ -82,7 +82,7 @@ gg_bar_col(
 
 \item{size_line}{The size of the outlines of bars.}
 
-\item{size_width}{Width of bars. Defaults to 0.75.}
+\item{width}{Width of bars. Defaults to 0.75.}
 
 \item{title}{Title string.}
 
@@ -92,7 +92,7 @@ gg_bar_col(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 100.}
 
-\item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
+\item{x_zero_mid}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 
 \item{x_expand}{A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
@@ -112,7 +112,7 @@ gg_bar_col(
 
 \item{x_zero_line}{For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
-\item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
+\item{y_zero_mid}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
 
 \item{y_expand}{A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions.}
 
@@ -134,7 +134,7 @@ gg_bar_col(
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_intervals_right}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
+\item{col_intervals_left}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.}
 
 \item{col_labels}{A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::label_comma() for numeric. Use function(x) x to keep labels untransformed.}
 
@@ -185,6 +185,6 @@ gg_bar_col(plot_data,
            col_var = sex, 
            col_na_rm = TRUE, 
            stack = TRUE, 
-           size_width = 0.5)
+           width = 0.5)
 
 }

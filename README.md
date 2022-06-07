@@ -1,5 +1,3 @@
-<img src="man/figures/logo.png" align="right" height="139" style="float:right; height:139px;">
-
 <!-- badges: start -->
   [![CRAN status](https://www.r-pkg.org/badges/version/simplevis)](https://CRAN.R-project.org/package=simplevis)
   [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/simplevis?color=lightgrey)](https://r-pkg.org/pkg/simplevis)
@@ -12,25 +10,21 @@
 
 ### Purpose
 
-`simplevis` is a package of `ggplot2` and `leaflet` wrapper functions that aims to make visualisation easier with less brainpower required.
+{simplevis} is a package of [{ggplot2}](https://ggplot2.tidyverse.org/) and [{leaflet}](https://rstudio.github.io/leaflet/) wrapper functions that aims to to simplify beautiful {ggplot2} and {leaflet} visualisation. This is the precursor package to the [{ggblanket}](https://github.com/davidhodge931/ggblanket) package.
 
 ### Installation
 
-Install stable version from CRAN:
+Stable version from CRAN:
+
 `install.packages("simplevis")`
 
-Install development version from github:
-`devtools::install_github("statisticsNZ/simplevis")`
+Development version from github:
 
-### Documentation
+`devtools::install_github("StatisticsNZ/simplevis")`
 
-Webpage URL:
+### Get started
 
-https://statisticsnz.github.io/simplevis/
-
-R vignette:
-
-`vignette("simplevis", "simplevis")`
+Click [here](https://StatisticsNZ.github.io/simplevis/articles/simplevis.html) to get started.
 
 ---
 __Copyright and Licensing__

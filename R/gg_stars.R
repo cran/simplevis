@@ -1,4 +1,5 @@
 #' @title Stars ggplot map.
+#' 
 #' @description Map of an array in ggplot that is not coloured and not facetted. 
 #' @param data A stars object with defined coordinate reference system in a structure to be plotted untransformed. Note, it cannot be a stars_proxy object. Required input.
 #' @param borders A sf object as administrative boundaries (or coastlines). Defaults to no boundaries added. The rnaturalearth package is a useful source of country and state boundaries.
@@ -30,7 +31,7 @@ gg_stars <- function(data,
                      borders = NULL,
                      borders_on_top = TRUE,
                      downsample = 0,
-                     pal = pal_viridis_reorder(1),
+                     pal = pal_viridis_mix(1),
                      pal_borders = "#323232",
                      alpha_fill = 0.5,
                      alpha_borders = 0.5, 
@@ -45,7 +46,7 @@ gg_stars <- function(data,
                      mobile = FALSE) {
   
   #warnings
-  if (class(data) != "stars") stop("Please use a stars object as data input")
+  # if (class(data) != "stars") stop("Please use a stars object as data input")
   if (is.na(sf::st_crs(data)$proj4string)) stop("Please assign a coordinate reference system to data input")
 
   if (!is.null(borders)) {
@@ -126,6 +127,7 @@ gg_stars <- function(data,
 }
 
 #' @title Stars ggplot map that is coloured.
+#' 
 #' @description Map of an array in ggplot that is coloured, but not facetted. 
 #' @param data A stars object with defined coordinate reference system in a structure to be plotted untransformed. Note, it cannot be a stars_proxy object. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
@@ -145,7 +147,7 @@ gg_stars <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param col_breaks_n For a numeric colour variable, the desired number of intervals on the colour scale. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
-#' @param col_intervals_right For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_intervals_left For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.
 #' @param col_labels A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.
 #' @param col_legend_none TRUE or FALSE of whether to remove the legend.   
 #' @param col_method The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".
@@ -185,7 +187,7 @@ gg_stars_col <- function(data,
                          subtitle_wrap = 80,
                          col_breaks_n = 4,
                          col_cuts = NULL,
-                         col_intervals_right = TRUE,
+                         col_intervals_left = TRUE,
                          col_labels = NULL,
                          col_legend_none = FALSE,
                          col_na_rm = FALSE,
@@ -210,7 +212,7 @@ gg_stars_col <- function(data,
   col_var_vctr <- dplyr::pull(data, !!col_var)
   
   #warnings
-  if (class(data) != "stars") stop("Please use a stars object as data input")
+  # if (class(data) != "stars") stop("Please use a stars object as data input")
   if (is.na(sf::st_crs(data)$proj4string)) stop("Please assign a coordinate reference system to data input")
   
   if (!is.null(borders)) {
@@ -292,23 +294,36 @@ gg_stars_col <- function(data,
       
       if (is.function(col_labels)) {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE,
+              labels = santoku::lbl_intervals(raw = FALSE, fmt = col_labels)
+            )
+          ))
         
         col_labels <- sv_interval_labels_chr
       }
       else {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE
+            )
+          ))
       }
       
       col_n <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      if (is.null(pal)) pal <- pal_viridis_mix(col_n)
       else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
@@ -317,7 +332,7 @@ gg_stars_col <- function(data,
       }
       else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      if (is.null(pal)) pal <- pal_d3_mix(col_n)
       else pal <- pal[1:col_n]
       
       if (is.null(col_labels)) col_labels <- snakecase::to_sentence_case
@@ -362,16 +377,13 @@ gg_stars_col <- function(data,
         na.translate = na_translate
       )
     
-    if (mobile == TRUE) {
+    if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
       plot <- plot +
-        guides(col = guide_legend(ncol = 1),
-               fill = guide_legend(ncol = 1))
+        guides(col = guide_legend(reverse = TRUE), 
+               fill = guide_legend(reverse = TRUE))
     }
   }
   
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
-
   #borders
   if (!is.null(borders)) {
     if (borders_on_top == TRUE) {
@@ -404,6 +416,11 @@ gg_stars_col <- function(data,
       theme_mobile_extra(void = TRUE)
   }
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }
 

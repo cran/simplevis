@@ -1,6 +1,7 @@
 #' @title Point ggplot.
+#' 
 #' @description Point ggplot that is not coloured and not facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.
+#' @param data A data frame in a structure to be plotted untransformed. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or POSIXt). Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
@@ -11,7 +12,7 @@
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_jitter Amount of horizontal jitter to be added in positive and negative directions. Defaults to 0. See ggplot2::position_jitter for further information.
@@ -21,7 +22,7 @@
 #' @param x_title_wrap Number of characters to wrap the x title to. Defaults to 50. 
 #' @param x_zero For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to FALSE.
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
-#' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
+#' @param y_zero_mid For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_jitter Amount of vertical jitter to be added in positive and negative directions. Defaults to 0.See ggplot2::position_jitter for further information. 
@@ -48,14 +49,14 @@ gg_point <- function(data,
                      x_var,
                      y_var,
                      text_var = NULL,
-                     pal = pal_viridis_reorder(1),
+                     pal = pal_viridis_mix(1),
                      alpha_point = 1,
                      size_point = 1.5,
                      title = NULL,
                      title_wrap = 80,
                      subtitle = NULL,
                      subtitle_wrap = 80,
-                     x_balance = FALSE,
+                     x_zero_mid = FALSE,
                      x_breaks_n = 5,
                      x_expand = NULL,
                      x_jitter = 0,
@@ -65,7 +66,7 @@ gg_point <- function(data,
                      x_title_wrap = 50,
                      x_zero = FALSE,
                      x_zero_line = NULL,
-                     y_balance = FALSE,
+                     y_zero_mid = FALSE,
                      y_breaks_n = 5,
                      y_expand = c(0, 0),
                      y_jitter = 0,
@@ -76,7 +77,7 @@ gg_point <- function(data,
                      y_zero_line = NULL,
                      caption = NULL,
                      caption_wrap = 80,
-                     theme = gg_theme(gridlines_h = TRUE, gridlines_v = TRUE),
+                     theme = gg_theme(y_grid = TRUE, x_grid = TRUE),
                      mobile = FALSE) {
   
   #ungroup
@@ -136,10 +137,10 @@ gg_point <- function(data,
   #x scale
   if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr)) {
     
-    x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+    x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
     x_zero <- x_zero_list[[1]]
     x_zero_line <- x_zero_list[[2]]
-    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
+    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
     x_limits <- c(min(x_breaks), max(x_breaks))
     if (is.null(x_expand)) x_expand <- c(0, 0)
     
@@ -181,7 +182,7 @@ gg_point <- function(data,
   }
   
   #y scale
-  y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_balance = y_balance, y_zero = y_zero, y_zero_line = y_zero_line)
+  y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_zero_mid = y_zero_mid, y_zero = y_zero, y_zero_line = y_zero_line)
   y_zero <- y_zero_list[[1]]
   y_zero_line <- y_zero_list[[2]]
   
@@ -190,7 +191,7 @@ gg_point <- function(data,
       scale_y_continuous(expand = y_expand, breaks = c(0, 1), labels = y_labels, limits = c(0, 1))
   }
   else ({
-    y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_balance, breaks_n = y_breaks_n, zero = y_zero)
+    y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_zero_mid, breaks_n = y_breaks_n, zero = y_zero)
     y_limits <- c(min(y_breaks), max(y_breaks))
     
     plot <- plot +
@@ -229,8 +230,9 @@ gg_point <- function(data,
 }
 
 #' @title Point ggplot that is coloured.
+#' 
 #' @description Point ggplot that is coloured, but not facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.
+#' @param data A data frame in a structure to be plotted untransformed. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or POSIXt). Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
@@ -244,7 +246,7 @@ gg_point <- function(data,
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 75. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_jitter Amount of horizontal jitter to be added in positive and negative directions. Defaults to 0. See ggplot2::position_jitter for further information.
 #' @param x_labels A function or named vector to modify x scale labels. Use function(x) x to keep labels untransformed.
@@ -254,7 +256,7 @@ gg_point <- function(data,
 #' @param x_title_wrap Number of characters to wrap the x title to. Defaults to 50. 
 #' @param x_zero For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to FALSE.
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
-#' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
+#' @param y_zero_mid For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_jitter Amount of vertical jitter to be added in positive and negative directions. Defaults to 0.See ggplot2::position_jitter for further information. 
 #' @param y_labels A function or named vector to modify y scale labels. Use function(x) x to keep labels untransformed.
@@ -265,11 +267,12 @@ gg_point <- function(data,
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param col_breaks_n For a numeric colour variable. If "bin" col_method, the intervals on the colour scale for the pretty algorithm to aim for. If "quantile" col_method, the number of equal quantiles. Defaults to 4.
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_intervals_right For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_intervals_left For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.
 #' @param col_labels A function or named vector to modify the colour scale labels. Defaults to stringr::str_to_sentence if categorical, and scales::label_comma() if numeric.    
 #' @param col_legend_none TRUE or FALSE of whether to remove the legend.
 #' @param col_method The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".
 #' @param col_na_rm TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.
+#' @param col_rev TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. Not applicable where mobile equals TRUE.
 #' @param caption Caption title string. 
@@ -301,7 +304,7 @@ gg_point_col <- function(data,
                          title_wrap = 80,
                          subtitle = NULL,
                          subtitle_wrap = 80,
-                         x_balance = FALSE,
+                         x_zero_mid = FALSE,
                          x_breaks_n = 5,
                          x_expand = NULL,
                          x_jitter = 0,
@@ -311,7 +314,7 @@ gg_point_col <- function(data,
                          x_title_wrap = 50,
                          x_zero = FALSE,
                          x_zero_line = NULL,
-                         y_balance = FALSE,
+                         y_zero_mid = FALSE,
                          y_breaks_n = 5,
                          y_expand = c(0, 0),
                          y_jitter = 0,
@@ -325,13 +328,14 @@ gg_point_col <- function(data,
                          col_labels = NULL,
                          col_legend_none = FALSE,
                          col_method = NULL,
-                         col_intervals_right = TRUE,
+                         col_intervals_left = TRUE,
                          col_na_rm = FALSE,
+                         col_rev = FALSE,
                          col_title = NULL,
                          col_title_wrap = 25,
                          caption = NULL,
                          caption_wrap = 80,
-                         theme = gg_theme(gridlines_h = TRUE, gridlines_v = TRUE),
+                         theme = gg_theme(y_grid = TRUE, x_grid = TRUE),
                          mobile = FALSE){
   
   #ungroup
@@ -392,6 +396,14 @@ gg_point_col <- function(data,
       x_var_vctr <- dplyr::pull(data, !!x_var)
     }
   }
+  if (col_rev == TRUE) {
+    if (is.factor(col_var_vctr) | is.character(col_var_vctr)){
+      data <- data %>%
+        dplyr::mutate(dplyr::across(!!col_var, ~forcats::fct_rev(.x)))
+      
+      col_var_vctr <- dplyr::pull(data, !!col_var)
+    }
+  }
   
   #colour
   if (mobile == TRUE) col_title_wrap <- 20
@@ -429,23 +441,36 @@ gg_point_col <- function(data,
       
       if (is.function(col_labels)) {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE,
+              labels = santoku::lbl_intervals(raw = FALSE, fmt = col_labels)
+            )
+          ))
         
         col_labels <- sv_interval_labels_chr
       }
       else {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE
+            )
+          ))
       }
       
       col_n <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      if (is.null(pal)) pal <- pal_viridis_mix(col_n)
       else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
@@ -454,7 +479,7 @@ gg_point_col <- function(data,
       }
       else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      if (is.null(pal)) pal <- pal_d3_mix(col_n)
       else pal <- pal[1:col_n]
       
       if (is.null(col_labels)) col_labels <- snakecase::to_sentence_case
@@ -477,10 +502,10 @@ gg_point_col <- function(data,
   #x scale
   if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr)) {
     
-    x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+    x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
     x_zero <- x_zero_list[[1]]
     x_zero_line <- x_zero_list[[2]]
-    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
+    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
     x_limits <- c(min(x_breaks), max(x_breaks))
     if (is.null(x_expand)) x_expand <- c(0, 0)
     
@@ -522,7 +547,7 @@ gg_point_col <- function(data,
   }
   
   #y scale
-  y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_balance = y_balance, y_zero = y_zero, y_zero_line = y_zero_line)
+  y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_zero_mid = y_zero_mid, y_zero = y_zero, y_zero_line = y_zero_line)
   y_zero <- y_zero_list[[1]]
   y_zero_line <- y_zero_list[[2]]
   
@@ -531,7 +556,7 @@ gg_point_col <- function(data,
       scale_y_continuous(expand = y_expand, breaks = c(0, 1), labels = y_labels, limits = c(0, 1))
   }
   else ({
-    y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_balance, breaks_n = y_breaks_n, zero = y_zero)
+    y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_zero_mid, breaks_n = y_breaks_n, zero = y_zero)
     y_limits <- c(min(y_breaks), max(y_breaks))
     
     plot <- plot +
@@ -563,15 +588,12 @@ gg_point_col <- function(data,
         name = stringr::str_wrap(col_title, col_title_wrap)
       ) 
     
-    if (mobile == TRUE) {
+    if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
       plot <- plot +
-        guides(col = guide_legend(ncol = 1))
+        guides(col = guide_legend(reverse = TRUE))
     }
   }
   
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
-
   #titles
   if (mobile == FALSE) {
     plot <- plot +
@@ -595,12 +617,18 @@ gg_point_col <- function(data,
       theme_mobile_extra() #extra mobile theme components
   }
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }
 
 #' @title Point ggplot that is facetted.
+#' 
 #' @description Point ggplot that is facetted, but not coloured.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.
+#' @param data A data frame in a structure to be plotted untransformed. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or POSIXt). Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
@@ -612,7 +640,7 @@ gg_point_col <- function(data,
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_jitter Amount of horizontal jitter to be added in positive and negative directions. Defaults to 0. See ggplot2::position_jitter for further information.
 #' @param x_labels A function or named vector to modify x scale labels. Use function(x) x to keep labels untransformed.
@@ -622,7 +650,7 @@ gg_point_col <- function(data,
 #' @param x_title_wrap Number of characters to wrap the x title to. Defaults to 50. 
 #' @param x_zero For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to FALSE.
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
-#' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
+#' @param y_zero_mid For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_jitter Amount of vertical jitter to be added in positive and negative directions. Defaults to 0.See ggplot2::position_jitter for further information. 
 #' @param y_labels A function or named vector to modify y scale labels. Use function(x) x to keep labels untransformed.
@@ -656,14 +684,14 @@ gg_point_facet <- function(data,
                            y_var,
                            facet_var,
                            text_var = NULL,
-                           pal = pal_viridis_reorder(1),
+                           pal = pal_viridis_mix(1),
                            alpha_point = 1,
                            size_point = 1.5,
                            title = NULL,
                            title_wrap = 80,
                            subtitle = NULL,
                            subtitle_wrap = 80,
-                           x_balance = FALSE,
+                           x_zero_mid = FALSE,
                            x_breaks_n = 2,
                            x_expand = NULL,
                            x_jitter = 0,
@@ -673,7 +701,7 @@ gg_point_facet <- function(data,
                            x_title_wrap = 50,
                            x_zero = FALSE,
                            x_zero_line = NULL,
-                           y_balance = FALSE,
+                           y_zero_mid = FALSE,
                            y_breaks_n = 3,
                            y_expand = c(0, 0),
                            y_jitter = 0,
@@ -690,7 +718,7 @@ gg_point_facet <- function(data,
                            facet_scales = "fixed",
                            caption = NULL,
                            caption_wrap = 80,
-                           theme = gg_theme(gridlines_h = TRUE, gridlines_v = TRUE)) {
+                           theme = gg_theme(y_grid = TRUE, x_grid = TRUE)) {
   
   #ungroup
   data <- dplyr::ungroup(data)
@@ -777,10 +805,10 @@ gg_point_facet <- function(data,
   }
   else if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr)) {
     if (facet_scales %in% c("fixed", "free_y")) {
-      x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+      x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
       x_zero <- x_zero_list[[1]]
       x_zero_line <- x_zero_list[[2]]
-      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
+      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
       x_limits <- c(min(x_breaks), max(x_breaks))
       if (is.null(x_expand)) x_expand <- c(0, 0)
       
@@ -811,7 +839,7 @@ gg_point_facet <- function(data,
   }
   
   #y scale
-  y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_balance = y_balance, y_zero = y_zero, y_zero_line = y_zero_line)
+  y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_zero_mid = y_zero_mid, y_zero = y_zero, y_zero_line = y_zero_line)
   if (facet_scales %in% c("fixed", "free_x")) y_zero <- y_zero_list[[1]]
   y_zero_line <- y_zero_list[[2]]
   
@@ -821,7 +849,7 @@ gg_point_facet <- function(data,
         scale_y_continuous(expand = y_expand, breaks = c(0, 1), labels = y_labels, limits = c(0, 1))
     }
     else ({
-      y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_balance, breaks_n = y_breaks_n, zero = y_zero)
+      y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_zero_mid, breaks_n = y_breaks_n, zero = y_zero)
       y_limits <- c(min(y_breaks), max(y_breaks))
       
       plot <- plot +
@@ -853,8 +881,9 @@ gg_point_facet <- function(data,
 }
 
 #' @title Point ggplot that is coloured and facetted.
+#' 
 #' @description Point ggplot that is coloured and facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.
+#' @param data A data frame in a structure to be plotted untransformed. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or POSIXt). Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
@@ -869,7 +898,7 @@ gg_point_facet <- function(data,
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 100. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.
 #' @param x_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2. 
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_jitter Amount of horizontal jitter to be added in positive and negative directions. Defaults to 0. See ggplot2::position_jitter for further information.
@@ -879,7 +908,7 @@ gg_point_facet <- function(data,
 #' @param x_title_wrap Number of characters to wrap the x title to. Defaults to 50. 
 #' @param x_zero For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to FALSE.
 #' @param x_zero_line For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.   
-#' @param y_balance For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
+#' @param y_zero_mid For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.
 #' @param y_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4. 
 #' @param y_expand A vector of range expansion constants used to add padding to the y scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param y_jitter Amount of vertical jitter to be added in positive and negative directions. Defaults to 0.See ggplot2::position_jitter for further information. 
@@ -890,11 +919,12 @@ gg_point_facet <- function(data,
 #' @param y_zero_line For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.  
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
 #' @param col_breaks_n For a numeric colour variable, the desired number of intervals on the colour scale. 
-#' @param col_intervals_right For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_intervals_left For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.
 #' @param col_labels A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::label_comma() for numeric. Use function(x) x to keep labels untransformed.   
 #' @param col_legend_none TRUE or FALSE of whether to remove the legend.
 #' @param col_method The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".
 #' @param col_na_rm TRUE or FALSE of whether to include col_var NA values. Defaults to FALSE.
+#' @param col_rev TRUE or FALSE of whether the colour scale is reversed. Defaults to FALSE.
 #' @param col_title Colour title string for the legend. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param col_title_wrap Number of characters to wrap the colour title to. Defaults to 25. 
 #' @param facet_labels A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use function(x) x to keep labels untransformed.
@@ -933,7 +963,7 @@ gg_point_col_facet <- function(data,
                                title_wrap = 80,
                                subtitle = NULL,
                                subtitle_wrap = 80,
-                               x_balance = FALSE,
+                               x_zero_mid = FALSE,
                                x_breaks_n = 2,
                                x_expand = NULL,
                                x_jitter = 0,
@@ -943,7 +973,7 @@ gg_point_col_facet <- function(data,
                                x_title_wrap = 50,
                                x_zero = FALSE,
                                x_zero_line = NULL,
-                               y_balance = FALSE,
+                               y_zero_mid = FALSE,
                                y_breaks_n = 3,
                                y_expand = c(0, 0),
                                y_jitter = 0,
@@ -954,11 +984,12 @@ gg_point_col_facet <- function(data,
                                y_zero_line = NULL,
                                col_breaks_n = 4,
                                col_cuts = NULL,
-                               col_intervals_right = TRUE,
+                               col_intervals_left = TRUE,
                                col_labels = NULL,
                                col_legend_none = FALSE,
                                col_method = NULL,
                                col_na_rm = FALSE,
+                               col_rev = FALSE,
                                col_title = NULL,
                                col_title_wrap = 25,
                                facet_labels = snakecase::to_sentence_case,
@@ -969,7 +1000,7 @@ gg_point_col_facet <- function(data,
                                facet_scales = "fixed",
                                caption = NULL,
                                caption_wrap = 80,
-                               theme = gg_theme(gridlines_h = TRUE, gridlines_v = TRUE)) {
+                               theme = gg_theme(y_grid = TRUE, x_grid = TRUE)) {
   
   #ungroup
   data <- dplyr::ungroup(data)
@@ -1042,7 +1073,14 @@ gg_point_col_facet <- function(data,
       x_var_vctr <- dplyr::pull(data, !!x_var)
     }
   }
-  
+  if (col_rev == TRUE) {
+    if (is.factor(col_var_vctr) | is.character(col_var_vctr)){
+      data <- data %>%
+        dplyr::mutate(dplyr::across(!!col_var, ~forcats::fct_rev(.x)))
+      
+      col_var_vctr <- dplyr::pull(data, !!col_var)
+    }
+  }
   if (facet_rev == TRUE) {
     data <- data %>%
       dplyr::mutate(dplyr::across(!!facet_var, ~forcats::fct_rev(.x)))
@@ -1084,23 +1122,36 @@ gg_point_col_facet <- function(data,
       
       if (is.function(col_labels)) {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE,
+              labels = santoku::lbl_intervals(raw = FALSE, fmt = col_labels)
+            )
+          ))
         
         col_labels <- sv_interval_labels_chr
       }
       else {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE
+            )
+          ))
       }
       
       col_n <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      if (is.null(pal)) pal <- pal_viridis_mix(col_n)
       else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
@@ -1109,7 +1160,7 @@ gg_point_col_facet <- function(data,
       }
       else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      if (is.null(pal)) pal <- pal_d3_mix(col_n)
       else pal <- pal[1:col_n]
       
       if (is.null(col_labels)) col_labels <- snakecase::to_sentence_case
@@ -1139,10 +1190,10 @@ gg_point_col_facet <- function(data,
     }
     else if (is.numeric(x_var_vctr) | lubridate::is.Date(x_var_vctr) | lubridate::is.POSIXt(x_var_vctr)) {
       if (facet_scales %in% c("fixed", "free_y")) {
-          x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+          x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
           x_zero <- x_zero_list[[1]]
           x_zero_line <- x_zero_list[[2]]
-          x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
+          x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
           x_limits <- c(min(x_breaks), max(x_breaks))
           if (is.null(x_expand)) x_expand <- c(0, 0)
           
@@ -1173,7 +1224,7 @@ gg_point_col_facet <- function(data,
     }
     
     #y scale
-    y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_balance = y_balance, y_zero = y_zero, y_zero_line = y_zero_line)
+    y_zero_list <- sv_y_zero_adjust(y_var_vctr, y_zero_mid = y_zero_mid, y_zero = y_zero, y_zero_line = y_zero_line)
     if (facet_scales %in% c("fixed", "free_x")) y_zero <- y_zero_list[[1]]
     y_zero_line <- y_zero_list[[2]]
     
@@ -1183,7 +1234,7 @@ gg_point_col_facet <- function(data,
           scale_y_continuous(expand = y_expand, breaks = c(0, 1), labels = y_labels, limits = c(0, 1))
       }
       else ({
-        y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_balance, breaks_n = y_breaks_n, zero = y_zero)
+        y_breaks <- sv_numeric_breaks_v(y_var_vctr, balance = y_zero_mid, breaks_n = y_breaks_n, zero = y_zero)
         y_limits <- c(min(y_breaks), max(y_breaks))
         
         plot <- plot +
@@ -1219,12 +1270,14 @@ gg_point_col_facet <- function(data,
           na.value = pal_na_point,
           name = stringr::str_wrap(col_title, col_title_wrap)
         ) 
+      
+      if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
+        plot <- plot +
+          guides(col = guide_legend(reverse = TRUE))
+      }
     }
     
     #titles & facetting
-    if (col_legend_none == TRUE) plot <- plot +
-      theme(legend.position = "none")
-    
     plot <- plot +
       labs(
         title = stringr::str_wrap(title, title_wrap),
@@ -1234,6 +1287,11 @@ gg_point_col_facet <- function(data,
         caption = stringr::str_wrap(caption, caption_wrap)
       ) +
       facet_wrap(vars(!!facet_var), labeller = as_labeller(facet_labels), scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow)
+    
+    if (col_legend_none == TRUE) {
+      plot <- plot +
+        theme(legend.position = "none")
+    }
 
     return(plot)
   }

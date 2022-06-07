@@ -1,6 +1,7 @@
 #' @title Tile ggplot that is coloured.
+#' 
 #' @description Tile ggplot that is coloured, but not facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.
+#' @param data A data frame in a structure to be plotted untransformed. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). If numeric, date or datetime, variable values are bins that are mutually exclusive and equidistant. Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param col_var Unquoted categorical variable to colour the tiles Required input.
@@ -15,7 +16,7 @@
 #' @param size_line The size of the outlines of bars. 
 #' @param size_label The size of the of labels. Defaults to 3.5.
 #' @param size_height Height of tiles. Defaults to 1.
-#' @param size_width Width of tiles. Defaults to 1.
+#' @param width Width of tiles. Defaults to 1.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
@@ -33,7 +34,7 @@
 #' @param y_title y scale title string. Defaults to NULL, which converts to sentence case with spaces. Use "" if you would like no title.
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_intervals_right For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_intervals_left For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.
 #' @param col_labels A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::label_comma() for numeric. Use function(x) x to keep labels untransformed.  
 #' @param col_legend_none TRUE or FALSE of whether to remove the legend.
 #' @param col_method The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".
@@ -77,7 +78,7 @@ gg_tile_col <- function(data,
                         size_line = 0.5,
                         size_label = 3.5,
                         size_height = 1, 
-                        size_width = 1,
+                        width = 1,
                         title = NULL,
                         title_wrap = 75,
                         subtitle = NULL,
@@ -95,7 +96,7 @@ gg_tile_col <- function(data,
                         y_title = NULL,
                         y_title_wrap = 50,
                         col_cuts = NULL,
-                        col_intervals_right = TRUE,
+                        col_intervals_left = TRUE,
                         col_labels = NULL,
                         col_legend_none = FALSE,
                         col_method = NULL,
@@ -184,6 +185,10 @@ gg_tile_col <- function(data,
     y_var_vctr <- dplyr::pull(data, !!y_var)
   }
   
+  #allow for when label_var = col_var & col_method is bin or quantile
+  data <- data %>%
+    dplyr::mutate(.label_var = !!label_var)
+
   #colour
   if (is.null(col_method)) {
     if (!is.numeric(col_var_vctr)) col_method <- "category"
@@ -218,23 +223,36 @@ gg_tile_col <- function(data,
       
       if (is.function(col_labels)) {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE,
+              labels = santoku::lbl_intervals(raw = FALSE, fmt = col_labels)
+            )
+          ))
         
         col_labels <- sv_interval_labels_chr
       }
       else {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE
+            )
+          ))
       }
       
       col_n <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      if (is.null(pal)) pal <- pal_viridis_mix(col_n)
       else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
@@ -243,7 +261,7 @@ gg_tile_col <- function(data,
       }
       else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      if (is.null(pal)) pal <- pal_d3_mix(col_n)
       else pal <- pal[1:col_n]
       
       if (is.null(col_labels)) col_labels <- snakecase::to_sentence_case
@@ -261,11 +279,11 @@ gg_tile_col <- function(data,
   plot <- ggplot(data) +
     theme +
     geom_tile(aes(x = !!x_var, y = !!y_var, col = !!col_var, fill = !!col_var, text = !!text_var), 
-              size = size_line, width = size_width, height = size_height) 
+              size = size_line, width = width, height = size_height) 
   
   if(!rlang::quo_is_null(label_var)) {
     plot <- plot + 
-      geom_text(aes(x = !!x_var, y = !!y_var, label = !!label_var), size = size_label, col = pal_label)
+      geom_text(aes(x = !!x_var, y = !!y_var, label = .data$.label_var), size = size_label, col = pal_label)
   }
   
   #x and y scales
@@ -309,15 +327,13 @@ gg_tile_col <- function(data,
         name = stringr::str_wrap(col_title, col_title_wrap)
       )
     
-    if (mobile == TRUE) {
+    if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
       plot <- plot +
-        guides(col = guide_legend(ncol = 1), fill = guide_legend(ncol = 1))
+        guides(col = guide_legend(reverse = TRUE), 
+               fill = guide_legend(reverse = TRUE))
     }
   }
   
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
-
   #titles
   if (mobile == FALSE) {
     plot <- plot +
@@ -341,12 +357,18 @@ gg_tile_col <- function(data,
       theme_mobile_extra()
   }
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }
 
 #' @title Tile ggplot that is coloured and facetted.
+#' 
 #' @description Tile ggplot that is coloured and facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.
+#' @param data A data frame in a structure to be plotted untransformed. Required input.
 #' @param x_var Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). If numeric, date or datetime, variable values are bins that are mutually exclusive and equidistant. Required input.
 #' @param y_var Unquoted numeric variable to be on the y scale. Required input.
 #' @param col_var Unquoted categorical variable to colour the tiles. Required input.
@@ -362,7 +384,7 @@ gg_tile_col <- function(data,
 #' @param size_line The size of the outlines of bars.
 #' @param size_label The size of the of labels. Defaults to 3.5.
 #' @param size_height Height of tiles. Defaults to 1.
-#' @param size_width Width of tiles. Defaults to 1.
+#' @param width Width of tiles. Defaults to 1.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
@@ -381,7 +403,7 @@ gg_tile_col <- function(data,
 #' @param y_title_wrap Number of characters to wrap the y title to. Defaults to 50. 
 #' @param col_breaks_n For a numeric colour variable, the desired number of intervals on the colour scale. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.
-#' @param col_intervals_right For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_intervals_left For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.
 #' @param col_labels A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::label_comma() for numeric. Use function(x) x to keep labels untransformed.  
 #' @param col_legend_none TRUE or FALSE of whether to remove the legend.
 #' @param col_method The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".
@@ -431,7 +453,7 @@ gg_tile_col_facet <- function(data,
                               size_line = 0.5,
                               size_label = 3.5,
                               size_height = 1,
-                              size_width = 1,
+                              width = 1,
                               title = NULL,
                               title_wrap = 75,
                               subtitle = NULL,
@@ -450,7 +472,7 @@ gg_tile_col_facet <- function(data,
                               y_title_wrap = 50,
                               col_breaks_n = 4,
                               col_cuts = NULL,
-                              col_intervals_right = TRUE,
+                              col_intervals_left = TRUE,
                               col_labels = NULL,
                               col_legend_none = FALSE,
                               col_method = NULL,
@@ -563,7 +585,11 @@ gg_tile_col_facet <- function(data,
     
     facet_var_vctr <- dplyr::pull(data, !!facet_var)
   }
-  
+
+  #allow for when label_var = col_var & col_method is bin or quantile
+  data <- data %>%
+    dplyr::mutate(.label_var = !!label_var)
+
   #colour
   if (is.null(col_method)) {
     if (!is.numeric(col_var_vctr)) col_method <- "category"
@@ -598,23 +624,36 @@ gg_tile_col_facet <- function(data,
       
       if (is.function(col_labels)) {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE,
+              labels = santoku::lbl_intervals(raw = FALSE, fmt = col_labels)
+            )
+          ))
         
         col_labels <- sv_interval_labels_chr
       }
       else {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE
+            )
+          ))
       }
       
       col_n <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      if (is.null(pal)) pal <- pal_viridis_mix(col_n)
       else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
@@ -623,7 +662,7 @@ gg_tile_col_facet <- function(data,
       }
       else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      if (is.null(pal)) pal <- pal_d3_mix(col_n)
       else pal <- pal[1:col_n]
       
       if (is.null(col_labels)) col_labels <- snakecase::to_sentence_case
@@ -641,11 +680,11 @@ gg_tile_col_facet <- function(data,
   plot <- ggplot(data) +
     theme +
     geom_tile(aes(x = !!x_var, y = !!y_var, col = !!col_var, fill = !!col_var, text = !!text_var), 
-              size = size_line, width = size_width, height = size_height) 
+              size = size_line, width = width, height = size_height) 
   
   if(!rlang::quo_is_null(label_var)) {
     plot <- plot + 
-      geom_text(aes(x = !!x_var, y = !!y_var, label = !!label_var), size = size_label, col = pal_label)
+      geom_text(aes(x = !!x_var, y = !!y_var, label = .data$.label_var), size = size_label, col = pal_label)
   }
   
   #colour
@@ -681,11 +720,14 @@ gg_tile_col_facet <- function(data,
         na.value = pal_na_fill,
         name = stringr::str_wrap(col_title, col_title_wrap)
       )
+    
+    if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
+      plot <- plot +
+        guides(col = guide_legend(reverse = TRUE), 
+               fill = guide_legend(reverse = TRUE))
+    }
   }
   
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
-
   #x & y scales, titles, and facetting
   plot <- plot +
     scale_x_discrete(expand = x_expand, labels = x_labels) +
@@ -703,5 +745,10 @@ gg_tile_col_facet <- function(data,
                ncol = facet_ncol, 
                nrow = facet_nrow)
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }

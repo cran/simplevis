@@ -43,11 +43,11 @@ gg_histogram_col_facet(
   facet_scales = "fixed",
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(gridlines_h = TRUE)
+  theme = gg_theme(y_grid = TRUE)
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.}
+\item{data}{A data frame in a structure to be transformed to histogram statistics. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
@@ -129,7 +129,7 @@ gg_histogram_col_facet(
 A ggplot object.
 }
 \description{
-histogram ggplot that is coloured and facetted.
+Histogram ggplot that is coloured and facetted.
 }
 \examples{
 library(simplevis)

@@ -36,12 +36,12 @@ gg_histogram_col(
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(gridlines_h = TRUE),
+  theme = gg_theme(y_grid = TRUE),
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.}
+\item{data}{A data frame in a structure to be transformed to histogram statistics. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
@@ -111,7 +111,7 @@ gg_histogram_col(
 A ggplot object.
 }
 \description{
-histogram ggplot that is coloured but not facetted.
+Histogram ggplot that is coloured, but not facetted.
 }
 \examples{
 library(simplevis)

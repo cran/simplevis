@@ -17,12 +17,12 @@ gg_hboxplot_col(
   alpha_point = 1,
   size_line = 0.5,
   size_point = 1.5,
-  size_width = 0.5,
+  width = 0.5,
   title = NULL,
   title_wrap = 75,
   subtitle = NULL,
   subtitle_wrap = 75,
-  x_balance = FALSE,
+  x_zero_mid = FALSE,
   x_breaks_n = 5,
   x_expand = c(0, 0),
   x_labels = scales::label_comma(),
@@ -44,7 +44,7 @@ gg_hboxplot_col(
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 75,
-  theme = gg_theme(gridlines_v = TRUE),
+  theme = gg_theme(x_grid = TRUE),
   stat = "boxplot",
   xmin_var = NULL,
   xlower_var = NULL,
@@ -55,7 +55,7 @@ gg_hboxplot_col(
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe generally in a structure to be transformed to boxplot statistics (or alternatively in a structure of summary boxplot statistics). Required input.}
+\item{data}{An ungrouped summarised tibble or data frame generally in a structure to be transformed to boxplot statistics (or alternatively in a structure of summary boxplot statistics). Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale for when stat = "boxplot" is selected.}
 
@@ -75,11 +75,11 @@ gg_hboxplot_col(
 
 \item{alpha_point}{The opacity of the outlier points. Defaults to 1.}
 
-\item{size_line}{The size of the outlines of boxplots.}
+\item{size_line}{The size of the outlines of boxplots. Defaults to 0.5.}
 
 \item{size_point}{The size of the outlier points. Defaults to 1.5.}
 
-\item{size_width}{Width of boxes. Defaults to 0.5.}
+\item{width}{Width of boxes. Defaults to 0.5.}
 
 \item{title}{Title string.}
 
@@ -89,7 +89,7 @@ gg_hboxplot_col(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 60.}
 
-\item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
+\item{x_zero_mid}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
 
 \item{x_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2.}
 
@@ -176,7 +176,7 @@ outliers <- penguins \%>\%
   group_by(species, sex) \%>\% 
   summarise_boxplot_outliers(body_mass_g)
 
-size_width <- 0.5
+width <- 0.5
 
 gg_hboxplot_col(plot_data,
                xmin_var = min,
@@ -186,14 +186,14 @@ gg_hboxplot_col(plot_data,
                xmax_var = max,
                y_var = species,
                col_var = sex,
-               size_width = size_width,
+               width = width,
                stat = "identity",
                x_title = "Body mass g",
                x_breaks_n = 4, 
                col_na_rm = TRUE) +
                ggplot2::geom_point(ggplot2::aes(x = species, y = body_mass_g, col = sex), 
                      size = 0.75, 
-                     position = ggplot2::position_dodge(width = size_width),
+                     position = ggplot2::position_dodge(width = width),
                      data = outliers)
                      
 }

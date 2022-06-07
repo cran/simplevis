@@ -7,7 +7,7 @@
 gg_histogram(
   data,
   x_var,
-  pal = pal_viridis_reorder(1),
+  pal = pal_viridis_mix(1),
   alpha_fill = 0.5,
   alpha_line = 1,
   size_line = 0.5,
@@ -28,12 +28,12 @@ gg_histogram(
   y_title_wrap = 50,
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(gridlines_h = TRUE),
+  theme = gg_theme(y_grid = TRUE),
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.}
+\item{data}{A data frame in a structure to be transformed to histogram statistics. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
@@ -87,7 +87,7 @@ gg_histogram(
 A ggplot object.
 }
 \description{
-histogram ggplot that is not coloured and not facetted.
+Histogram ggplot that is not coloured and not facetted.
 }
 \examples{
 library(simplevis)

@@ -2,26 +2,29 @@
 % Please edit documentation in R/mutate_text.R
 \name{mutate_text}
 \alias{mutate_text}
-\title{Add a quick tooltip text column to data.}
+\title{Add 'HTML' strings column of variable names and values.}
 \usage{
 mutate_text(
   data,
   vars_vctr = NULL,
-  numeric_format = function(x) prettyNum(x, big.mark = "", scientific = FALSE)
+  numeric_format = function(x) prettyNum(x, big.mark = "", scientific = FALSE),
+  name = "text"
 )
 }
 \arguments{
-\item{data}{A tibble or dataframe. Required input.}
+\item{data}{A data frame. Required input.}
 
 \item{vars_vctr}{A vector of quoted variables to include in the tooltip. Defaults to NULL, which adds all variables in.}
 
 \item{numeric_format}{A function to format all numeric variables within the tooltip text column. Defaults to non-scientific. Use function(x) x to leave as is.}
+
+\item{name}{name of the tooltip text column to be created. Defaults to "text".}
 }
 \value{
-A tibble or data frame with an additional column called text.
+A data frame with an extra column called text.
 }
 \description{
-Add a column of tooltip text which is automatically created based on column names and values.
+Add 'HTML' strings' column of variable names and values.
 }
 \examples{
 library(simplevis)

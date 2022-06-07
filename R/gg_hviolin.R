@@ -1,18 +1,19 @@
 #' @title Horizontal violin ggplot.
+#' 
 #' @description Horizontal violin ggplot that is not coloured and not facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to density statistics. Required input.
+#' @param data A data frame in a structure to be transformed to density statistics. Required input.
 #' @param x_var Generally an unquoted numeric variable to be on the x scale. However if stat = "identity" is selected, a list-column with min, lower, middle, upper, and max variable names.
 #' @param y_var Unquoted categorical variable to be on the y scale (i.e. character, factor, or logical). Required input.
 #' @param pal Character vector of hex codes. 
 #' @param alpha_fill The opacity of the fill. Defaults to 1. 
 #' @param alpha_line The opacity of the outline. Defaults to 1. 
 #' @param size_line The size of the outlines of violins. Defaults to 0.5.
-#' @param size_width Width of boxes. Defaults to 0.75.
+#' @param width Width of boxes. Defaults to 0.75.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 60. 
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
 #' @param x_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. Use ggplot2::waiver() to keep x labels untransformed.
@@ -49,16 +50,16 @@
 gg_hviolin <- function(data,
                        x_var = NULL,
                        y_var,
-                       pal = pal_viridis_reorder(1),
+                       pal = pal_viridis_mix(1),
                        alpha_fill = 1,
                        alpha_line = 1,
                        size_line = 0.5,
-                       size_width = 0.75,
+                       width = 0.75,
                        title = NULL,
                        title_wrap = 75,
                        subtitle = NULL,
                        subtitle_wrap = 75,
-                       x_balance = FALSE,
+                       x_zero_mid = FALSE,
                        x_breaks_n = 5,
                        x_expand = c(0, 0),
                        x_labels = scales::label_comma(),
@@ -74,7 +75,7 @@ gg_hviolin <- function(data,
                        y_title_wrap = 50,
                        caption = NULL,
                        caption_wrap = 75,
-                       theme = gg_theme(gridlines_v = TRUE),
+                       theme = gg_theme(x_grid = TRUE),
                        model_scale = "area",
                        model_bw = "nrd0",
                        model_adjust = 1,
@@ -132,7 +133,7 @@ gg_hviolin <- function(data,
   
   #fundamentals
   plot <- ggplot(data) +
-    coord_flip(clip = "off") +
+    coord_flip() +
     theme +
     geom_violin(
       aes(x = !!y_var, y = !!x_var),
@@ -140,7 +141,7 @@ gg_hviolin <- function(data,
       fill = pal_fill,
       col = pal_line, 
       size = size_line, 
-      width = size_width
+      width = width
       )
 
   #y scale 
@@ -148,7 +149,7 @@ gg_hviolin <- function(data,
     scale_x_discrete(expand = y_expand, labels = y_labels)
   
   #x scale
-  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
   x_zero <- x_zero_list[[1]]
   x_zero_line <- x_zero_list[[2]]
   
@@ -157,7 +158,7 @@ gg_hviolin <- function(data,
       scale_y_continuous(expand = x_expand, breaks = c(0, 1), labels = x_labels, limits = c(0, 1))
   }
   else ({
-    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
+    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
     x_limits <- c(min(x_breaks), max(x_breaks))
     
     plot <- plot +
@@ -196,8 +197,9 @@ gg_hviolin <- function(data,
 }
 
 #' @title Horizontal violin ggplot that is coloured.
+#' 
 #' @description Horizontal violin ggplot that is coloured, but not facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to density statistics. Required input.
+#' @param data A data frame in a structure to be transformed to density statistics. Required input.
 #' @param x_var Generally an unquoted numeric variable to be on the x scale. However if stat = "identity" is selected, a list-column with min, lower, middle, upper, and max variable names.
 #' @param y_var Unquoted categorical variable to be on the y scale (i.e. character, factor, or logical). Required input.
 #' @param col_var Unquoted categorical or numeric variable to colour the boxplots. Required input.
@@ -207,12 +209,12 @@ gg_hviolin <- function(data,
 #' @param alpha_fill The opacity of the fill. Defaults to 1. 
 #' @param alpha_line The opacity of the outline. Defaults to 1. 
 #' @param size_line The size of the outlines of violins. Defaults to 0.5.
-#' @param size_width Width of boxes. Defaults to 0.75.
+#' @param width Width of boxes. Defaults to 0.75.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 60. 
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
 #' @param x_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2. 
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. Use ggplot2::waiver() to keep x labels untransformed.
@@ -264,12 +266,12 @@ gg_hviolin_col <- function(data,
                            alpha_fill = 1,
                            alpha_line = 1,
                            size_line = 0.5,
-                           size_width = 0.75,
+                           width = 0.75,
                            title = NULL,
                            title_wrap = 75,
                            subtitle = NULL,
                            subtitle_wrap = 75,
-                           x_balance = FALSE,
+                           x_zero_mid = FALSE,
                            x_breaks_n = 5,
                            x_expand = c(0, 0),
                            x_labels = scales::label_comma(),
@@ -291,7 +293,7 @@ gg_hviolin_col <- function(data,
                            col_title_wrap = 25,
                            caption = NULL,
                            caption_wrap = 75,
-                           theme = gg_theme(gridlines_v = TRUE),
+                           theme = gg_theme(x_grid = TRUE),
                            model_scale = "area",
                            model_bw = "nrd0",
                            model_adjust = 1,
@@ -371,7 +373,7 @@ gg_hviolin_col <- function(data,
   }
   else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+  if (is.null(pal)) pal <- pal_d3_mix(col_n)
   pal <- pal[col_n:1] #different because horizontal!
   
   if (pal_rev == TRUE) pal <- rev(pal)
@@ -383,13 +385,13 @@ gg_hviolin_col <- function(data,
   
   #fundamentals
   plot <- ggplot(data) +
-    coord_flip(clip = "off") +
+    coord_flip() +
     theme +
     geom_violin(
       aes(x = !!y_var, y = !!x_var, col = !!col_var, fill = !!col_var),
       scale = model_scale, bw = model_bw, adjust = model_adjust, kernel = model_kernel, trim = model_trim,
       size = size_line, 
-      width = size_width
+      width = width
     )
 
   #y scale 
@@ -397,7 +399,7 @@ gg_hviolin_col <- function(data,
     scale_x_discrete(expand = y_expand, labels = y_labels)
   
   #x scale
-  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
   x_zero <- x_zero_list[[1]]
   x_zero_line <- x_zero_list[[2]]
   
@@ -406,7 +408,7 @@ gg_hviolin_col <- function(data,
       scale_y_continuous(expand = x_expand, breaks = c(0, 1), labels = x_labels, limits = c(0, 1))
   }
   else ({
-    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
+    x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = mobile)
     x_limits <- c(min(x_breaks), max(x_breaks))
     
     plot <- plot +
@@ -438,18 +440,10 @@ gg_hviolin_col <- function(data,
     ) 
   
   if (col_legend_none == FALSE) {
-    if (mobile == FALSE) {
       plot <- plot +
-        guides(col = guide_legend(reverse = TRUE), fill = guide_legend(reverse = TRUE))
-    }
-    else if (mobile == TRUE) {
-      plot <- plot +
-        guides(col = guide_legend(ncol = 1, reverse = TRUE), fill = guide_legend(ncol = 1, reverse = TRUE))
-    }
+        guides(col = guide_legend(reverse = TRUE), 
+               fill = guide_legend(reverse = TRUE))
   }
-  
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
   
   #titles
   if (mobile == FALSE) {
@@ -474,12 +468,18 @@ gg_hviolin_col <- function(data,
       theme_mobile_extra()
   }
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }
 
 #' @title Horizontal violin ggplot that is facetted.
+#' 
 #' @description Horizontal violin ggplot that is facetted, but not coloured.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to density statistics. Required input.
+#' @param data A data frame in a structure to be transformed to density statistics. Required input.
 #' @param x_var Generally an unquoted numeric variable to be on the x scale. However if stat = "identity" is selected, a list-column with min, lower, middle, upper, and max variable names.
 #' @param y_var Unquoted categorical variable to be on the y scale (i.e. character, factor, or logical). Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
@@ -487,12 +487,12 @@ gg_hviolin_col <- function(data,
 #' @param alpha_fill The opacity of the fill. Defaults to 1. 
 #' @param alpha_line The opacity of the outline. Defaults to 1. 
 #' @param size_line The size of the outlines of violins. Defaults to 0.5.
-#' @param size_width Width of boxes. Defaults to 0.75.
+#' @param width Width of boxes. Defaults to 0.75.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 60. 
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
 #' @param x_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2. 
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. Use ggplot2::waiver() to keep x labels untransformed.
@@ -537,16 +537,16 @@ gg_hviolin_facet <- function(data,
                              x_var = NULL,
                              y_var,
                              facet_var,
-                             pal = pal_viridis_reorder(1),
+                             pal = pal_viridis_mix(1),
                              alpha_fill = 1,
                              alpha_line = 1,
                              size_line = 0.5,
-                             size_width = 0.75,
+                             width = 0.75,
                              title = NULL,
                              title_wrap = 75,
                              subtitle = NULL,
                              subtitle_wrap = 75,
-                             x_balance = FALSE,
+                             x_zero_mid = FALSE,
                              x_breaks_n = 2,
                              x_expand = c(0, 0),
                              x_labels = scales::label_comma(),
@@ -568,7 +568,7 @@ gg_hviolin_facet <- function(data,
                              facet_scales = "fixed",
                              caption = NULL,
                              caption_wrap = 75,
-                             theme = gg_theme(gridlines_v = TRUE),
+                             theme = gg_theme(x_grid = TRUE),
                              model_scale = "area",
                              model_bw = "nrd0",
                              model_adjust = 1,
@@ -645,7 +645,7 @@ gg_hviolin_facet <- function(data,
   
   #fundamentals
   plot <- ggplot(data) +
-    coord_flip(clip = "off") +
+    coord_flip() +
     theme +   
     geom_violin(
       aes(x = !!y_var, y = !!x_var),
@@ -653,7 +653,7 @@ gg_hviolin_facet <- function(data,
       fill = pal_fill,
       col = pal_line, 
       size = size_line, 
-      width = size_width
+      width = width
     )
 
   #y scale
@@ -661,7 +661,7 @@ gg_hviolin_facet <- function(data,
     scale_x_discrete(expand = y_expand, labels = y_labels)
   
   #x scale
-  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
   if (facet_scales %in% c("fixed", "free_y")) x_zero <- x_zero_list[[1]]
   x_zero_line <- x_zero_list[[2]]
   
@@ -671,7 +671,7 @@ gg_hviolin_facet <- function(data,
         scale_y_continuous(expand = x_expand, breaks = c(0, 1), labels = x_labels, limits = c(0, 1))
     }
     else ({
-      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
+      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
       x_limits <- c(min(x_breaks), max(x_breaks))
       
       plot <- plot +
@@ -703,8 +703,9 @@ gg_hviolin_facet <- function(data,
 }
 
 #' @title Horizontal violin ggplot that is coloured and facetted.
+#' 
 #' @description Horizontal violin ggplot that is coloured and facetted.
-#' @param data An ungrouped summarised tibble or dataframe in a structure to be transformed to density statistics. Required input.
+#' @param data A data frame in a structure to be transformed to density statistics. Required input.
 #' @param x_var Generally an unquoted numeric variable to be on the x scale. However if stat = "identity" is selected, a list-column with min, lower, middle, upper, and max variable names.
 #' @param y_var Unquoted categorical variable to be on the y scale (i.e. character, factor, or logical). Required input.
 #' @param col_var Unquoted categorical or numeric variable to colour the boxplots. Required input.
@@ -715,12 +716,12 @@ gg_hviolin_facet <- function(data,
 #' @param alpha_fill The opacity of the fill. Defaults to 1. 
 #' @param alpha_line The opacity of the outline. Defaults to 1. 
 #' @param size_line The size of the outlines of violins. Defaults to 0.5.
-#' @param size_width Width of boxes. Defaults to 0.75.
+#' @param width Width of boxes. Defaults to 0.75.
 #' @param title Title string. 
 #' @param title_wrap Number of characters to wrap the title to. Defaults to 60. 
 #' @param subtitle Subtitle string. 
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 60. 
-#' @param x_balance For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
+#' @param x_zero_mid For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.
 #' @param x_expand A vector of range expansion constants used to add padding to the x scale, as per the ggplot2 expand argument in ggplot2 scales functions. 
 #' @param x_labels A function or named vector to modify x scale labels. Use ggplot2::waiver() to keep x labels untransformed.
 #' @param x_breaks_n For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 5. 
@@ -780,13 +781,13 @@ gg_hviolin_col_facet <- function(data,
                                  alpha_fill = 1,
                                  alpha_line = 1,
                                  size_line = 0.5,
-                                 size_width = 0.75,
+                                 width = 0.75,
                                  title = NULL,
                                  title_wrap = 75,
                                  subtitle = NULL,
                                  subtitle_wrap = 75,
                                  x_breaks_n = 2,
-                                 x_balance = FALSE,
+                                 x_zero_mid = FALSE,
                                  x_expand = c(0, 0),
                                  x_labels = scales::label_comma(),
                                  x_title = NULL,
@@ -813,7 +814,7 @@ gg_hviolin_col_facet <- function(data,
                                  facet_scales = "fixed",
                                  caption = NULL,
                                  caption_wrap = 75,
-                                 theme = gg_theme(gridlines_v = TRUE),
+                                 theme = gg_theme(x_grid = TRUE),
                                  model_scale = "area",
                                  model_bw = "nrd0",
                                  model_adjust = 1,
@@ -912,7 +913,7 @@ gg_hviolin_col_facet <- function(data,
   }
   else col_n <- length(unique(col_var_vctr))
   
-  if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+  if (is.null(pal)) pal <- pal_d3_mix(col_n)
   pal <- pal[col_n:1] #different because horizontal!
   
   if (pal_rev == TRUE) pal <- rev(pal)
@@ -924,13 +925,13 @@ gg_hviolin_col_facet <- function(data,
   
   #fundamentals
   plot <- ggplot(data) +
-    coord_flip(clip = "off") +
+    coord_flip() +
     theme +
     geom_violin(
       aes(x = !!y_var, y = !!x_var, col = !!col_var, fill = !!col_var), 
       scale = model_scale, bw = model_bw, adjust = model_adjust, kernel = model_kernel, trim = model_trim,
       size = size_line, 
-      width = size_width
+      width = width
     )
 
   #y scale
@@ -938,7 +939,7 @@ gg_hviolin_col_facet <- function(data,
     scale_x_discrete(expand = y_expand, labels = y_labels)
   
   #x scale
-  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_balance = x_balance, x_zero = x_zero, x_zero_line = x_zero_line)
+  x_zero_list <- sv_x_zero_adjust(x_var_vctr, x_zero_mid = x_zero_mid, x_zero = x_zero, x_zero_line = x_zero_line)
   if (facet_scales %in% c("fixed", "free_y")) x_zero <- x_zero_list[[1]]
   x_zero_line <- x_zero_list[[2]]
   
@@ -948,7 +949,7 @@ gg_hviolin_col_facet <- function(data,
         scale_y_continuous(expand = x_expand, breaks = c(0, 1), labels = x_labels, limits = c(0, 1))
     }
     else ({
-      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_balance, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
+      x_breaks <- sv_numeric_breaks_h(x_var_vctr, balance = x_zero_mid, breaks_n = x_breaks_n, zero = x_zero, mobile = FALSE)
       x_limits <- c(min(x_breaks), max(x_breaks))
       
       plot <- plot +
@@ -967,11 +968,9 @@ gg_hviolin_col_facet <- function(data,
   
   if (col_legend_none == FALSE) {
     plot <- plot +
-      guides(col = guide_legend(reverse = TRUE), fill = guide_legend(reverse = TRUE))
+      guides(col = guide_legend(reverse = TRUE), 
+             fill = guide_legend(reverse = TRUE))
   } 
-  
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
   
   #colour, titles & facetting
   plot <- plot +
@@ -997,6 +996,11 @@ gg_hviolin_col_facet <- function(data,
       caption = stringr::str_wrap(caption, caption_wrap)
     ) +
     facet_wrap(vars(!!facet_var), labeller = as_labeller(facet_labels), scales = facet_scales, ncol = facet_ncol, nrow = facet_nrow)
+  
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
   
   return(plot)
 }

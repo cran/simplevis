@@ -6,13 +6,13 @@
 \usage{
 gg_hpointrange_facet(
   data,
-  xmiddle_var,
+  x_var,
   xmin_var,
   xmax_var,
   y_var,
   facet_var,
   text_var = NULL,
-  pal = pal_viridis_reorder(1),
+  pal = pal_viridis_mix(1),
   alpha_line = 1,
   alpha_point = 1,
   size_point = 1.5,
@@ -21,16 +21,16 @@ gg_hpointrange_facet(
   title_wrap = 75,
   subtitle = NULL,
   subtitle_wrap = 75,
-  x_balance = FALSE,
+  x_zero_mid = FALSE,
   x_breaks_n = 2,
   x_expand = c(0, 0),
   x_labels = scales::label_comma(),
   x_na_rm = FALSE,
-  x_title = "",
+  x_title = NULL,
   x_title_wrap = 50,
   x_zero = FALSE,
   x_zero_line = NULL,
-  y_balance = FALSE,
+  y_zero_mid = FALSE,
   y_breaks_n = 3,
   y_expand = NULL,
   y_labels = NULL,
@@ -48,13 +48,13 @@ gg_hpointrange_facet(
   facet_scales = "fixed",
   caption = NULL,
   caption_wrap = 75,
-  theme = gg_theme(gridlines_v = TRUE)
+  theme = gg_theme(x_grid = TRUE)
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
+\item{data}{A data frame in a structure to be plotted untransformed. Required input.}
 
-\item{xmiddle_var}{Unquoted numeric variable to be on the x scale. Required input.}
+\item{x_var}{Unquoted numeric variable for the point on the x scale. Required input.}
 
 \item{xmin_var}{Unquoted numeric variable to be the minimum of the x vertical line. Required input.}
 
@@ -74,7 +74,7 @@ gg_hpointrange_facet(
 
 \item{size_point}{Size of points. Defaults to 1.5.}
 
-\item{size_line}{Size of lines. Defaults to 0.75.}
+\item{size_line}{Size of lines. Defaults to 0.5.}
 
 \item{title}{Title string.}
 
@@ -84,7 +84,7 @@ gg_hpointrange_facet(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 60.}
 
-\item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
+\item{x_zero_mid}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
 
 \item{x_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2.}
 
@@ -92,7 +92,7 @@ gg_hpointrange_facet(
 
 \item{x_labels}{A function or named vector to modify x scale labels. Use function(x) x to keep labels untransformed.}
 
-\item{x_na_rm}{TRUE or FALSE of whether to include xmiddle_var NA values. Defaults to FALSE.}
+\item{x_na_rm}{TRUE or FALSE of whether to include x_var NA values. Defaults to FALSE.}
 
 \item{x_title}{X scale title string. Defaults to "".}
 
@@ -100,9 +100,9 @@ gg_hpointrange_facet(
 
 \item{x_zero}{For a numeric x variable, TRUE or FALSE of whether the minimum of the x scale is zero. Defaults to FALSE.}
 
-\item{x_zero_line}{For a numeric x variable, TRUE or FALSE whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in xmiddle_var. Otherwise defaults to FALSE.}
+\item{x_zero_line}{For a numeric x variable, TRUE or FALSE whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
-\item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre. Defaults to FALSE.}
+\item{y_zero_mid}{For a numeric y variable, add balance to the y scale so that zero is in the centre. Defaults to FALSE.}
 
 \item{y_breaks_n}{For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4.}
 
@@ -160,7 +160,7 @@ plot_data <- penguins \%>\%
 gg_hpointrange_facet(
   plot_data,
   y_var = species,
-  xmiddle_var = middle,
+  x_var = middle,
   xmin_var = lower,
   xmax_var = upper,
   facet_var = sex,

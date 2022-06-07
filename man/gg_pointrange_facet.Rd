@@ -7,12 +7,12 @@
 gg_pointrange_facet(
   data,
   x_var,
-  ymiddle_var,
+  y_var,
   ymin_var,
   ymax_var,
   facet_var,
   text_var = NULL,
-  pal = pal_viridis_reorder(1),
+  pal = pal_viridis_mix(1),
   alpha_line = 1,
   alpha_point = 1,
   size_point = 1.5,
@@ -21,7 +21,7 @@ gg_pointrange_facet(
   title_wrap = 80,
   subtitle = NULL,
   subtitle_wrap = 80,
-  x_balance = FALSE,
+  x_zero_mid = FALSE,
   x_breaks_n = 2,
   x_expand = NULL,
   x_labels = NULL,
@@ -31,12 +31,12 @@ gg_pointrange_facet(
   x_title_wrap = 50,
   x_zero = FALSE,
   x_zero_line = NULL,
-  y_balance = FALSE,
+  y_zero_mid = FALSE,
   y_breaks_n = 3,
   y_expand = c(0, 0),
   y_labels = scales::label_comma(),
   y_na_rm = FALSE,
-  y_title = "",
+  y_title = NULL,
   y_title_wrap = 50,
   y_zero = FALSE,
   y_zero_line = NULL,
@@ -48,15 +48,15 @@ gg_pointrange_facet(
   facet_scales = "fixed",
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(gridlines_h = TRUE)
+  theme = gg_theme(y_grid = TRUE)
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
+\item{data}{A data frame in a structure to be plotted untransformed. Required input.}
 
 \item{x_var}{Unquoted variable to be on the x scale (i.e. character, factor, logical, numeric, date or datetime). Required input.}
 
-\item{ymiddle_var}{Unquoted numeric variable to be on the y scale. Required input.}
+\item{y_var}{Unquoted numeric variable for the point on the y scale. Required input.}
 
 \item{ymin_var}{Unquoted numeric variable to be the minimum of the y vertical line. Required input.}
 
@@ -74,7 +74,7 @@ gg_pointrange_facet(
 
 \item{size_point}{Size of points. Defaults to 1.5.}
 
-\item{size_line}{Size of lines. Defaults to 0.75.}
+\item{size_line}{Size of lines. Defaults to 0.5.}
 
 \item{title}{Title string.}
 
@@ -84,7 +84,7 @@ gg_pointrange_facet(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 100.}
 
-\item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
+\item{x_zero_mid}{For a numeric x variable, add balance to the x scale so that zero is in the centre. Defaults to FALSE.}
 
 \item{x_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2.}
 
@@ -104,7 +104,7 @@ gg_pointrange_facet(
 
 \item{x_zero_line}{For a numeric x variable, TRUE or FALSE of whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
-\item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
+\item{y_zero_mid}{For a numeric y variable, add balance to the y scale so that zero is in the centre of the y scale.}
 
 \item{y_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 4.}
 
@@ -112,7 +112,7 @@ gg_pointrange_facet(
 
 \item{y_labels}{A function or named vector to modify y scale labels. Use ggplot2::waiver() to keep y labels untransformed.}
 
-\item{y_na_rm}{TRUE or FALSE of whether to include ymiddle_var NA values. Defaults to FALSE.}
+\item{y_na_rm}{TRUE or FALSE of whether to include y_var NA values. Defaults to FALSE.}
 
 \item{y_title}{y scale title string. Defaults to "".}
 
@@ -120,7 +120,7 @@ gg_pointrange_facet(
 
 \item{y_zero}{For a numeric y variable, TRUE or FALSE of whether the minimum of the y scale is zero. Defaults to TRUE.}
 
-\item{y_zero_line}{For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in ymiddle_var. Otherwise defaults to FALSE.}
+\item{y_zero_line}{For a numeric y variable, TRUE or FALSE whether to add a zero reference line to the y scale. Defaults to TRUE if there are positive and negative values in y_var. Otherwise defaults to FALSE.}
 
 \item{facet_labels}{A function or named vector to modify facet scale labels. Defaults to converting labels to sentence case. Use ggplot2::waiver() to keep facet labels untransformed.}
 
@@ -160,7 +160,7 @@ plot_data <- penguins \%>\%
 gg_pointrange_facet(
   plot_data,
   x_var = species,
-  ymiddle_var = middle,
+  y_var = middle,
   ymin_var = lower,
   ymax_var = upper,
   facet_var = sex,

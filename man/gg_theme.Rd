@@ -2,7 +2,7 @@
 % Please edit documentation in R/gg_theme.R
 \name{gg_theme}
 \alias{gg_theme}
-\title{Create a simple theme for a graph.}
+\title{Quick theme for a ggplot.}
 \usage{
 gg_theme(
   font = "",
@@ -14,7 +14,7 @@ gg_theme(
   size_body = 10,
   size_axis = 0.3,
   size_ticks = 0.3,
-  size_gridlines = 0.2,
+  size_grid = 0.2,
   style_title = "bold",
   style_subtitle = "plain",
   style_body = "plain",
@@ -24,9 +24,11 @@ gg_theme(
   pal_axis = "#323232",
   pal_ticks = "#323232",
   pal_background = c("#ffffff", "#ffffff"),
-  pal_gridlines = "#D3D3D3",
-  gridlines_h = FALSE,
-  gridlines_v = FALSE,
+  pal_grid = "#D3D3D3",
+  y_grid = FALSE,
+  x_grid = FALSE,
+  gridlines_v = NULL,
+  gridlines_h = NULL,
   void = FALSE
 )
 }
@@ -49,7 +51,7 @@ gg_theme(
 
 \item{size_ticks}{The size of the ticks. Defaults to 0.3.}
 
-\item{size_gridlines}{The size of the vertical major gridlines. Defaults to 0.2.}
+\item{size_grid}{The size of the vertical major gridlines. Defaults to 0.2.}
 
 \item{style_title}{The style of the title font. Defaults to "bold".}
 
@@ -69,11 +71,15 @@ gg_theme(
 
 \item{pal_background}{A two colour vector. The first colour if for the panel (and legend key). The second colour is for the rest of the background.}
 
-\item{pal_gridlines}{The colour palette for the vertical major gridlines. Defaults to "#D3D3D3".}
+\item{pal_grid}{The colour palette for the vertical major gridlines. Defaults to "#D3D3D3".}
 
-\item{gridlines_h}{TRUE or FALSE of whether to show hotizontal gridlines.}
+\item{y_grid}{TRUE or FALSE of whether to show hotizontal gridlines.}
 
-\item{gridlines_v}{TRUE or FALSE of whether to show vertical gridlines.}
+\item{x_grid}{TRUE or FALSE of whether to show vertical gridlines.}
+
+\item{gridlines_v}{DEPRECATED. Use x_grid.}
+
+\item{gridlines_h}{DEPRECATED. Use y_grid.}
 
 \item{void}{TRUE or FALSE of whether to drop all axis lines, ticks and x and y labels. Useful for maps. Defaults to FALSE.}
 }
@@ -81,5 +87,5 @@ gg_theme(
 A ggplot theme.
 }
 \description{
-Create a simple theme for a graph.
+Quick theme for a ggplot visualisation.
 }

@@ -8,7 +8,7 @@ gg_histogram_facet(
   data,
   x_var,
   facet_var,
-  pal = pal_viridis_reorder(1),
+  pal = pal_viridis_mix(1),
   alpha_fill = 0.5,
   alpha_line = 1,
   size_line = 0.5,
@@ -35,11 +35,11 @@ gg_histogram_facet(
   facet_scales = "fixed",
   caption = NULL,
   caption_wrap = 80,
-  theme = gg_theme(gridlines_h = TRUE)
+  theme = gg_theme(y_grid = TRUE)
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be transformed to histogram statistics. Required input.}
+\item{data}{A data frame in a structure to be transformed to histogram statistics. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
@@ -105,7 +105,7 @@ gg_histogram_facet(
 A ggplot object.
 }
 \description{
-histogram ggplot that is facetted, but not coloured.
+Histogram ggplot that is facetted, but not coloured.
 }
 \examples{
 library(simplevis)

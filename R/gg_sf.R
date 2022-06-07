@@ -1,4 +1,5 @@
 #' @title Simple feature ggplot map.
+#' 
 #' @description Map of simple features in ggplot that is not coloured and not facetted. 
 #' @param data A sf object with defined coordinate reference system in a structure to be plotted untransformed. Required input.
 #' @param text_var Unquoted variable to be used as a customised tooltip in combination with plotly::ggplotly(plot, tooltip = "text"). Defaults to NULL.
@@ -31,7 +32,7 @@ gg_sf <- function(data,
                   text_var = NULL,
                   borders = NULL,
                   borders_on_top = NULL,
-                  pal = pal_viridis_reorder(1),
+                  pal = pal_viridis_mix(1),
                   pal_borders = "#7F7F7F",
                   alpha_fill = NULL,
                   alpha_line = 1,
@@ -171,6 +172,7 @@ gg_sf <- function(data,
 }
 
 #' @title Simple feature ggplot map that is coloured.
+#' 
 #' @description Map of simple features in ggplot that is coloured, but not facetted. 
 #' @param data A sf object with defined coordinate reference system in a structure to be plotted untransformed. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
@@ -194,7 +196,7 @@ gg_sf <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. Not applicable where mobile equals TRUE.
 #' @param col_breaks_n For a numeric colour variable, the desired number of intervals on the colour scale. 
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
-#' @param col_intervals_right For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_intervals_left For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.
 #' @param col_labels A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.   
 #' @param col_legend_none TRUE or FALSE of whether to remove the legend.
 #' @param col_method The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".
@@ -263,7 +265,7 @@ gg_sf_col <- function(data,
                       subtitle_wrap = 80,
                       col_breaks_n = 4,
                       col_cuts = NULL,
-                      col_intervals_right = TRUE,
+                      col_intervals_left = TRUE,
                       col_labels = NULL,
                       col_legend_none = FALSE,
                       col_na_rm = FALSE,
@@ -386,23 +388,36 @@ gg_sf_col <- function(data,
       
       if (is.function(col_labels)) {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE,
+              labels = santoku::lbl_intervals(raw = FALSE, fmt = col_labels)
+            )
+          ))
         
         col_labels <- sv_interval_labels_chr
       }
       else {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE
+            )
+          ))
       }
       
       col_n <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      if (is.null(pal)) pal <- pal_viridis_mix(col_n)
       else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
@@ -411,7 +426,7 @@ gg_sf_col <- function(data,
       }
       else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      if (is.null(pal)) pal <- pal_d3_mix(col_n)
       else pal <- pal[1:col_n]
       
       if (is.null(col_labels)) col_labels <- snakecase::to_sentence_case
@@ -498,25 +513,32 @@ gg_sf_col <- function(data,
     }
   }
   else if (col_method %in% c("quantile", "bin", "category")) {
-    if (geometry_type %in% c("POINT", "MULTIPOINT")) {
-      plot <- plot +
-        scale_colour_manual(
-          values = pal_point,
-          drop = FALSE,
-          labels = col_labels,
-          na.value = pal_na_point,
-          name = stringr::str_wrap(col_title, col_title_wrap)
-        )       
-    }
-    else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
-      plot <- plot +
-        scale_colour_manual(
-          values = pal_line,
-          drop = FALSE,
-          labels = col_labels,
-          na.value = pal_na_line,
-          name = stringr::str_wrap(col_title, col_title_wrap)
-        )       
+    if (geometry_type %in% c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING")) {
+      if (geometry_type %in% c("POINT", "MULTIPOINT")) {
+        plot <- plot +
+          scale_colour_manual(
+            values = pal_point,
+            drop = FALSE,
+            labels = col_labels,
+            na.value = pal_na_point,
+            name = stringr::str_wrap(col_title, col_title_wrap)
+          )       
+      }
+      else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
+        plot <- plot +
+          scale_colour_manual(
+            values = pal_line,
+            drop = FALSE,
+            labels = col_labels,
+            na.value = pal_na_line,
+            name = stringr::str_wrap(col_title, col_title_wrap)
+          )       
+      }
+      
+      if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
+        plot <- plot +
+          guides(col = guide_legend(reverse = TRUE))
+      }
     }
     else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
       plot <- plot +
@@ -532,17 +554,14 @@ gg_sf_col <- function(data,
           labels = col_labels,
           na.value = pal_na_fill,
           name = stringr::str_wrap(col_title, col_title_wrap))
-    }
-
-    if (mobile == TRUE) {
-      plot <- plot +
-        guides(col = guide_legend(ncol = 1),
-               fill = guide_legend(ncol = 1))
+      
+      if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
+        plot <- plot +
+          guides(col = guide_legend(reverse = TRUE), 
+                 fill = guide_legend(reverse = TRUE))
+      }
     }
   }
-  
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
   
   #borders
   if (!is.null(borders)) {
@@ -576,10 +595,16 @@ gg_sf_col <- function(data,
       theme_mobile_extra(void = TRUE)
   }
   
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
+
   return(plot)
 }
 
 #' @title Simple feature ggplot map that is facetted.
+#' 
 #' @description Map of simple features in ggplot that is facetted, but not coloured. 
 #' @param data A sf object with defined coordinate reference system in a structure to be plotted untransformed. Required input.
 #' @param facet_var Unquoted categorical variable to facet the data by. Required input.
@@ -619,7 +644,7 @@ gg_sf_col <- function(data,
 gg_sf_facet <- function(data,
                         facet_var,
                         text_var = NULL,
-                        pal = pal_viridis_reorder(1),
+                        pal = pal_viridis_mix(1),
                         pal_borders = "#7F7F7F",
                         borders = NULL,
                         borders_on_top = NULL,
@@ -781,6 +806,7 @@ gg_sf_facet <- function(data,
 }
 
 #' @title Simple feature ggplot map that is coloured and facetted.
+#' 
 #' @description Map of simple features in ggplot that is coloured and facetted. 
 #' @param data A sf object with defined coordinate reference system in a structure to be plotted untransformed. Required input.
 #' @param col_var Unquoted variable for points to be coloured by. Required input.
@@ -805,7 +831,7 @@ gg_sf_facet <- function(data,
 #' @param subtitle_wrap Number of characters to wrap the subtitle to. Defaults to 100. 
 #' @param col_breaks_n For a numeric colour variable. If "bin" col_method, the intervals on the colour scale for the pretty algorithm to aim for. If "quantile" col_method, the number of equal quantiles. Defaults to 4.
 #' @param col_cuts A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles. 
-#' @param col_intervals_right For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.
+#' @param col_intervals_left For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.
 #' @param col_labels A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::comma for numeric colour variables. Use ggplot2::waiver() to keep colour labels untransformed.   
 #' @param col_legend_none TRUE or FALSE of whether to remove the legend.
 #' @param col_method The method of colouring features, either "bin", "quantile", "continuous", or "category." If numeric, defaults to "bin".
@@ -852,7 +878,7 @@ gg_sf_col_facet <- function(data,
                             subtitle_wrap = 80,
                             col_breaks_n = 4,
                             col_cuts = NULL,
-                            col_intervals_right = TRUE,
+                            col_intervals_left = TRUE,
                             col_labels = NULL,
                             col_legend_none = FALSE,
                             col_method = NULL,
@@ -1002,23 +1028,36 @@ gg_sf_col_facet <- function(data,
       
       if (is.function(col_labels)) {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE, format_fun = col_labels)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE,
+              labels = santoku::lbl_intervals(raw = FALSE, fmt = col_labels)
+            )
+          ))
         
         col_labels <- sv_interval_labels_chr
       }
       else {
         data <- data %>%
-          dplyr::mutate(
-            dplyr::across(!!col_var, 
-                          ~ kimisc::cut_format(.x, col_cuts,
-                                       right = col_intervals_right, include.lowest = TRUE, dig.lab = 50, ordered_result = TRUE)))
+          dplyr::mutate(dplyr::across(
+            !!col_var,
+            ~ santoku::chop(
+              .x,
+              breaks = col_cuts,
+              left = col_intervals_left,
+              close_end = TRUE,
+              drop = FALSE
+            )
+          ))
       }
       
       col_n <- length(col_cuts) - 1
-      if (is.null(pal)) pal <- pal_viridis_reorder(col_n)
+      if (is.null(pal)) pal <- pal_viridis_mix(col_n)
       else pal <- pal[1:col_n]
     }
     else if (col_method == "category") {
@@ -1027,7 +1066,7 @@ gg_sf_col_facet <- function(data,
       }
       else col_n <- length(unique(col_var_vctr))
       
-      if (is.null(pal)) pal <- pal_d3_reorder(col_n)
+      if (is.null(pal)) pal <- pal_d3_mix(col_n)
       else pal <- pal[1:col_n]
       
       if (is.null(col_labels)) col_labels <- snakecase::to_sentence_case
@@ -1111,25 +1150,32 @@ gg_sf_col_facet <- function(data,
     }
   }
   else if (col_method %in% c("quantile", "bin", "category")) {
-    if (geometry_type %in% c("POINT", "MULTIPOINT")) {
-      plot <- plot +
-        scale_colour_manual(
-          values = pal_point,
-          drop = FALSE,
-          labels = col_labels,
-          na.value = pal_na_point,
-          name = stringr::str_wrap(col_title, col_title_wrap)
-        )       
-    }
-    else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
-      plot <- plot +
-        scale_colour_manual(
-          values = pal_line,
-          drop = FALSE,
-          labels = col_labels,
-          na.value = pal_na_line,
-          name = stringr::str_wrap(col_title, col_title_wrap)
-        )       
+    if (geometry_type %in% c("POINT", "MULTIPOINT", "LINESTRING", "MULTILINESTRING")) {
+      if (geometry_type %in% c("POINT", "MULTIPOINT")) {
+        plot <- plot +
+          scale_colour_manual(
+            values = pal_point,
+            drop = FALSE,
+            labels = col_labels,
+            na.value = pal_na_point,
+            name = stringr::str_wrap(col_title, col_title_wrap)
+          )       
+      }
+      else if (geometry_type %in% c("LINESTRING", "MULTILINESTRING")) {
+        plot <- plot +
+          scale_colour_manual(
+            values = pal_line,
+            drop = FALSE,
+            labels = col_labels,
+            na.value = pal_na_line,
+            name = stringr::str_wrap(col_title, col_title_wrap)
+          )       
+      }
+      
+      if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
+        plot <- plot +
+          guides(col = guide_legend(reverse = TRUE))
+      }
     }
     else if (geometry_type %in% c("POLYGON", "MULTIPOLYGON")) {
       plot <- plot +
@@ -1145,11 +1191,14 @@ gg_sf_col_facet <- function(data,
           labels = col_labels,
           na.value = pal_na_fill,
           name = stringr::str_wrap(col_title, col_title_wrap))
+      
+        if (col_legend_none == FALSE & col_method %in% c("quantile", "bin")) {
+          plot <- plot +
+            guides(col = guide_legend(reverse = TRUE), 
+                   fill = guide_legend(reverse = TRUE))
+        }
     }
   }
-  
-  if (col_legend_none == TRUE) plot <- plot +
-    theme(legend.position = "none")
   
   #borders
   if (!is.null(borders)) {
@@ -1172,6 +1221,11 @@ gg_sf_col_facet <- function(data,
       caption = stringr::str_wrap(caption, caption_wrap)
     ) +
     facet_wrap(vars(!!facet_var), labeller = as_labeller(facet_labels), scales = "fixed", ncol = facet_ncol, nrow = facet_nrow)
+  
+  if (col_legend_none == TRUE) {
+    plot <- plot +
+      theme(legend.position = "none")
+  }
 
   return(plot)
 }

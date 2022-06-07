@@ -17,12 +17,12 @@ gg_hbar_col(
   alpha_fill = 1,
   alpha_line = 1,
   size_line = 0.5,
-  size_width = NULL,
+  width = NULL,
   title = NULL,
   title_wrap = 75,
   subtitle = NULL,
   subtitle_wrap = 75,
-  x_balance = FALSE,
+  x_zero_mid = FALSE,
   x_breaks_n = 5,
   x_expand = c(0, 0),
   x_labels = scales::label_comma(),
@@ -31,7 +31,7 @@ gg_hbar_col(
   x_title_wrap = 50,
   x_zero = TRUE,
   x_zero_line = NULL,
-  y_balance = FALSE,
+  y_zero_mid = FALSE,
   y_breaks_n = 5,
   y_expand = NULL,
   y_labels = NULL,
@@ -43,7 +43,7 @@ gg_hbar_col(
   y_zero_line = NULL,
   col_breaks_n = 4,
   col_cuts = NULL,
-  col_intervals_right = TRUE,
+  col_intervals_left = TRUE,
   col_labels = NULL,
   col_legend_none = FALSE,
   col_method = NULL,
@@ -53,12 +53,12 @@ gg_hbar_col(
   col_title_wrap = 25,
   caption = NULL,
   caption_wrap = 75,
-  theme = gg_theme(gridlines_v = TRUE),
+  theme = gg_theme(x_grid = TRUE),
   mobile = FALSE
 )
 }
 \arguments{
-\item{data}{An ungrouped summarised tibble or dataframe in a structure to be plotted untransformed. Required input.}
+\item{data}{An ungrouped summarised tibble or data frame in a structure to be plotted untransformed. Required input.}
 
 \item{x_var}{Unquoted numeric variable to be on the x scale. Required input.}
 
@@ -82,7 +82,7 @@ gg_hbar_col(
 
 \item{size_line}{The size of the outlines of bars.}
 
-\item{size_width}{Width of bars. Defaults to 0.75.}
+\item{width}{Width of bars. Defaults to 0.75.}
 
 \item{title}{Title string.}
 
@@ -92,7 +92,7 @@ gg_hbar_col(
 
 \item{subtitle_wrap}{Number of characters to wrap the subtitle to. Defaults to 60.}
 
-\item{x_balance}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
+\item{x_zero_mid}{For a numeric x variable, add balance to the x scale so that zero is in the centre of the x scale.}
 
 \item{x_breaks_n}{For a numeric or date x variable, the desired number of intervals on the x scale, as calculated by the pretty algorithm. Defaults to 2.}
 
@@ -110,7 +110,7 @@ gg_hbar_col(
 
 \item{x_zero_line}{For a numeric x variable, TRUE or FALSE whether to add a zero reference line to the x scale. Defaults to TRUE if there are positive and negative values in x_var. Otherwise defaults to FALSE.}
 
-\item{y_balance}{For a numeric y variable, add balance to the y scale so that zero is in the centre. Defaults to FALSE.}
+\item{y_zero_mid}{For a numeric y variable, add balance to the y scale so that zero is in the centre. Defaults to FALSE.}
 
 \item{y_breaks_n}{For a numeric or date y variable, the desired number of intervals on the y scale, as calculated by the pretty algorithm. Defaults to 4.}
 
@@ -134,7 +134,7 @@ gg_hbar_col(
 
 \item{col_cuts}{A vector of cuts to colour a numeric variable. If "bin" is selected, the first number in the vector should be either -Inf or 0, and the final number Inf. If "quantile" is selected, the first number in the vector should be 0 and the final number should be 1. Defaults to quartiles.}
 
-\item{col_intervals_right}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut right-closed. Defaults to TRUE.}
+\item{col_intervals_left}{For a numeric colour variable, TRUE or FALSE of whether bins or quantiles are to be cut left-closed. Defaults to TRUE.}
 
 \item{col_labels}{A function or named vector to modify colour scale labels. Defaults to snakecase::to_sentence_case for categorical colour variables and scales::label_comma() for numeric. Use function(x) x to keep labels untransformed.}
 
@@ -185,6 +185,6 @@ gg_hbar_col(plot_data,
            col_var = sex,
            col_na_rm = TRUE,
            stack = TRUE,
-           size_width = 0.5)
+           width = 0.5)
             
 }
