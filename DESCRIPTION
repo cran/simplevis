@@ -1,8 +1,7 @@
 Package: simplevis
 Type: Package
-Title: Wrappers to Simplify Beautiful 'ggplot2' and 'leaflet'
-        Visualisation
-Version: 6.4.0
+Title: Wrappers to Simplify 'leaflet' Visualisation
+Version: 7.0.0
 Authors@R: 
     c(person(given = "David",
              family = "Hodge",
@@ -19,9 +18,9 @@ Authors@R:
              comment = c(ORCID = "0000-0002-1727-5110")),
       person(given = "Statistics New Zealand",
              role = c("cph")))
-Description: Wrapper functions around the amazing 'ggplot2' and 'leaflet' 
-    packages that aims to simplify beautiful 'ggplot2' and 'leaflet'  
-    visualisation. Precursor package to the 'ggblanket' package. 
+Description: Wrapper functions around the amazing 'leaflet' 
+    package that aims to simplify 'leaflet' visualisation. 
+    See the 'ggblanket' package for 'ggplot2' wrappers. 
 License: MIT + file LICENSE
 URL: https://StatisticsNZ.github.io/simplevis/,
         https://github.com/StatisticsNZ/simplevis/
@@ -29,20 +28,19 @@ BugReports: https://github.com/StatisticsNZ/simplevis/issues/
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
-Imports: dplyr, forcats, ggplot2, htmlwidgets, leaflet, leafem,
-        leafpop, lubridate, magrittr, plotly, purrr, rlang, santoku,
+Imports: dplyr, htmlwidgets, leaflet, leafem, leafpop, magrittr, rlang,
         scales, sf, shiny, snakecase, stars, stringr, tidyr,
-        tidyselect, viridis
-Suggests: DT, glue, gt, knitr, pals, palmerpenguins, patchwork, rgdal,
+        tidyselect, viridis, ggplot2
+Suggests: glue, gt, knitr, pals, palmerpenguins, patchwork, rgdal,
         rgeos, rmarkdown, s2, tibble, tidytext
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2022-08-05 12:47:21 UTC; david
+Packaged: 2023-01-29 19:35:59 UTC; david
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Kate Lee [ctb] (<https://orcid.org/0000-0002-0886-3746>),
   Xavier Miles [ctb] (<https://orcid.org/0000-0002-1727-5110>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-08-05 14:00:02 UTC
+Date/Publication: 2023-01-29 20:00:02 UTC
