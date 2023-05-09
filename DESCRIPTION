@@ -1,7 +1,7 @@
 Package: simplevis
 Type: Package
 Title: Wrappers to Simplify 'leaflet' Visualisation
-Version: 7.0.0
+Version: 7.1.0
 Authors@R: 
     c(person(given = "David",
              family = "Hodge",
@@ -32,15 +32,15 @@ Imports: dplyr, htmlwidgets, leaflet, leafem, leafpop, magrittr, rlang,
         scales, sf, shiny, snakecase, stars, stringr, tidyr,
         tidyselect, viridis, ggplot2
 Suggests: glue, gt, knitr, pals, palmerpenguins, patchwork, rgdal,
-        rgeos, rmarkdown, s2, tibble, tidytext
+        rgeos, rmarkdown, s2, tibble, tidytext, plotly
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2023-01-29 19:35:59 UTC; david
+Packaged: 2023-05-09 03:33:30 UTC; david
 Author: David Hodge [aut, cre] (<https://orcid.org/0000-0002-3868-7501>),
   Kate Lee [ctb] (<https://orcid.org/0000-0002-0886-3746>),
   Xavier Miles [ctb] (<https://orcid.org/0000-0002-1727-5110>),
   Statistics New Zealand [cph]
 Maintainer: David Hodge <davidhodge931@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-01-29 20:00:02 UTC
+Date/Publication: 2023-05-09 04:00:02 UTC

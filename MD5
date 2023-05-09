@@ -1,7 +1,8 @@
-4a30aa2b9e2365ec15be4350dcf3c572 *DESCRIPTION
+8fc20ef78e8d11b12aa972480ab9034b *DESCRIPTION
 1e269452f0618c945021603b10ec8322 *LICENSE
-3cf7d8ac878a567492ea31147429ee84 *NAMESPACE
-989189c35b9bd048cfe2fbee723ce838 *NEWS.md
+d6dcc14d9298ec2375a30e135d03bf2c *NAMESPACE
+97761186571bfb6b50b1be41c51a2c01 *NEWS.md
+aec4535d662a6fb22e072b4fd1c6fad9 *R/add_tooltip.R
 2e5cc10d7ba82bdf3c347d544fc2f034 *R/data.R
 e0d2787c2376da5987bcf4d9812e9943 *R/interval_labels.R
 f3987a77824abe4313df63841edd70ee *R/leaf_basemap.R
@@ -21,7 +22,8 @@ e8fa915198a2a563a7de59cd874ac498 *data/example_polygon.rda
 d0a35dbc67897d362dfd4953197d76e5 *data/example_stars.rda
 dd93f24c766472ca1eafd261026143d8 *inst/doc/simplevis.R
 2110bfd4b852b29e921eb09eb870adfb *inst/doc/simplevis.Rmd
-c916c9788d01170a2eca5761aca1ab3b *inst/doc/simplevis.html
+5d96c4687285a36f39cd899d869860b7 *inst/doc/simplevis.html
+7cfb4895e2db50cc0fd54891db8354d5 *man/add_tooltip.Rd
 c9075c96e36e46056e3ade6b61a80427 *man/example_borders.Rd
 19e919a5a8a5c2fcb7b1d8ac827aee8f *man/example_point.Rd
 47721a4a977bd46a8a626de1fcd0884f *man/example_polygon.Rd
